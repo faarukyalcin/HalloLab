@@ -213,6 +213,12 @@
     lastFelcanContext=serialized;
     frame.contentWindow.postMessage({type:explain?'deutschai:explain':'deutschai:context',context},location.origin);
   }
+  function setFelcanVisible(panel,visible){
+    panel.hidden=!visible;
+    const frame=panel.querySelector('iframe');
+    if(frame?.contentWindow)frame.contentWindow.postMessage({type:'deutschai:visibility',visible},location.origin);
+    if(visible)sendFelcanContext(true);
+  }
   function felkan(){
     if(!auth)return show();
     let panel=document.getElementById('da-felcan-window');
@@ -222,13 +228,12 @@
       panel.setAttribute('role','dialog');
       panel.setAttribute('aria-label','Felcan yardımcı öğretmen');
       panel.innerHTML='<div class="da-felcan-head"><strong>✦ Felcan <span>· Öğretmenin</span></strong><div style="display:flex;gap:6px"><button type="button" class="da-explain">Bu soruyu açıkla</button><button type="button" class="da-felcan-close" aria-label="Felcanı küçült">− Küçült</button></div></div><iframe title="Felcan Almanca öğretmeni" allow="microphone;autoplay" src="./felkan.html?compact=1&v=toy-1"></iframe>';
-      panel.querySelector('.da-felcan-close').onclick=()=>{panel.hidden=true;document.getElementById('da-felcan-float')?.focus()};
+      panel.querySelector('.da-felcan-close').onclick=()=>{setFelcanVisible(panel,false);document.getElementById('da-felcan-float')?.focus()};
       panel.querySelector('.da-explain').onclick=()=>sendFelcanContext(true,true);
       panel.querySelector('iframe').addEventListener('load',()=>sendFelcanContext(true));
       document.body.append(panel);
     }
-    panel.hidden=false;
-    sendFelcanContext(true);
+    setFelcanVisible(panel,true);
   }
   function floatingFelcan(){
     if(!auth||document.getElementById('da-felcan-float'))return;
@@ -236,7 +241,7 @@
     button.type='button';button.id='da-felcan-float';
     button.setAttribute('aria-label','Felcan yardımcı öğretmeni aç veya küçült');
     button.innerHTML='<span class="da-felcan-orb" aria-hidden="true"><span class="da-toy-eyes">● ●</span><span class="da-toy-smile">ᴗ</span><span class="da-toy-feet"></span><span class="da-toy-spark">✦</span></span><span class="da-felcan-text">Felcan<span class="da-felcan-sub">Yanında, hazır ✨</span></span>';
-    button.onclick=()=>{const panel=document.getElementById('da-felcan-window');if(panel&&!panel.hidden){panel.hidden=true;return}felkan()};
+    button.onclick=()=>{const panel=document.getElementById('da-felcan-window');if(panel&&!panel.hidden){setFelcanVisible(panel,false);return}felkan()};
     document.body.append(button);
     setInterval(()=>{if(document.getElementById('da-felcan-window'))sendFelcanContext()},1300);
   }
