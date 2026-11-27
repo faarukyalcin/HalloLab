@@ -99,3 +99,24 @@ body.intro-finished .app.study-app #view .panel-enter {
 @media(prefers-reduced-motion:reduce) {
  body.intro-finished .app.study-app #view .panel-enter { animation:none!important;will-change:auto; }
 }
+
+/* Preserve the landscape composition on desktop, and the original portrait crop on phones. */
+@media (min-width:768px) {
+  #deutschai-intro .intro-frame {
+    width:100%;
+    max-width:none;
+    height:100%;
+    box-shadow:none;
+    background:radial-gradient(ellipse at 50% 44%,#271e45,#070b19 78%);
+  }
+  #deutschai-intro .intro-frame video {
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    object-position:center;
+  }
+  #deutschai-intro .intro-skip {
+    right:max(28px,env(safe-area-inset-right));
+    top:max(25px,env(safe-area-inset-top));
+  }
+}
