@@ -252,12 +252,12 @@
   }
 }
 
-/* Four-slot Liquid Glass bottom dock: Home / Lessons / Practice / More */
+/* Five-slot Liquid Glass bottom dock: Home / Lessons / Felcan / Practice / More */
 .mobile-more-trigger,.mobile-more-menu{display:none}
 @media(max-width:999px){
  .app.study-app>.study-header .study-nav{
    display:grid!important;
-   grid-template-columns:repeat(4,minmax(0,1fr))!important;
+   grid-template-columns:repeat(5,minmax(0,1fr))!important;
    align-items:stretch!important;justify-content:stretch!important;
    gap:6px!important;overflow:visible!important;
    width:auto!important;min-width:0!important;
@@ -282,7 +282,51 @@
    color:#fff;background:linear-gradient(135deg,#9873fa,#7452db 55%,#5639bd);
    border-color:#c7a9ff9c;box-shadow:inset 0 1px 0 #ffffff53,0 7px 19px #7652dc66
  }
- .mobile-more-menu.open{display:block;position:fixed;inset:0;z-index:999}
+ 
+  /* Primary five-tab order. Felcan is deliberately in the middle. */
+  .app.study-app>.study-header .study-nav>[data-page="home"]{order:1}
+  .app.study-app>.study-header .study-nav>[data-page="lessons"]{order:2}
+  .app.study-app>.study-header .study-nav>[data-page="live"]{order:3}
+  .app.study-app>.study-header .study-nav>[data-page="practice"]{order:4}
+  .app.study-app>.study-header .study-nav>.mobile-more-trigger{order:5}
+  .app.study-app>.study-header .study-nav>.mobile-felcan-route{
+    position:relative;
+    border-color:#b798fa85!important;
+    background:linear-gradient(155deg,#724fbb99,#3a2b6dbd)!important;
+    overflow:visible!important;
+    color:#fff!important;
+  }
+  .app.study-app>.study-header .study-nav>.mobile-felcan-route .study-icon{display:none!important}
+  .app.study-app>.study-header .study-nav .mobile-felcan-emblem{
+    display:flex!important;position:relative;align-items:center;justify-content:center;
+    width:37px;height:37px;margin:-16px auto 0;flex:none;
+    border-radius:48% 48% 41% 41%;font:900 21px/1 system-ui;color:#4e2b7b;
+    border:1px solid #ffecffcc;
+    background:radial-gradient(circle at 30% 14%,#f6e7ff,#bf9cf2 47%,#8968d6);
+    box-shadow:inset 2px 2px 9px #fff9,0 5px 19px #ad76fa9c;
+    animation:mobile-felcan-float 4s ease-in-out infinite;
+  }
+  .app.study-app>.study-header .study-nav .mobile-felcan-emblem::before{
+    content:"●  ●";position:absolute;top:8px;left:7px;
+    color:#412660;font-size:10px;letter-spacing:1px;white-space:pre
+  }
+  .app.study-app>.study-header .study-nav .mobile-felcan-emblem::after{
+    content:"";position:absolute;z-index:-1;left:1px;top:-9px;
+    width:13px;height:19px;border-radius:70% 10% 80% 20%;
+    background:#ba92ed;transform:rotate(-22deg);
+    box-shadow:27px 12px 0 -2px #ba92ed;
+  }
+  .app.study-app>.study-header .study-nav>[data-page="live"][data-voice="listening"] .mobile-felcan-emblem::after{animation:mobile-felcan-ears .33s ease-in-out infinite alternate}
+  .app.study-app>.study-header .study-nav>[data-page="live"][data-voice="speaking"] .mobile-felcan-emblem{animation:mobile-felcan-speak .24s ease-in-out infinite alternate}
+  .app.study-app>.study-header .study-nav>[data-page="live"][data-voice="connecting"] .mobile-felcan-emblem{animation:mobile-felcan-ears .35s ease-in-out infinite alternate}
+  @keyframes mobile-felcan-float{50%{transform:translateY(-5px)}}
+  @keyframes mobile-felcan-ears{to{transform:rotate(6deg) translateY(-4px)}}
+  @keyframes mobile-felcan-speak{to{transform:rotate(6deg) scale(1.07)}}
+  #da-felcan-float{display:none!important}
+  #da-felcan-hello{left:12px!important;right:12px!important;bottom:calc(99px + env(safe-area-inset-bottom))!important;width:auto!important;text-align:center}
+  #da-felcan-hello::after{right:50%!important}
+
+  .mobile-more-menu.open{display:block;position:fixed;inset:0;z-index:999}
  .mobile-more-dismiss{position:absolute;inset:0;width:100%;border:0;background:#05071675}
  .mobile-more-sheet{
    position:absolute;left:10px;right:10px;
