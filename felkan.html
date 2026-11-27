@@ -1645,7 +1645,7 @@ $('#cmdSend').onclick=sendCmd;$('#cmdInput').addEventListener('keydown',e=>{if(e
 $('#bDebug').onclick=()=>{const d=$('#debug');d.classList.toggle('open');if(d.classList.contains('open')){d.textContent=LOGS.slice(-60).join('\n')||'(henüz kayıt yok)'}};
 
 $('#welcomeTitle').textContent='Hoş geldin, '+cfg.name+'.';
-if(!cfg.key)setTimeout(openSettings,400);
+if(!window.FelkanBridge?.user)setTimeout(()=>setStatus('error','DeutschAI hesabınla giriş yapmalısın'),400);
 window.felkanDebug={GE,GM,RP,rpAdd,resumeContext,makePlan,S,cfg,DATA:()=>DATA,PT,log,setPos,runTool,closeAll,ptShowResult,ptStats};
 })();
 </script>
