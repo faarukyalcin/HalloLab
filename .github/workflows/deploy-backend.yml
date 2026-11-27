@@ -1,0 +1,111 @@
+name: DeutschAI Cloudflare backend kurulumu
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: deutschai-backend-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CI: 'true'
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      ENCRYPTION_SECRET: ${{ secrets.ENCRYPTION_SECRET }}
+      ADMIN_BOOTSTRAP_SECRET: ${{ secrets.ADMIN_BOOTSTRAP_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check required secrets
+        run: |
+          set -eu
+          for secret_name in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID ENCRYPTION_SECRET ADMIN_BOOTSTRAP_SECRET; do
+            test -n "${!secret_name}" || { echo "Missing GitHub Actions secret: $secret_name"; exit 1; }
+          done
+          python3 - <<'PY'
+          import os, base64
+          value = os.environ['ENCRYPTION_SECRET']
+          assert len(base64.b64decode(value,validate=True)) == 32, 'ENCRYPTION_SECRET must be base64 of 32 random bytes'
+          assert len(os.environ['ADMIN_BOOTSTRAP_SECRET']) >= 32, 'ADMIN_BOOTSTRAP_SECRET must be >=32 characters'
+          PY
+      - name: Install Cloudflare CLI
+        run: npm install --global wrangler@4
+      - name: Find or create D1 database
+        run: |
+          set -euo pipefail
+          wrangler d1 list --json > /tmp/deutschai-d1-list.json
+          DB_ID=$(python3 - <<'PY'
+          import json
+          x=json.load(open('/tmp/deutschai-d1-list.json'))
+          rows=x if isinstance(x,list) else x.get('result',x.get('databases',[]))
+          print(next((d.get('uuid', d.get('id','')) for d in rows if d.get('name')=='deutschai'),''))
+          PY
+          )
+          if [ -z "$DB_ID" ]; then
+            wrangler d1 create deutschai --json > /tmp/deutschai-created.json
+            DB_ID=$(python3 - <<'PY'
+          import json
+          x=json.load(open('/tmp/deutschai-created.json'))
+          if isinstance(x,dict): x=x.get('result',x)
+          print(x.get('uuid',x.get('id','')))
+          PY
+            )
+          fi
+          test -n "$DB_ID" || { echo 'D1 database ID unavailable'; exit 1; }
+          sed -i "s/REPLACE_WITH_YOUR_D1_DATABASE_ID/$DB_ID/g" backend/wrangler.toml
+          echo 'D1 database binding prepared'
+      - name: Apply D1 schema
+        working-directory: backend
+        run: wrangler d1 migrations apply DB --remote
+      - name: Deploy Worker
+        working-directory: backend
+        run: |
+          set -euo pipefail
+          wrangler deploy | tee /tmp/deutschai-worker-deploy.log
+      - name: Install server-only secrets
+        working-directory: backend
+        run: |
+          set -euo pipefail
+          printf '%s' "$ENCRYPTION_SECRET" | wrangler secret put ENCRYPTION_SECRET
+          printf '%s' "$ADMIN_BOOTSTRAP_SECRET" | wrangler secret put ADMIN_BOOTSTRAP_SECRET
+      - name: Check Worker health and account endpoints
+        run: |
+          set -euo pipefail
+          WORKER_URL=$(grep -Eo 'https://[[:alnum:].-]+\.workers\.dev' /tmp/deutschai-worker-deploy.log | head -1)
+          test -n "$WORKER_URL" || { echo 'Worker URL not found'; exit 1; }
+          curl --retry 6 --retry-delay 2 -fsS "$WORKER_URL/health" | python3 -c 'import json,sys; assert json.load(sys.stdin).get("ok") is True'
+          CODE=$(curl -sS -o /tmp/deutschai-auth-check.json -w '%{http_code}' "$WORKER_URL/auth/me")
+          test "$CODE" = '401' || { echo "Unexpected auth check: $CODE"; exit 1; }
+          echo "WORKER_URL=$WORKER_URL" >> "$GITHUB_ENV"
+          echo "Backend responding at $WORKER_URL"
+      - name: Connect DeutschAI website
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os, pathlib, json
+          path=pathlib.Path('api-config.js')
+          path.write_text('/* Public API endpoint; do not place API keys here. */\nwindow.DEUTSCHAI_API_URL = '+json.dumps(os.environ['WORKER_URL'])+';\n')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add api-config.js
+          if ! git diff --cached --quiet; then
+            git commit -m 'Connect DeutschAI frontend to deployed Cloudflare API'
+            git push
+          fi
+      - name: Deployment summary
+        run: |
+          echo '### DeutschAI backend hazır' >> "$GITHUB_STEP_SUMMARY"
+          echo "Worker: $WORKER_URL" >> "$GITHUB_STEP_SUMMARY"
+          echo 'Bir hesap oluşturup ilk yönetici kurulumunu tamamlayın; Gemini anahtarını yalnız admin paneline girin.' >> "$GITHUB_STEP_SUMMARY"
