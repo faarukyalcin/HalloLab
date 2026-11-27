@@ -1,0 +1,54 @@
+body:not(.welcome-mode) .app,
+body.welcome-mode:has(.assistant-dashboard) .app{
+  display:grid!important;grid-template-columns:224px minmax(0,1fr)!important
+}
+body:not(.welcome-mode) .app>.side,
+body.welcome-mode:has(.assistant-dashboard) .app>.side{
+  display:flex!important;flex-direction:column;align-items:stretch;gap:14px;
+  grid-column:1;grid-row:1;position:sticky!important;top:0;
+  width:100%!important;height:100dvh!important;max-height:100dvh;overflow-y:auto!important;
+  padding:18px 13px!important;background:#0c1525!important;color:#edf5ff;border-right:1px solid #25364d;
+  box-shadow:none!important;transition:none!important;z-index:20
+}
+body:not(.welcome-mode) .app>.main,
+body.welcome-mode:has(.assistant-dashboard) .app>.main{grid-column:2;grid-row:1;min-width:0}
+.app>.side .brand{width:auto!important;justify-content:flex-start!important;padding:4px 7px!important;gap:9px}
+.app>.side .brand>div:last-child,.app>.side .brand b,.app>.side .brand small{
+  display:block!important;opacity:1!important;visibility:visible!important;max-width:none!important;transform:none!important
+}
+.app>.side .brand small{color:#aebed7}
+.app>.side .nav{display:grid!important;gap:5px!important;overflow:visible!important;width:100%;align-content:start;animation:none!important}
+.app>.side .nav-group{display:grid;gap:3px}
+.app>.side .nav-group-title{padding:7px 9px 3px;color:#aebed7;font-size:.8rem;font-weight:700}
+.app>.side .nav .nav-item{
+  display:grid!important;grid-template-columns:22px minmax(0,1fr)!important;align-items:center;justify-items:start!important;
+  text-align:left;gap:9px!important;min-height:39px;padding:7px 9px!important;border:1px solid transparent;
+  border-radius:10px;background:transparent;color:#dbe8f9;box-shadow:none!important;transform:none!important;
+  font-size:.93rem;line-height:1.25;animation:none!important;transition:background .15s
+}
+.app>.side .nav .nav-item:hover{background:#182840}
+.app>.side .nav .nav-item[aria-current=page]{background:#163246;color:#77f0ee;border-color:#28536a}
+.app>.side .nav .nav-item .nav-label{
+  display:block!important;opacity:1!important;visibility:visible!important;max-width:none!important;
+  transform:none!important;white-space:normal!important;color:inherit
+}
+.app>.side .nav .nav-item .nav-icon{display:grid;place-items:center;color:inherit;background:none!important;box-shadow:none!important;width:21px;height:21px}
+.app>.side .nav .nav-item:focus-visible,.app>.side .nav-toggle:focus-visible{outline:2px solid #77f0ee;outline-offset:2px}
+.app>.side .theme-picker{display:block!important;max-height:none!important;opacity:1!important;visibility:visible!important;transform:none!important;margin:0!important}
+.app>.side .nav-toggle{display:none}
+@media(max-width:760px){
+  body:not(.welcome-mode) .app,
+  body.welcome-mode:has(.assistant-dashboard) .app{grid-template-columns:minmax(0,1fr)!important}
+  body:not(.welcome-mode) .app>.side,
+  body.welcome-mode:has(.assistant-dashboard) .app>.side{
+    grid-column:1;grid-row:1;height:auto!important;max-height:100dvh;padding:8px 13px!important;gap:8px;border-right:0;border-bottom:1px solid #25364d
+  }
+  body:not(.welcome-mode) .app>.main,
+  body.welcome-mode:has(.assistant-dashboard) .app>.main{grid-column:1;grid-row:2}
+  .app>.side .brand{padding:1px 0!important;min-height:43px}
+  .app>.side .nav-toggle{
+    position:absolute;right:13px;top:9px;display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    min-height:40px;padding:0 11px;border:1px solid #38516a;border-radius:9px;background:#16273a;color:#edf5ff;cursor:pointer;font:inherit
+  }
+  .app>.side:not([data-nav-open]) .nav,.app>.side:not([data-nav-open]) .theme-picker{display:none!important}
+}
