@@ -19,7 +19,7 @@
     let n = 0;
     nodes.forEach(el => {
       if (el.classList.contains('panel-enter')) return;
-      el.style.setProperty('--panel-delay', Math.min(n++ * 65, 450) + 'ms');
+      el.style.setProperty('--panel-delay', Math.min(n++ * 42, 240) + 'ms');
       el.classList.add('panel-enter');
     });
   }
@@ -31,7 +31,7 @@
     document.body.classList.add('intro-finished');
     overlay.classList.add('is-leaving');
     video.pause();
-    setTimeout(() => { overlay.remove(); }, 900);
+    setTimeout(() => { overlay.remove(); }, 600);
   }
   video.addEventListener('ended', finish, {once:true});
   video.addEventListener('error', finish, {once:true});

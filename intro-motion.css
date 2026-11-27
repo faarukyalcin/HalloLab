@@ -67,3 +67,35 @@ body.intro-finished .app.study-app #view .panel-enter {
   #deutschai-intro {transition:none}
   body.intro-finished .app.study-app #view .panel-enter {animation:none!important}
 }
+
+/* High-quality restrained intro and polished transitions */
+#deutschai-intro {
+  background:#090c1b;
+  transition:opacity .55s cubic-bezier(.2,.7,.2,1), visibility .55s;
+}
+#deutschai-intro::before {display:none;}
+#deutschai-intro .intro-frame { width:min(100%,512px);box-shadow:none; }
+#deutschai-intro video { object-fit:contain; background:#090c1b; }
+#deutschai-intro .intro-shade {background:linear-gradient(180deg,transparent 78%,#090c1b72 100%);}
+#deutschai-intro .intro-skip {
+  top:max(24px,env(safe-area-inset-top));
+  padding:10px 16px;
+  background:#171d34b8;border-color:#ffffff42;
+  box-shadow:inset 0 1px 0 #ffffff20;
+}
+@keyframes deutschai-polished-enter {
+  from { opacity:0;transform:translate3d(0,9px,0); }
+  to { opacity:1;transform:translate3d(0,0,0); }
+}
+body.intro-finished .app.study-app #view .panel-enter {
+  animation:deutschai-polished-enter .52s cubic-bezier(.22,1,.36,1) both;
+  animation-delay:var(--panel-delay,0ms);
+  will-change:opacity,transform;
+}
+@media(max-width:600px) {
+  #deutschai-intro video {object-fit:contain;}
+  #deutschai-intro .intro-frame {width:100%;box-shadow:none;}
+}
+@media(prefers-reduced-motion:reduce) {
+ body.intro-finished .app.study-app #view .panel-enter { animation:none!important;will-change:auto; }
+}
