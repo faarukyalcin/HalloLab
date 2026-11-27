@@ -195,12 +195,13 @@
     const root=document.getElementById('view');if(!root)return null;
     const title=root.querySelector('.top h1')?.textContent?.trim()||'DeutschAI';
     const q=[...root.querySelectorAll('.question')].find(x=>x.getClientRects().length&&!x.dataset.done)||root.querySelector('.question');
+    const practice=root.querySelector('#da-personal-practice .da-question');
     return {
       title,
       page:document.querySelector('#nav [aria-current="page"]')?.dataset.page||'home',
-      prompt:q?.querySelector('p b')?.textContent?.trim()||root.querySelector('#da-personal-practice .da-question b')?.textContent?.trim()||'',
+      prompt:q?.querySelector('p b')?.textContent?.trim()||practice?.querySelector('b')?.textContent?.trim()||'',
       passage:q?.querySelector('.study-prompt')?.textContent?.trim()||'',
-      options:[...(q?.querySelectorAll('.option')||[])].map(x=>x.textContent.trim()).slice(0,6),
+      options:[...(q?.querySelectorAll('.option')||practice?.querySelectorAll('.da-opts button')||[])].map(x=>x.textContent.trim()).slice(0,6),
       grammar:root.querySelector('details[open]')?.textContent?.slice(0,600)||''
     };
   }
