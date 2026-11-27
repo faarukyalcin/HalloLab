@@ -298,6 +298,8 @@
   }
   function felcanVisual(state,message){
     felcanState=state;
+    const mobile=document.querySelector('#nav [data-page="live"]');
+    if(mobile)mobile.dataset.voice=state;
     const button=document.getElementById('da-felcan-float');
     if(!button)return;
     button.dataset.voice=state;
