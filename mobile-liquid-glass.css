@@ -320,3 +320,136 @@
  .mobile-more-sheet{padding:12px}
  .mobile-more-links{gap:6px}
 }
+
+/* Floating Liquid Glass mobile header, matching the approved DeutschAI mockup.
+   The blur lives on a pseudo-element so the fixed bottom navigation stays viewport-fixed. */
+@media (max-width: 999px) {
+  body .app.study-app > .study-header {
+    position: sticky !important;
+    top: 9px;
+    z-index: 90;
+    box-sizing: border-box;
+    width: calc(100% - 24px);
+    min-height: 72px;
+    margin: 9px 12px 0;
+    padding: 12px 17px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto;
+    align-items: center;
+    gap: 9px;
+    border: 1px solid #9f9ce568 !important;
+    border-radius: 27px !important;
+    background: transparent !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    transform: none !important;
+    filter: none !important;
+    box-shadow: 0 10px 30px #04091b50, inset 0 1px 0 #ffffff3a !important;
+  }
+  body .app.study-app > .study-header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    border-radius: inherit;
+    background:
+      radial-gradient(ellipse at 67% 120%, #8f50e633, transparent 53%),
+      radial-gradient(ellipse at 4% -5%, #d2bbff18, transparent 54%),
+      linear-gradient(135deg, #38487570, #202a536b 44%, #39285280),
+      color-mix(in srgb, var(--paper) 62%, transparent);
+    -webkit-backdrop-filter: blur(26px) saturate(160%);
+    backdrop-filter: blur(26px) saturate(160%);
+  }
+  body .app.study-app > .study-header::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    left: 15%;
+    right: 15%;
+    bottom: -1px;
+    height: 1px;
+    z-index: 1;
+    background: linear-gradient(90deg, transparent, #9a8aff99 45%, #ca74f3b3 72%, transparent);
+    box-shadow: 0 0 12px 2px #8a5bf766;
+  }
+  body .app.study-app > .study-header > :not(.study-nav) {
+    position: relative;
+    z-index: 1;
+  }
+  body .app.study-app > .study-header .study-head,
+  body .app.study-app > .study-header .study-tools {
+    align-self: center;
+    margin: 0;
+  }
+  body .app.study-app > .study-header .study-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: clamp(17px, 4.5vw, 21px);
+    font-weight: 800;
+    letter-spacing: -.04em;
+    white-space: nowrap;
+  }
+  body .app.study-app > .study-header .study-mark {
+    flex: 0 0 auto;
+    width: 45px;
+    height: 45px;
+    border-radius: 16px;
+    background: linear-gradient(140deg,#9a6afa,#5f3cb4 70%,#44267f);
+    border: 1px solid #cab3ff90;
+    box-shadow: inset 0 1px 0 #fff7, 0 6px 18px #8a52e45c;
+  }
+  body .app.study-app > .study-header .study-mark .deutschai-book-mark {
+    width: 85%;
+    height: 85%;
+  }
+  body .app.study-app > .study-header .study-appearance > summary {
+    display: grid;
+    place-items: center;
+    height: 44px;
+    width: 44px;
+    padding: 0;
+    border: 1px solid #a5a7e16b;
+    border-radius: 15px;
+    background: linear-gradient(150deg,#8791d12d,#4f5e9d12);
+    box-shadow: inset 0 1px 0 #ffffff3a, 0 4px 10px #080b2233;
+  }
+  body .app.study-app > .study-header .study-appearance > summary svg {
+    width: 21px;
+    height: 21px;
+  }
+  body .app.study-app .main {
+    padding-top: 24px;
+  }
+  body .app.study-app .main .top {
+    padding-inline: 3px;
+  }
+}
+@media (max-width: 600px) {
+  body .app.study-app > .study-header {
+    top: 8px;
+    width: calc(100% - 22px);
+    margin: 8px 11px 0;
+    padding: 10px 14px;
+    min-height: 69px;
+    border-radius: 25px !important;
+  }
+  body .app.study-app > .study-header .study-mark {
+    width: 43px;
+    height: 43px;
+    border-radius: 15px;
+  }
+  body .app.study-app > .study-header .study-appearance > summary {
+    width: 43px;
+    height: 43px;
+  }
+  body .app.study-app .main {
+    padding-top: 22px;
+  }
+}
+@media (max-width: 360px) {
+  body .app.study-app > .study-header { padding-inline: 11px; }
+  body .app.study-app > .study-header .study-brand { gap: 8px; font-size: 16px; }
+}
