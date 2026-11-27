@@ -478,7 +478,7 @@ body .app.study-app .main .glass-shortcuts > button { display:grid; justify-item
 </style><style>
 .study-brand .study-mark { background:linear-gradient(145deg,#6144b6,#3d267b 58%,#291d55); border:1px solid #d9beff75; border-radius:11px; box-shadow:inset 0 1px 0 #e2cfff4d,0 3px 12px #613ec858; }
 .study-brand .study-mark .deutschai-book-mark { display:block; width:87%; height:87%; }
-</style><link rel="stylesheet" href="./mobile-liquid-glass.css?v=20261128-bottomdock"></head><body><div class="scene-ribbons" aria-hidden="true"></div><div class="app study-app"><header class="study-header"><div class="study-head"><div class="study-brand"><div class="study-mark"><svg class="deutschai-book-mark" viewBox="0 0 48 48" aria-hidden="true" fill="none">
+</style><link rel="stylesheet" href="./mobile-liquid-glass.css?v=20261128-sixdock"></head><body><div class="scene-ribbons" aria-hidden="true"></div><div class="app study-app"><header class="study-header"><div class="study-head"><div class="study-brand"><div class="study-mark"><svg class="deutschai-book-mark" viewBox="0 0 48 48" aria-hidden="true" fill="none">
   <path d="M12 11h13c8 0 14 5.5 14 13s-6 13-14 13H12z" stroke="#fcfaff" stroke-width="3.1" stroke-linejoin="round"/>
   <path d="M12 18c4-1 8.2.2 12 3.2 3.5-2.8 7.3-4.1 11-3.4M12 27c4-1 8.2.2 12 3.2 4.2-3.3 8.5-4.6 13-3.1M24 21.2v9" stroke="#ded0ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
   <path d="M14.5 41h5" stroke="#f28a9c" stroke-width="2.2" stroke-linecap="round"/>
@@ -522,6 +522,14 @@ function setPage(p){
   render();
   window.scrollTo(0,0);
 }
+function toggleMobileMore(force) {
+  const menu = document.getElementById('mobile-more-menu');
+  const trigger = document.querySelector('.mobile-more-trigger');
+  if (!menu) return;
+  const open = typeof force === 'boolean' ? force : !menu.classList.contains('open');
+  menu.classList.toggle('open',open);
+  trigger?.setAttribute('aria-expanded', String(open));
+}
 function renderNav() {
   const nav = document.querySelector('#nav');
   const picker = document.querySelector('#theme-picker');
@@ -531,7 +539,22 @@ function renderNav() {
     const label = { home: 'Ana sayfa', words: 'Kelimeler', practice: 'Pratik', live: 'Asistan' }[id] || name;
     return `<button type="button" data-page="${id}" ${active === id ? 'aria-current="page"' : ''} onclick="setPage('${id}')"><span class="study-icon" aria-hidden="true">${navIcon(id)}</span>${label}</button>`;
   };
-  nav.innerHTML = navItems.map(route).join('');
+  const primaryMobile = ['home','lessons','words','practice','live'];
+  nav.innerHTML = navItems.map(route).join('') + `<button type="button" class="mobile-more-trigger" aria-label="Diğer sayfalar" aria-expanded="false" onclick="toggleMobileMore()"><span class="study-icon" aria-hidden="true">${navIcon('progress')}</span>Diğer</button>`;
+  let mobileMore = document.getElementById('mobile-more-menu');
+  if (!mobileMore) {
+    mobileMore = document.createElement('div');
+    mobileMore.id = 'mobile-more-menu';
+    mobileMore.className = 'mobile-more-menu';
+    document.body.appendChild(mobileMore);
+  }
+  mobileMore.classList.remove('open');
+  mobileMore.innerHTML = `<button type="button" class="mobile-more-dismiss" onclick="toggleMobileMore(false)" aria-label="Menüyü kapat"></button><div class="mobile-more-sheet" role="group" aria-label="Diğer sayfalar"><div class="mobile-more-heading">Diğer bölümler <button type="button" onclick="toggleMobileMore(false)" aria-label="Kapat">✕</button></div><div class="mobile-more-links">${navItems.filter(([id])=>!primaryMobile.includes(id)).map(route).join('')}</div></div>`;
+  nav.querySelectorAll('[data-page]').forEach(button => {
+    if(!primaryMobile.includes(button.dataset.page))button.classList.add('mobile-secondary-route');
+  });
+  if(!primaryMobile.includes(active))nav.querySelector('.mobile-more-trigger')?.setAttribute('data-current','');
+
   const wasOpen = picker.querySelector('details')?.open;
   const colors = [['light','Yeşil','#167461'],['ocean','Mavi','#3978c5'],['violet','Mor','#7957c8'],['rose','Pembe','#c05f7a'],['sunset','Turuncu','#c47a24']];
   picker.innerHTML = `<details class="study-disclosure study-appearance" ${wasOpen ? 'open' : ''}>
