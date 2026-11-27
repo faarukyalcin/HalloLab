@@ -101,6 +101,15 @@
     '#da-felcan-window .da-felcan-head span{font-size:11px;color:#c5b8e8}',
     '#da-felcan-window .da-felcan-close{border:1px solid #cfbaff66;border-radius:11px;background:#7661b655;color:#fff;font:600 12px system-ui;padding:9px 11px;cursor:pointer}',
     '#da-felcan-window iframe{flex:1;width:100%;min-height:0;border:0;background:transparent}',
+    '#da-felcan-window .da-explain{border:1px solid #c5a6ff77;background:#6844b886;color:white;border-radius:11px;padding:8px 9px;cursor:pointer;font:600 11px system-ui}',
+    '#da-felcan-float .da-felcan-orb{width:57px;height:63px;border-radius:46% 46% 40% 40%;overflow:visible;position:relative;background:radial-gradient(circle at 28% 9%,#f5e2ff,#ae8bf0 46%,#6552b4);box-shadow:inset 4px 5px 9px #fff9,inset -5px -7px 15px #482d9466,0 0 18px #9365df88}',
+    '#da-felcan-float .da-felcan-orb::before{content:"";position:absolute;width:18px;height:26px;background:#a485de;top:-10px;left:5px;border-radius:100% 5% 90% 20%;transform:rotate(-20deg);box-shadow:36px 13px 0 -2px #a485de}',
+    '#da-felcan-float .da-felcan-orb::after{display:none}',
+    '#da-felcan-float .da-toy-eyes{position:absolute;top:19px;left:12px;font:900 15px system-ui;white-space:pre;color:#302054;letter-spacing:6px}',
+    '#da-felcan-float .da-toy-smile{position:absolute;top:32px;left:24px;color:#39235c;font-size:18px;line-height:1}',
+    '#da-felcan-float .da-toy-feet{position:absolute;bottom:-6px;left:10px;background:#6645a0;width:14px;height:11px;border-radius:7px;box-shadow:26px 0 #6645a0}',
+    '#da-felcan-float .da-toy-spark{position:absolute;right:-10px;top:1px;color:#ffde8f;font-size:17px;filter:drop-shadow(0 0 6px #cba3ff)}',
+    '#da-felcan-window[hidden]{display:none!important}',
     '@keyframes da-felcan-fly{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}',
     '@keyframes da-felcan-appear{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}',
     '@media(max-width:600px){#da-felcan-float{bottom:82px;right:12px;padding:6px;border-radius:19px}#da-felcan-float .da-felcan-text{display:none}#da-felcan-float .da-felcan-orb{width:44px;height:44px}#da-felcan-window{right:8px;bottom:149px;width:calc(100vw - 16px);height:min(570px,calc(100dvh - 168px));border-radius:21px}}',
@@ -180,35 +189,66 @@
       else e.querySelector('#da-claim-admin').onclick=claimAdmin;
     };
   }
-  function felkan() {
-    if (!auth) return show();
-    let windowNode=document.getElementById('da-felcan-window');
-    if(!windowNode){
-      windowNode=document.createElement('section');
-      windowNode.id='da-felcan-window';
-      windowNode.setAttribute('role','dialog');
-      windowNode.setAttribute('aria-label','Felcan ile konuşma alanı');
-      windowNode.innerHTML='<div class="da-felcan-head"><div><strong>✦ Felcan</strong><span> · Almanca öğretmenin</span></div><button type="button" class="da-felcan-close" aria-label="Felcan konuşmasını kapat">✕ Kapat</button></div><iframe title="Felcan sesli Almanca öğretmeni" allow="microphone;autoplay" src="./felkan.html?compact=1&v=liquid-float-1"></iframe>';
-      windowNode.querySelector('.da-felcan-close').onclick=()=>{windowNode.remove();document.getElementById('da-felcan-float')?.focus()};
-      document.body.append(windowNode);
-    } else windowNode.querySelector('.da-felcan-close').focus();
+
+  let lastFelcanContext='';
+  function felcanScreenContext(){
+    const root=document.getElementById('view');if(!root)return null;
+    const title=root.querySelector('.top h1')?.textContent?.trim()||'DeutschAI';
+    const q=[...root.querySelectorAll('.question')].find(x=>x.getClientRects().length&&!x.dataset.done)||root.querySelector('.question');
+    return {
+      title,
+      page:document.querySelector('#nav [aria-current="page"]')?.dataset.page||'home',
+      prompt:q?.querySelector('p b')?.textContent?.trim()||root.querySelector('#da-personal-practice .da-question b')?.textContent?.trim()||'',
+      passage:q?.querySelector('.study-prompt')?.textContent?.trim()||'',
+      options:[...(q?.querySelectorAll('.option')||[])].map(x=>x.textContent.trim()).slice(0,6),
+      grammar:root.querySelector('details[open]')?.textContent?.slice(0,600)||''
+    };
+  }
+  function sendFelcanContext(force=false,explain=false){
+    const frame=document.querySelector('#da-felcan-window iframe');
+    if(!frame?.contentWindow)return;
+    const context=felcanScreenContext();if(!context)return;
+    const serialized=JSON.stringify(context);
+    if(!force&&serialized===lastFelcanContext)return;
+    lastFelcanContext=serialized;
+    frame.contentWindow.postMessage({type:explain?'deutschai:explain':'deutschai:context',context},location.origin);
+  }
+  function felkan(){
+    if(!auth)return show();
+    let panel=document.getElementById('da-felcan-window');
+    if(!panel){
+      panel=document.createElement('section');
+      panel.id='da-felcan-window';
+      panel.setAttribute('role','dialog');
+      panel.setAttribute('aria-label','Felcan yardımcı öğretmen');
+      panel.innerHTML='<div class="da-felcan-head"><strong>✦ Felcan <span>· Öğretmenin</span></strong><div style="display:flex;gap:6px"><button type="button" class="da-explain">Bu soruyu açıkla</button><button type="button" class="da-felcan-close" aria-label="Felcanı küçült">− Küçült</button></div></div><iframe title="Felcan Almanca öğretmeni" allow="microphone;autoplay" src="./felkan.html?compact=1&v=toy-1"></iframe>';
+      panel.querySelector('.da-felcan-close').onclick=()=>{panel.hidden=true;document.getElementById('da-felcan-float')?.focus()};
+      panel.querySelector('.da-explain').onclick=()=>sendFelcanContext(true,true);
+      panel.querySelector('iframe').addEventListener('load',()=>sendFelcanContext(true));
+      document.body.append(panel);
+    }
+    panel.hidden=false;
+    sendFelcanContext(true);
   }
   function floatingFelcan(){
     if(!auth||document.getElementById('da-felcan-float'))return;
     const button=document.createElement('button');
     button.type='button';button.id='da-felcan-float';
-    button.setAttribute('aria-label','Felcan asistanını aç');
-    button.innerHTML='<span class="da-felcan-orb" aria-hidden="true">✦</span><span class="da-felcan-text">Felcan<span class="da-felcan-sub">Konuşmak için dokun</span></span>';
-    button.onclick=()=>{const panel=document.getElementById('da-felcan-window');if(panel){panel.remove();return;}felkan()};
+    button.setAttribute('aria-label','Felcan yardımcı öğretmeni aç veya küçült');
+    button.innerHTML='<span class="da-felcan-orb" aria-hidden="true"><span class="da-toy-eyes">● ●</span><span class="da-toy-smile">ᴗ</span><span class="da-toy-feet"></span><span class="da-toy-spark">✦</span></span><span class="da-felcan-text">Felcan<span class="da-felcan-sub">Yanında, hazır ✨</span></span>';
+    button.onclick=()=>{const panel=document.getElementById('da-felcan-window');if(panel&&!panel.hidden){panel.hidden=true;return}felkan()};
     document.body.append(button);
+    setInterval(()=>{if(document.getElementById('da-felcan-window'))sendFelcanContext()},1300);
   }
   window.deutschaiStore=store;
   window.DeutschAI={api:request,store,get user(){return auth?.user||null;},get ready(){return !!origin && !!auth;},logout,showAdmin:admin,openFelkan:felkan};
   window.addEventListener('message',event=>{
     if (event.origin!==location.origin || event.data?.type!=='deutschai:navigate') return;
     if(!['home','lessons','grammar','words','practice','writing','exam','placement','progress'].includes(event.data.page))return;
-    document.getElementById('da-felcan-window')?.remove();
     if(typeof window.setPage==='function')window.setPage(event.data.page);
+    const current=document.querySelector('#nav [aria-current="page"]')?.dataset.page;
+    event.source?.postMessage({type:'deutschai:navigated',page:event.data.page,ok:current===event.data.page},event.origin);
+    sendFelcanContext(true);
   });
   document.addEventListener('DOMContentLoaded',async()=>{
     if(!origin)return; // Avoid locking the existing GitHub Pages site before backend activation.
