@@ -227,7 +227,7 @@
       panel.id='da-felcan-window';
       panel.setAttribute('role','dialog');
       panel.setAttribute('aria-label','Felcan yardımcı öğretmen');
-      panel.innerHTML='<div class="da-felcan-head"><strong>✦ Felcan <span>· Öğretmenin</span></strong><div style="display:flex;gap:6px"><button type="button" class="da-explain">Bu soruyu açıkla</button><button type="button" class="da-felcan-close" aria-label="Felcanı küçült">− Küçült</button></div></div><iframe title="Felcan Almanca öğretmeni" allow="microphone;autoplay" src="./felkan.html?compact=1&v=toy-1"></iframe>';
+      panel.innerHTML='<div class="da-felcan-head"><strong>✦ Felcan <span>· Öğretmenin</span></strong><div style="display:flex;gap:6px"><button type="button" class="da-explain">Bu soruyu açıkla</button><button type="button" class="da-felcan-close" aria-label="Felcanı küçült">− Küçült</button></div></div><iframe title="Felcan Almanca öğretmeni" allow="microphone;autoplay" src="./felkan.html?compact=1&v=toy-2"></iframe>';
       panel.querySelector('.da-felcan-close').onclick=()=>{setFelcanVisible(panel,false);document.getElementById('da-felcan-float')?.focus()};
       panel.querySelector('.da-explain').onclick=()=>sendFelcanContext(true,true);
       panel.querySelector('iframe').addEventListener('load',()=>sendFelcanContext(true));
