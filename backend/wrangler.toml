@@ -1,0 +1,13 @@
+name = "deutschai-api"
+main = "src.js"
+compatibility_date = "2026-11-28"
+
+[vars]
+SITE_ORIGIN = "https://faarukyalcin.github.io"
+GEMINI_TEXT_MODEL = "gemini-2.5-flash"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "deutschai"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+migrations_dir = "migrations"
