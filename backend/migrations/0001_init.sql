@@ -1,0 +1,29 @@
+PRAGMA foreign_keys=ON;
+CREATE TABLE IF NOT EXISTS users (
+  id TEXT PRIMARY KEY, username TEXT NOT NULL COLLATE NOCASE UNIQUE,
+  email TEXT NOT NULL COLLATE NOCASE UNIQUE, first_name TEXT NOT NULL,
+  last_name TEXT NOT NULL, password_salt TEXT NOT NULL, password_hash TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('user','admin')),
+  created_at INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS sessions (
+  token_hash TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  expires_at INTEGER NOT NULL, created_at INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS sessions_user_idx ON sessions(user_id);
+CREATE TABLE IF NOT EXISTS user_states (
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE, bucket TEXT NOT NULL,
+  data TEXT NOT NULL, revision INTEGER NOT NULL DEFAULT 1, updated_at INTEGER NOT NULL,
+  PRIMARY KEY(user_id,bucket)
+);
+CREATE TABLE IF NOT EXISTS app_settings (
+  key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS login_attempts (
+  key TEXT PRIMARY KEY, count INTEGER NOT NULL, reset_at INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS api_usage (
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  day TEXT NOT NULL, tokens INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY(user_id,day)
+);
