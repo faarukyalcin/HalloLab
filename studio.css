@@ -83,3 +83,32 @@ body.hallolab-shell .app>.side{
  .today-tools{border-left:0;border-top:1px solid var(--line);padding:20px 0 0}
 }
 @media(max-width:385px){.today-feature{grid-template-columns:1fr}.today-paper{display:none}.today-row{grid-template-columns:44px 1fr}.today-row>span:last-child{display:none}}
+
+/* One layout owns the header, including the tablet transition. */
+body.hallolab-shell .app>.side{scrollbar-gutter:auto}
+.hallolab-shell .app>.side .brand{flex:0 0 auto}
+.hallolab-shell .app>.side .nav{min-width:0;justify-content:center}
+.hallolab-shell .app>.side .theme-picker{flex:0 0 auto}
+.studio-navigation:not([open])>div{display:none}
+.studio-navigation summary:focus-visible{outline:2px solid var(--green);outline-offset:-3px}
+.hallolab-shell .main :is(input,select,textarea){max-width:100%;background:var(--paper);color:var(--ink);border-color:var(--line)}
+@media(max-width:950px){
+  body.hallolab-shell .app>.side{
+    display:block!important;padding:0 16px!important;max-height:100dvh;overflow-y:auto!important;
+  }
+  .hallolab-shell .app>.side .brand{min-height:59px}
+  .hallolab-shell .app>.side .nav-toggle{
+    display:inline-flex;align-items:center;gap:6px;position:absolute;top:9px;right:16px;cursor:pointer;font:inherit
+  }
+  .hallolab-shell .app>.side:not([data-nav-open]) :is(.nav,.theme-picker){display:none!important}
+  .hallolab-shell .app>.side[data-nav-open] .nav{display:grid!important;justify-content:stretch;gap:0!important}
+  .hallolab-shell .app>.side .nav .nav-item,.studio-navigation summary{width:100%;min-height:44px;justify-content:flex-start!important}
+  .studio-navigation>div{position:static;box-shadow:none}
+  .hallolab-shell .app>.side .theme-picker{padding:8px 0!important}
+}
+@media(max-width:500px){
+  .today-feature{grid-template-columns:minmax(0,1fr);gap:0}
+  .today-paper{display:none}
+  .today-row{grid-template-columns:42px minmax(0,1fr)}
+  .today-row>span:last-child{display:none}
+}
