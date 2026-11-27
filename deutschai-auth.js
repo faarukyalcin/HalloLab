@@ -217,18 +217,28 @@
   // Felcan speaks as a small animated character; a same-origin, visually-hidden
   // iframe keeps the Live connection alive while the learner navigates lessons.
   let lastFelcanContext='', felcanReady=false, felcanRequested=false, felcanState='idle';
+  let felcanFocusedQuestion=-1;
   function felcanScreenContext(){
     const root=document.getElementById('view');if(!root)return null;
     const title=root.querySelector('.top h1')?.textContent?.trim()||'DeutschAI';
-    const q=[...root.querySelectorAll('.question')].find(x=>x.getClientRects().length&&!x.dataset.done)||root.querySelector('.question');
-    const practice=root.querySelector('#da-personal-practice .da-question');
+    const nodes=[...root.querySelectorAll('.question, #da-personal-practice .da-question')];
+    const questions=nodes.slice(0,40).map((node,i)=>{
+      const prompt=node.querySelector('p b, b')?.textContent?.trim()||'';
+      const passage=node.querySelector('.study-prompt')?.textContent?.trim()||'';
+      const options=[...node.querySelectorAll('.option, .da-opts button')].map(x=>x.textContent.trim()).slice(0,8);
+      const feedback=node.querySelector('.feedback, .da-feedback')?.textContent?.trim()||'';
+      return {number:i+1,prompt:prompt.slice(0,280),passage:passage.slice(0,380),options,answered:node.dataset.done==='1',feedback:feedback.slice(0,220)};
+    });
+    const focused=nodes.findIndex(node=>node.contains(document.activeElement));
+    const selected=focused>=0?focused+1:felcanFocusedQuestion>0&&felcanFocusedQuestion<=questions.length?felcanFocusedQuestion:0;
     return {
-      title,
-      page:document.querySelector('#nav [aria-current="page"]')?.dataset.page||'home',
-      prompt:q?.querySelector('p b')?.textContent?.trim()||practice?.querySelector('b')?.textContent?.trim()||'',
-      passage:q?.querySelector('.study-prompt')?.textContent?.trim()||'',
-      options:[...(q?.querySelectorAll('.option')||practice?.querySelectorAll('.da-opts button')||[])].map(x=>x.textContent.trim()).slice(0,6),
-      grammar:root.querySelector('details[open]')?.textContent?.slice(0,600)||''
+      title,page:document.querySelector('#nav [aria-current="page"]')?.dataset.page||'home',
+      level:(document.querySelector('.study-next .badge')?.textContent||'').slice(0,20),
+      selectedQuestion:selected,
+      questionCount:nodes.length,
+      questions,
+      grammar:root.querySelector('details[open]')?.textContent?.slice(0,1100)||'',
+      lesson:root.querySelector('.classroom-lead')?.textContent?.slice(0,350)||''
     };
   }
   function felcanFrame(){
@@ -332,6 +342,7 @@
     button.setAttribute('aria-pressed','false');
     button.innerHTML='<span class="da-felcan-orb" aria-hidden="true"><span class="da-toy-eyes">● ●</span><span class="da-toy-smile">ᴗ</span><span class="da-toy-feet"></span><span class="da-toy-spark">✦</span></span><span class="da-felcan-text">Felcan<span class="da-felcan-sub">Konuşmak için dokun</span></span>';
     button.onclick=()=>{document.getElementById('da-felcan-hello')?.remove();startFelcanVoice()};
+    document.getElementById('view')?.addEventListener('click',e=>{const q=e.target.closest('.question, #da-personal-practice .da-question');if(!q)return;felcanFocusedQuestion=[...document.querySelectorAll('#view .question, #view #da-personal-practice .da-question')].indexOf(q)+1;sendFelcanContext(true)},true);
     document.body.append(button);
     ensureFelcanRuntime();
     felcanWelcome();
