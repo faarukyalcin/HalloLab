@@ -723,6 +723,7 @@ function buildSetup(c){
 function send(o){if(S.ws&&S.ws.readyState===1){S.ws.send(JSON.stringify(o));return true}return false}
 function notify(text){log('→ Felkan:',text.slice(0,160));return send({realtimeInput:{text}})}
 let felcanScreen=null,felcanPendingExplain=false;
+let felcanMinimizedMute=false;
 function describeFelcanScreen(context){
   if(!context)return '';
   const strings=[
@@ -736,6 +737,22 @@ function describeFelcanScreen(context){
 }
 window.addEventListener('message',event=>{
   if(event.origin!==location.origin||event.source!==window.parent||!event.data)return;
+  if(event.data.type==='deutschai:visibility'){
+    if(!event.data.visible){
+      felcanMinimizedMute=!S.muted;
+      if(felcanMinimizedMute){
+        S.muted=true;
+        S.stream?.getAudioTracks().forEach(track=>track.enabled=false);
+        document.getElementById('bMute')?.classList.add('on');
+      }
+    }else if(felcanMinimizedMute){
+      S.muted=false;felcanMinimizedMute=false;
+      S.stream?.getAudioTracks().forEach(track=>track.enabled=true);
+      document.getElementById('bMute')?.classList.remove('on');
+      if(S.setupDone)setStatus('listening','Dinliyorum… konuşabilirsin');
+    }
+    return;
+  }
   if(event.data.type==='deutschai:context'||event.data.type==='deutschai:explain'){
     felcanScreen=event.data.context||null;
     const explain=event.data.type==='deutschai:explain';
