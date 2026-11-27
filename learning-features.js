@@ -148,14 +148,6 @@
     </section>`;
   }
 
-  function appendHomeLearning() {
-    const view = document.querySelector('#view');
-    if (!view || view.querySelector('.learning-overview')) return;
-    const wrapper = document.createElement('div');
-    wrapper.className = 'learning-overview';
-    wrapper.innerHTML = `<div class="learning-overview-grid">${progressMarkup()}${dailyPlanMarkup()}</div>`;
-    view.appendChild(wrapper);
-  }
 
   function openPlanTask(index) {
     const task = packForToday()?.content?.schedule?.[index];
@@ -244,8 +236,6 @@
   window.deutschaiCreateHomePlan = createHomePlan;
   window.deutschaiOpenExtraWork = openExtraWork;
 
-  const baseHome = home;
-  home = function () { baseHome(); appendHomeLearning(); };
   const baseProgress = progress;
   progress = function () {
     baseProgress();
@@ -295,11 +285,4 @@
     };
   }
 
-  if (typeof MutationObserver !== 'undefined') {
-    const observer = new MutationObserver(() => {
-      if (page === 'home') appendHomeLearning();
-    });
-    const view = document.querySelector('#view');
-    if (view) observer.observe(view, { childList: true, subtree: false });
-  }
 })();
