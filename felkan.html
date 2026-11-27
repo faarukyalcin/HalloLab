@@ -410,6 +410,17 @@ html.compact-felcan #stageBanner .bt{font-size:23px}
 html.compact-felcan #caption{bottom:5px;max-width:92vw;font-size:11px}
 html.compact-felcan .modal{padding:10px}
 html.compact-felcan .mbox{padding:16px;border-radius:17px}
+
+/* Glass companion iframe: never show the browser's white default canvas */
+html.compact-felcan,html.compact-felcan body{
+ background:radial-gradient(ellipse 75% 70% at 50% 44%,#52427b66,transparent 77%),linear-gradient(165deg,#1c193b,#10152a)!important;
+ color:#f6f0ff;
+}
+html.compact-felcan #toolbar button{background:linear-gradient(145deg,#68508c88,#262545aa);box-shadow:inset 0 1px #fff3}
+html.compact-felcan #avatar[data-pos="center"]{top:43%}
+html.compact-felcan #avatar[data-pos="center"] .orb{border-radius:44%;transform:scale(.92)}
+html.compact-felcan #startBtn{bottom:24px}
+
 </style>
 </head>
 <body>
@@ -683,6 +694,8 @@ MEVCUT DURUM (uygulama verisi): ${JSON.stringify(stateSummary())}
 GENEL KURALLAR:
 - Türkçe konuş, Almanca örnekler ver. Cevapların sesli okunur: kısa, sıcak ve doğal ol (genelde 1-3 cümle).
 - Kullanıcının seviyesini, yanlışlarını ve günün çalışma planını göz önünde bulundur. "Bugün gramer çalışman var, açayım mı?" diye sor; kullanıcı kabul ettiğinde open_app_section fonksiyonuyla gerçek DeutschAI sayfasını aç. Zorlandığı konulardan kişiye özel kelimeler, gramer örnekleri ve sorular hazırla. Goethe odaklı çalışma yalnızca kullanıcı isterse yapılsın.
+- ANA UYGULAMA: Gerçek DeutschAI sayfalarını açman istendiğinde kendi show_grammar, show_quiz gibi araçların yerine open_app_section kullan. Özellikle "grameri aç", "dersleri aç", "sorulara geç" dendiğinde gerçek ana site sayfasını aç. İşlem başarısızsa açıldı deme.
+- EKRANDAKİ SORU: Kullanıcı "bu soruyu anlamadım", "buradakini anlat", "şu soruya bak" dediğinde senden önce gönderilen [Uygulama] EKRAN bilgisini kullan. Soru ve seçenekleri incele, Türkçe kısa ipuçlarıyla öğret; cevabı hemen söyleme. Ekran bilgisi yoksa hangi soruyu kastettiğini sor.
 - Ekranı sen yönetirsin. Ekranla ilgili HER isteği ilgili fonksiyonu çağırarak yap; fonksiyonu çağırmadan "açtım" deme. Fonksiyon success:true dönerse bir cümleyle onayla (örn. "Tamam, sola geçtim, testi açtım"). success:false dönerse nedenini söyle ve bir kez daha dene.
 - PANELLER: Ekranda sol, orta ve sağ olmak üzere en fazla 3 panel AYNI ANDA açık olabilir. Her show_* fonksiyonunda slot ile yerini seç (left/center/right). Slot verilmezse ders programı solda, ilerleme sağda, diğer her şey ortada açılır. Kullanıcı "sola test koy" derse slot=left ver. Dolu bir slota yeni panel açarsan eskisi yerine geçer. Diğer panelleri kapatma, sadece istenirse kapat (close_panel, slot veya all).
 - SEVİYE TESPİT SINAVI: Kullanıcı seviye tespiti isterse start_placement_test çağır ("kısa" derse short=true), sonra hiçbir şey söyleme; uygulama sana "[Uygulama] SEVİYE TESPİTİ ..." mesajlarıyla adım adım talimat gönderir. Bu talimatlara AYNEN uy: istenen fonksiyonu (pt_listening, pt_writing, pt_reading_tf, pt_questions, pt_words, pt_result) tam istenen sayıda soruyla çağır; "sessizce" denen yerde hiçbir şey söyleme, "sesli söyle" denen cümleyi aynen söyle. Fonksiyon success:false dönerse hatayı düzeltip aynı fonksiyonu tekrar çağır. Sınav sırasında ipucu verme, doğru cevapları söyleme. Konuşma bölümünde kullanıcı "devam / bitti / sonraki" derse pt_continue çağır. Sınavı bırakmak isterse cancel_placement_test çağır.
@@ -709,6 +722,34 @@ function buildSetup(c){
 }
 function send(o){if(S.ws&&S.ws.readyState===1){S.ws.send(JSON.stringify(o));return true}return false}
 function notify(text){log('→ Felkan:',text.slice(0,160));return send({realtimeInput:{text}})}
+let felcanScreen=null,felcanPendingExplain=false;
+function describeFelcanScreen(context){
+  if(!context)return '';
+  const strings=[
+    'Sayfa: '+String(context.title||context.page||''),
+    context.prompt?'Ekrandaki soru: '+String(context.prompt):'',
+    context.passage?'Soru metni: '+String(context.passage):'',
+    Array.isArray(context.options)&&context.options.length?'Seçenekler: '+context.options.join(' | '):'',
+    context.grammar?'Açık gramer içeriği: '+String(context.grammar):''
+  ].filter(Boolean);
+  return strings.join('\n').slice(0,1600);
+}
+window.addEventListener('message',event=>{
+  if(event.origin!==location.origin||event.source!==window.parent||!event.data)return;
+  if(event.data.type==='deutschai:context'||event.data.type==='deutschai:explain'){
+    felcanScreen=event.data.context||null;
+    const explain=event.data.type==='deutschai:explain';
+    if(explain)felcanPendingExplain=true;
+    if(S.setupDone&&S.ws?.readyState===1){
+      notify('[Uygulama] Kullanıcının şu an gördüğü DeutschAI ekranı:\n'+describeFelcanScreen(felcanScreen)+(explain?'\nKullanıcı bu soruyu anlamadığını söylüyor. Türkçe ve basitçe kuralı anlat; doğru şıkkı hemen söylemeden ipucu ver.':'\nKullanıcı sorarsa bu bilgileri kullan.'));
+      if(explain)felcanPendingExplain=false;
+    }else if(explain){
+      setStatus('idle','Açıklamak için konuşmayı başlat');
+      const b=document.getElementById('startBtn');if(b)b.hidden=false;
+    }
+  }
+});
+
 
 async function connect(){
   S.userClosed=false;$('#startBtn').hidden=true;setStatus('connecting','Bağlanıyor…');
@@ -743,6 +784,10 @@ async function onMsg(ev){
     S.setupDone=true;setStatus('listening','Dinliyorum… konuşabilirsin');log('Kurulum tamam');
     clearTimeout(S.stableTimer);S.stableTimer=setTimeout(()=>{S.retries=0},30000);
     $('#welcomeTitle').textContent='Hoş geldin, '+cfg.name+'.';
+    if(felcanScreen){
+      notify('[Uygulama] Şu anki DeutschAI ekranı:\n'+describeFelcanScreen(felcanScreen)+(felcanPendingExplain?'\nÖğrenci bu sorunun açıklamasını istedi. Kısa ve öğretici bir ipucu ver.':''));
+      felcanPendingExplain=false;
+    }
     if(!S.greeted){S.greeted=true;if(!DATA.plan)makePlan({});const ctx=resumeContext()+' DeutschAI genel Almanca programından bir sonraki gramer, kelime veya pratiği öner. Öğrenci onay verirse open_app_section çağır.';DATA.visits=(DATA.visits||0)+1;DATA.lastVisit=today();saveData();notify('[Uygulama] Oturum başladı. '+ctx)}
     return}
   if(m.error){log('API hatası',m.error)}
