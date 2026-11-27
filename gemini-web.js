@@ -2,6 +2,7 @@
 (() => {
   const apiBase = "https://generativelanguage.googleapis.com/v1beta";
   let sessionKey = "";
+  const brokerReady = () => Boolean(window.DEUTSCHAI_API_URL && window.DeutschAI?.ready);
 
   async function geminiRequest(route, body, timeout) {
     const key = sessionKey;
@@ -36,6 +37,21 @@
     const task = input?.task;
     if (!Object.hasOwn(taskFormats, task)) throw new Error("Bilinmeyen Gemini çalışması.");
     const instructions = "Türkçe konuşan bir öğrenci için Almanca öğretmenisin. Genel çalışmalarda günlük iletişim ve kelime, gramer, dinleme, konuşma, okuma, yazma becerilerine odaklan. Goethe sınav biçimini yalnızca istek bunu özellikle belirttiğinde kullan. Almanca örnek ve soruları seçilen CEFR seviyesine, açıklamaları Türkçeye uyarla. Bir JSON nesnesi döndür. Kullanıcı isteğinde belirli bir JSON yapısı istendiğinde onu kullan. Aksi halde şu yapıyı kullan: " + taskFormats[task];
+    if (brokerReady()) {
+      const prompt = instructions + "\nGörev: " + JSON.stringify({
+        task, profile:input.profile, history:Array.isArray(input.history)?input.history.slice(-12):[],
+        request:String(input.text || "")
+      }) + "\nYalnızca istenen geçerli JSON nesnesini döndür; Markdown kullanma.";
+      const response = await window.DeutschAI.api('/ai/generate',{
+        method:'POST',body:JSON.stringify({task:prompt,profile:input.profile||{}})
+      });
+      const raw = String(response.text || '').trim();
+      let answer;
+      try { answer = JSON.parse(raw.slice(raw.indexOf('{'),raw.lastIndexOf('}')+1)); } catch {}
+      if (!answer || typeof answer !== 'object' || Array.isArray(answer))
+        throw Error('Felkan geçerli bir çalışma döndürmedi.');
+      return answer;
+    }
     const data = await geminiRequest("/models/gemini-3.8-flash:generateContent", {
       systemInstruction: { parts: [{ text: instructions }] },
       contents: [{ role: "user", parts: [{ text: JSON.stringify({
@@ -51,6 +67,10 @@
   }
 
   async function geminiLiveToken() {
+    if (brokerReady()) {
+      const response = await window.DeutschAI.api('/ai/live-token',{method:'POST',body:'{}'});
+      return {token:response.token,model:'models/gemini-3.8-live'};
+    }
     const data = await geminiRequest("/auth_tokens", { uses: 1 }, 20000);
     if (!data.name) throw new Error("Gemini Live oturum anahtarı alınamadı.");
     return { token: data.name, model: "models/gemini-3.8-live" };
@@ -59,13 +79,17 @@
   window.deutschaiWeb = Object.freeze({
     geminiTutor,
     geminiLiveToken,
-    geminiKeyStatus: async () => ({ configured: !!sessionKey }),
+    geminiKeyStatus: async () => brokerReady() ? window.DeutschAI.api('/ai/status') : ({configured:!!sessionKey}),
     geminiKeySave: async value => {
+      if (window.DEUTSCHAI_API_URL) throw Error('Gemini anahtarını yalnız yönetici panelinden ayarlayabilirsin.');
       const key = String(value || "").trim();
       if (key.length < 20 || key.length > 256 || /\s/.test(key)) throw new Error("Geçerli Gemini API anahtarını gir.");
       sessionKey = key;
       return { configured: true };
     },
-    geminiKeyRemove: async () => { sessionKey = ""; return { configured: false }; }
+    geminiKeyRemove: async () => {
+      if (window.DEUTSCHAI_API_URL) throw Error('Ortak anahtar yalnız yönetici panelinden değiştirilebilir.');
+      sessionKey='';return {configured:false};
+    }
   });
 })();
