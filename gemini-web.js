@@ -35,7 +35,7 @@
   async function geminiTutor(input) {
     const task = input?.task;
     if (!Object.hasOwn(taskFormats, task)) throw new Error("Bilinmeyen Gemini çalışması.");
-    const instructions = "Türkçe konuşan bir öğrenci için Goethe odaklı Almanca öğretmenisin. Almanca örnek ve soruları seçilen CEFR seviyesine, açıklamaları Türkçeye uyarla. Bir JSON nesnesi döndür. Kullanıcı isteğinde belirli bir JSON yapısı istendiğinde onu kullan. Aksi halde şu yapıyı kullan: " + taskFormats[task];
+    const instructions = "Türkçe konuşan bir öğrenci için Almanca öğretmenisin. Genel çalışmalarda günlük iletişim ve kelime, gramer, dinleme, konuşma, okuma, yazma becerilerine odaklan. Goethe sınav biçimini yalnızca istek bunu özellikle belirttiğinde kullan. Almanca örnek ve soruları seçilen CEFR seviyesine, açıklamaları Türkçeye uyarla. Bir JSON nesnesi döndür. Kullanıcı isteğinde belirli bir JSON yapısı istendiğinde onu kullan. Aksi halde şu yapıyı kullan: " + taskFormats[task];
     const data = await geminiRequest("/models/gemini-3.8-flash:generateContent", {
       systemInstruction: { parts: [{ text: instructions }] },
       contents: [{ role: "user", parts: [{ text: JSON.stringify({
