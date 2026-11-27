@@ -89,6 +89,22 @@
     '#da-auth-screen .da-tabs{display:flex;gap:8px;margin:15px 0}.da-tabs button{flex:1}',
     '#da-auth-screen .da-error{color:#ffb2c3;min-height:21px}',
     '#da-account-action{position:fixed;top:97px;right:12px;z-index:98;font-size:12px}',
+    '#da-felcan-float{position:fixed;right:22px;bottom:24px;z-index:990;display:flex;align-items:center;gap:10px;cursor:pointer;border:1px solid #d9c6ff77;border-radius:24px;padding:7px 16px 7px 8px;background:linear-gradient(135deg,#6550a9b8,#242148e3);color:#fff;backdrop-filter:blur(26px) saturate(150%);box-shadow:0 16px 45px #160d4570,inset 0 1px #ffffff50;font:700 13px system-ui;animation:da-felcan-fly 5s ease-in-out infinite}',
+    '#da-felcan-float:hover{border-color:#e2ceff;box-shadow:0 18px 48px #6c43b766;animation-play-state:paused}',
+    '#da-felcan-float .da-felcan-orb{width:44px;height:44px;display:grid;place-items:center;position:relative;overflow:hidden;border:1px solid #fffa;border-radius:17px;background:radial-gradient(circle at 22% 13%,#f0d8ffbb,transparent 55%),linear-gradient(130deg,#a889ef,#5449ac 75%);box-shadow:inset 0 2px 8px #ffffff65,0 0 16px #986ae655;font-size:19px;color:white}',
+    '#da-felcan-float .da-felcan-orb::after{content:"";position:absolute;top:8px;left:7px;right:7px;height:8px;border-radius:100%;background:#ffffff60;filter:blur(4px)}',
+    '#da-felcan-float .da-felcan-sub{display:block;font-size:10px;font-weight:500;color:#ded5fa;margin-top:2px}',
+    '#da-felcan-window{position:fixed;right:20px;bottom:96px;z-index:991;width:min(415px,calc(100vw - 24px));height:min(610px,calc(100dvh - 116px));min-height:320px;overflow:hidden;border:1px solid #e2cfff60;border-radius:26px;background:linear-gradient(150deg,#282348f5,#11152cf8);backdrop-filter:blur(30px);box-shadow:0 25px 90px #09071dbb,inset 0 1px #fff4;display:flex;flex-direction:column;animation:da-felcan-appear .3s ease both}',
+    '#da-felcan-window[hidden]{display:none}',
+    '#da-felcan-window .da-felcan-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px;color:#f8f3ff;border-bottom:1px solid #c9b5fc33;background:#9a80e712}',
+    '#da-felcan-window .da-felcan-head strong{font-size:14px}',
+    '#da-felcan-window .da-felcan-head span{font-size:11px;color:#c5b8e8}',
+    '#da-felcan-window .da-felcan-close{border:1px solid #cfbaff66;border-radius:11px;background:#7661b655;color:#fff;font:600 12px system-ui;padding:9px 11px;cursor:pointer}',
+    '#da-felcan-window iframe{flex:1;width:100%;min-height:0;border:0;background:transparent}',
+    '@keyframes da-felcan-fly{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}',
+    '@keyframes da-felcan-appear{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}',
+    '@media(max-width:600px){#da-felcan-float{bottom:82px;right:12px;padding:6px;border-radius:19px}#da-felcan-float .da-felcan-text{display:none}#da-felcan-float .da-felcan-orb{width:44px;height:44px}#da-felcan-window{right:8px;bottom:149px;width:calc(100vw - 16px);height:min(570px,calc(100dvh - 168px));border-radius:21px}}',
+    '@media(prefers-reduced-motion:reduce){#da-felcan-float,#da-felcan-window{animation:none}}',
     '@media(min-width:1000px){#da-account-action{top:70px;right:23px}}'
   ].join('');
   document.head.append(style);
@@ -166,18 +182,32 @@
   }
   function felkan() {
     if (!auth) return show();
-    document.getElementById('da-felkan-modal')?.remove();
-    const e=document.createElement('div');e.id='da-felkan-modal';
-    e.style.cssText='position:fixed;inset:0;z-index:1100;background:#0b091d';
-    e.innerHTML='<button aria-label="Felkan kapat" style="position:absolute;z-index:5;right:15px;top:15px;border:1px solid #a998e8;border-radius:14px;padding:12px;background:#241a4c;color:#fff">✕ Kapat</button><iframe title="Felkan Almanca öğretmeni" allow="microphone;autoplay" src="./felkan.html" style="width:100%;height:100%;border:0"></iframe>';
-    e.querySelector('button').onclick=()=>e.remove();document.body.append(e);
+    let windowNode=document.getElementById('da-felcan-window');
+    if(!windowNode){
+      windowNode=document.createElement('section');
+      windowNode.id='da-felcan-window';
+      windowNode.setAttribute('role','dialog');
+      windowNode.setAttribute('aria-label','Felcan ile konuşma alanı');
+      windowNode.innerHTML='<div class="da-felcan-head"><div><strong>✦ Felcan</strong><span> · Almanca öğretmenin</span></div><button type="button" class="da-felcan-close" aria-label="Felcan konuşmasını kapat">✕ Kapat</button></div><iframe title="Felcan sesli Almanca öğretmeni" allow="microphone;autoplay" src="./felkan.html?compact=1&v=liquid-float-1"></iframe>';
+      windowNode.querySelector('.da-felcan-close').onclick=()=>{windowNode.remove();document.getElementById('da-felcan-float')?.focus()};
+      document.body.append(windowNode);
+    } else windowNode.querySelector('.da-felcan-close').focus();
+  }
+  function floatingFelcan(){
+    if(!auth||document.getElementById('da-felcan-float'))return;
+    const button=document.createElement('button');
+    button.type='button';button.id='da-felcan-float';
+    button.setAttribute('aria-label','Felcan asistanını aç');
+    button.innerHTML='<span class="da-felcan-orb" aria-hidden="true">✦</span><span class="da-felcan-text">Felcan<span class="da-felcan-sub">Konuşmak için dokun</span></span>';
+    button.onclick=()=>{const panel=document.getElementById('da-felcan-window');if(panel){panel.remove();return;}felkan()};
+    document.body.append(button);
   }
   window.deutschaiStore=store;
   window.DeutschAI={api:request,store,get user(){return auth?.user||null;},get ready(){return !!origin && !!auth;},logout,showAdmin:admin,openFelkan:felkan};
   window.addEventListener('message',event=>{
     if (event.origin!==location.origin || event.data?.type!=='deutschai:navigate') return;
     if(!['home','lessons','grammar','words','practice','writing','exam','placement','progress'].includes(event.data.page))return;
-    document.getElementById('da-felkan-modal')?.remove();
+    document.getElementById('da-felcan-window')?.remove();
     if(typeof window.setPage==='function')window.setPage(event.data.page);
   });
   document.addEventListener('DOMContentLoaded',async()=>{
@@ -191,6 +221,7 @@
         sessionStorage.setItem('da-hydrated','1');location.reload();return;
       }
       account();
+      floatingFelcan();
     } catch(error) {auth=null;del(authKey);show('login',error.message);}
   });
 })();
