@@ -121,6 +121,7 @@ async function main(req,env){
   }
   return error('Bilinmeyen yönetici işlemi',404);
  }
+ if(route==='/ai/status'&&req.method==='GET')return answer({configured:!!(await geminiKey(env))});
  if(route==='/ai/generate'&&req.method==='POST'){
   if(!(await throttle(env,'ai:'+user.id,45,3600)))return error('Saatlik AI sınırına ulaştın',429);
   const x=await body(req),task=String(x.task||'').slice(0,3000);
