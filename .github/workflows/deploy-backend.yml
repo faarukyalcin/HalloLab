@@ -89,6 +89,21 @@ jobs:
           test "$CODE" = '401' || { echo "Unexpected auth check: $CODE"; exit 1; }
           echo "WORKER_URL=$WORKER_URL" >> "$GITHUB_ENV"
           echo "Backend responding at $WORKER_URL"
+      - name: Verify real registration and login before switching website
+        working-directory: backend
+        run: |
+          set -euo pipefail
+          TEST_USER="ci_${GITHUB_RUN_ID}"
+          TEST_PASS=$(openssl rand -hex 18)
+          cleanup() { wrangler d1 execute DB --remote --command="DELETE FROM users WHERE username='$TEST_USER'" >/dev/null 2>&1 || true; }
+          trap cleanup EXIT
+          REGISTER_PAYLOAD=$(printf '{"username":"%s","password":"%s","firstName":"Test","lastName":"User","email":"%s@example.invalid"}' "$TEST_USER" "$TEST_PASS" "$TEST_USER")
+          STATUS=$(curl --max-time 30 -sS -o /tmp/register-result.json -w '%{http_code}' -H 'Content-Type: application/json' -X POST -d "$REGISTER_PAYLOAD" "$WORKER_URL/auth/register")
+          test "$STATUS" = '200' || { echo "Registration test failed (HTTP $STATUS); frontend remains disconnected"; exit 1; }
+          LOGIN_PAYLOAD=$(printf '{"username":"%s","password":"%s"}' "$TEST_USER" "$TEST_PASS")
+          STATUS=$(curl --max-time 30 -sS -o /tmp/login-result.json -w '%{http_code}' -H 'Content-Type: application/json' -X POST -d "$LOGIN_PAYLOAD" "$WORKER_URL/auth/login")
+          test "$STATUS" = '200' || { echo "Login test failed (HTTP $STATUS); frontend remains disconnected"; exit 1; }
+          echo 'Register and login smoke tests passed'
       - name: Connect DeutschAI website
         run: |
           set -euo pipefail
