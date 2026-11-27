@@ -705,6 +705,7 @@ GENEL KURALLAR:
 - Türkçe konuş, Almanca örnekler ver. Cevapların sesli okunur: kısa, sıcak ve doğal ol (genelde 1-3 cümle).
 - Kullanıcının seviyesini, yanlışlarını ve günün çalışma planını göz önünde bulundur. "Bugün gramer çalışman var, açayım mı?" diye sor; kullanıcı kabul ettiğinde open_app_section fonksiyonuyla gerçek DeutschAI sayfasını aç. Zorlandığı konulardan kişiye özel kelimeler, gramer örnekleri ve sorular hazırla. Goethe odaklı çalışma yalnızca kullanıcı isterse yapılsın.
 - ANA UYGULAMA: Gerçek DeutschAI sayfalarını açman istendiğinde kendi show_grammar, show_quiz gibi araçların yerine open_app_section kullan. Özellikle "grameri aç", "dersleri aç", "sorulara geç" dendiğinde gerçek ana site sayfasını aç. İşlem başarısızsa açıldı deme.
+- TÜM SORULARI GÖR: [Uygulama] ekran bilgisinde birden fazla soru (1, 2, 3...) gönderilir. Kullanıcı "2. soruyu açıkla" derse o numaralı sorunun metnini ve seçeneklerini seç; DAİMA numarayı kontrol et. Kullanıcı sadece "bu soru" derse selectedQuestion alanını kullan, yoksa hangi soru olduğunu sor. Görmediğin soruyu uydurma.
 - EKRANDAKİ SORU: Kullanıcı "bu soruyu anlamadım", "buradakini anlat", "şu soruya bak" dediğinde senden önce gönderilen [Uygulama] EKRAN bilgisini kullan. Soru ve seçenekleri incele, Türkçe kısa ipuçlarıyla öğret; cevabı hemen söyleme. Ekran bilgisi yoksa hangi soruyu kastettiğini sor.
 - Ekranı sen yönetirsin. Ekranla ilgili HER isteği ilgili fonksiyonu çağırarak yap; fonksiyonu çağırmadan "açtım" deme. Fonksiyon success:true dönerse bir cümleyle onayla (örn. "Tamam, sola geçtim, testi açtım"). success:false dönerse nedenini söyle ve bir kez daha dene.
 - PANELLER: Ekranda sol, orta ve sağ olmak üzere en fazla 3 panel AYNI ANDA açık olabilir. Her show_* fonksiyonunda slot ile yerini seç (left/center/right). Slot verilmezse ders programı solda, ilerleme sağda, diğer her şey ortada açılır. Kullanıcı "sola test koy" derse slot=left ver. Dolu bir slota yeni panel açarsan eskisi yerine geçer. Diğer panelleri kapatma, sadece istenirse kapat (close_panel, slot veya all).
@@ -735,15 +736,26 @@ function notify(text){log('→ Felkan:',text.slice(0,160));return send({realtime
 let felcanScreen=null,felcanPendingExplain=false;
 let felcanMinimizedMute=false;
 function describeFelcanScreen(context){
-  if(!context)return '';
-  const strings=[
-    'Sayfa: '+String(context.title||context.page||''),
-    context.prompt?'Ekrandaki soru: '+String(context.prompt):'',
-    context.passage?'Soru metni: '+String(context.passage):'',
-    Array.isArray(context.options)&&context.options.length?'Seçenekler: '+context.options.join(' | '):'',
-    context.grammar?'Açık gramer içeriği: '+String(context.grammar):''
-  ].filter(Boolean);
-  return strings.join('\n').slice(0,1600);
+ if(!context)return '';
+ const questions=Array.isArray(context.questions)?context.questions:[];
+ const overview=questions.map(q=>{
+   const line=[
+     String(q.number)+'. soru: '+String(q.prompt||'').slice(0,220),
+     q.passage?'Metin: '+String(q.passage).slice(0,220):'',
+     Array.isArray(q.options)&&q.options.length?'Şıklar: '+q.options.join(' | ').slice(0,250):'',
+     q.answered?'Cevaplandı'+(q.feedback?' - '+String(q.feedback).slice(0,100):''):''
+   ].filter(Boolean).join(' · ');
+   return line.slice(0,650);
+ });
+ const header=[
+   'Gerçek DeutschAI sayfası: '+String(context.title||context.page||''),
+   'Sayfa kodu: '+String(context.page||''),
+   'Sayfada '+(context.questionCount||questions.length)+' soru var.',
+   context.selectedQuestion?'Öğrencinin seçtiği soru: '+context.selectedQuestion+'. soru':'',
+   context.grammar?'Açık gramer içeriği: '+String(context.grammar).slice(0,800):'',
+   context.lesson?'Öğrenme ilerlemesi: '+String(context.lesson).slice(0,250):''
+ ].filter(Boolean).join('\n');
+ return (header+'\nSORULAR (sırasıyla):\n'+overview.join('\n')).slice(0,12500);
 }
 window.addEventListener('message',event=>{
   if(event.origin!==location.origin||event.source!==window.parent||!event.data)return;
