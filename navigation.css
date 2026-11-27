@@ -52,3 +52,31 @@ body.welcome-mode:has(.assistant-dashboard) .app>.main{grid-column:2;grid-row:1;
   }
   .app>.side:not([data-nav-open]) .nav,.app>.side:not([data-nav-open]) .theme-picker{display:none!important}
 }
+
+/* Sidebar geometry stays fixed when an item is hovered or focused. */
+.app>.side{scrollbar-gutter:stable;scrollbar-width:thin;scrollbar-color:#334961 transparent}
+.app>.side .brand{flex:none;min-height:53px}
+.app>.side .brand>div:last-child{text-align:left}
+.app>.side .nav{flex:0 0 auto;min-height:0;justify-items:stretch}
+.app>.side .nav .nav-item{position:relative;justify-content:stretch;transition:background-color .15s,color .15s,border-color .15s}
+.app>.side .nav .nav-item:hover{background:#182840!important;color:#eef6ff!important}
+.app>.side .nav .nav-item[aria-current=page],
+.app>.side .nav .nav-item[aria-current=page]:hover{background:#163246!important;color:#77f0ee!important;border-color:#28536a}
+.app>.side .nav .nav-item.active::before{
+  inset:9px auto 9px 0;width:2px;background:#67e9e7;box-shadow:none
+}
+.app>.side .nav .nav-item .nav-icon,
+.app>.side .nav .nav-item .nav-icon svg,
+.app>.side .nav .nav-item .nav-label{
+  transform:none!important;animation:none!important;transition:none!important;filter:none!important
+}
+.app>.side .nav .nav-item .nav-icon{border-color:transparent!important}
+.app>.side .nav .nav-item .nav-icon svg{width:18px;height:18px}
+.app>.side .theme-picker{flex:none;padding:10px!important;border:1px solid #25364d!important;border-radius:12px;text-align:left}
+.app>.side .theme-picker-label{text-align:left}
+.app>.side .theme-swatches{justify-content:flex-start}
+@media(max-width:760px){
+  .app>.side{scrollbar-gutter:auto}
+  .app>.side .brand{min-height:43px}
+}
+@media(prefers-reduced-motion:reduce){.app>.side .nav .nav-item{transition:none}}
