@@ -252,6 +252,8 @@
   }
 }
 
+.mobile-felcan-emblem{display:none}
+
 /* Five-slot Liquid Glass bottom dock: Home / Lessons / Felcan / Practice / More */
 .mobile-more-trigger,.mobile-more-menu{display:none}
 @media(max-width:999px){
