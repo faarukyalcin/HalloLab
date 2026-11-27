@@ -349,34 +349,33 @@
 
   function felcanWelcome(){
     const button=document.getElementById('da-felcan-float');
-    if(!button)return;
-    const name=String(auth?.user?.firstName||'arkadaşım').trim();
-    let bubble=document.getElementById('da-felcan-hello');
-    if(!bubble){
-      bubble=document.createElement('div');
-      bubble.id='da-felcan-hello';
-      bubble.setAttribute('role','status');
-      bubble.innerHTML='<span class="da-hello-text"></span><button type="button" class="da-hello-dismiss" aria-label="Karşılamayı kapat">×</button>';
-      button.insertAdjacentElement('beforebegin',bubble);
-      bubble.querySelector('.da-hello-dismiss').onclick=()=>bubble.remove();
-      bubble.onclick=e=>{if(e.target.closest('button'))return;startFelcanVoice();bubble.remove()};
-    }
-    bubble.querySelector('.da-hello-text').textContent='👋 Hoş geldin, '+name+'! Ben Felcan. Bugün kaldığımız yerden devam edelim mi?';
-    button.classList.add('da-felcan-waving');
-    setTimeout(()=>button.classList.remove('da-felcan-waving'),3400);
-    setTimeout(()=>bubble.remove(),13500);
-    // Only try hands-free greeting when microphone permission was previously
-    // granted. Browsers may still require a click to unlock audio.
+    if(!button||!auth?.user)return;
+    // One automatic greeting per browser session. Avoid asking for microphone
+    // permission on page load; permission must be granted by the learner.
     const once='da:felcan-auto-greet:'+auth.user.id;
     if(sessionStorage.getItem(once))return;
     sessionStorage.setItem(once,'1');
-    if(!navigator.permissions?.query)return;
-    navigator.permissions.query({name:'microphone'}).then(permission=>{
-      if(permission.state==='granted'&&document.visibilityState==='visible'){
-        felcanRequested=true;
-        if(felcanReady){felcanRequested=false;startFelcanVoice()}
+    const name=String(auth.user.firstName||'arkadaşım').trim().slice(0,60);
+    button.classList.add('da-felcan-waving');
+    setTimeout(()=>button.classList.remove('da-felcan-waving'),4700);
+    const speakWelcome=()=>{
+      if(!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window)){
+        felcanVisual('idle','Ses için bana dokun');
+        return;
       }
-    }).catch(()=>{});
+      const text='Hoş geldin, '+name+'! Ben Felcan. Bugün Almancaya kaldığımız yerden devam edelim mi?';
+      const say=new SpeechSynthesisUtterance(text);
+      say.lang='tr-TR';say.rate=.94;say.pitch=1.09;
+      const turkish=window.speechSynthesis.getVoices().find(v=>v.lang?.toLowerCase().startsWith('tr'));
+      if(turkish)say.voice=turkish;
+      say.onstart=()=>{button.dataset.voice='speaking';const tab=document.querySelector('#nav [data-page="live"]');if(tab)tab.dataset.voice='speaking'};
+      say.onend=()=>{if(button.dataset.voice==='speaking')felcanVisual('idle','Konuşmak için dokun')};
+      say.onerror=()=>{if(button.dataset.voice==='speaking')felcanVisual('idle','Ses için bana dokun')};
+      try{window.speechSynthesis.speak(say)}catch{felcanVisual('idle','Ses için bana dokun')}
+    };
+    // The login click may have granted playback permission, but some mobile
+    // browsers still prohibit sound without a new tap.
+    setTimeout(speakWelcome,650);
   }
   function floatingFelcan(){
     if(!auth||document.getElementById('da-felcan-float'))return;
@@ -386,7 +385,7 @@
     button.setAttribute('aria-label','Felcan ile sesli konuşmaya başla');
     button.setAttribute('aria-pressed','false');
     button.innerHTML='<span class="da-felcan-orb" aria-hidden="true"><span class="da-toy-eyes">● ●</span><span class="da-toy-smile">ᴗ</span><span class="da-toy-feet"></span><span class="da-toy-spark">✦</span></span><span class="da-felcan-text">Felcan<span class="da-felcan-sub">Konuşmak için dokun</span></span>';
-    button.onclick=()=>{document.getElementById('da-felcan-hello')?.remove();startFelcanVoice()};
+    button.onclick=()=>{try{window.speechSynthesis?.cancel()}catch{};startFelcanVoice()};
     document.getElementById('view')?.addEventListener('click',e=>{const q=e.target.closest('.question, #da-personal-practice .da-question');if(!q)return;felcanFocusedQuestion=[...document.querySelectorAll('#view .question, #view #da-personal-practice .da-question')].indexOf(q)+1;sendFelcanContext(true)},true);
     document.body.append(button);
     ensureFelcanRuntime();
