@@ -110,6 +110,23 @@
     '#da-felcan-float .da-toy-feet{position:absolute;bottom:-6px;left:10px;background:#6645a0;width:14px;height:11px;border-radius:7px;box-shadow:26px 0 #6645a0}',
     '#da-felcan-float .da-toy-spark{position:absolute;right:-10px;top:1px;color:#ffde8f;font-size:17px;filter:drop-shadow(0 0 6px #cba3ff)}',
     '#da-felcan-window[hidden]{display:none!important}',
+
+    '#da-felcan-runtime{position:fixed!important;left:-10px!important;bottom:-10px!important;width:2px!important;height:2px!important;opacity:0!important;overflow:hidden!important;pointer-events:none!important;z-index:-1!important}',
+    '#da-felcan-runtime iframe{width:2px;height:2px;border:0;display:block}',
+    '#da-felcan-float .da-felcan-orb{transform-origin:50% 82%;transition:filter .2s,transform .2s}',
+    '#da-felcan-float .da-toy-smile{transform-origin:center 40%;transition:transform .15s}',
+    '#da-felcan-float[data-voice="connecting"] .da-felcan-orb{animation:da-felcan-thinking .65s ease-in-out infinite alternate}',
+    '#da-felcan-float[data-voice="listening"] .da-felcan-orb::before{animation:da-felcan-ears .35s ease-in-out infinite alternate}',
+    '#da-felcan-float[data-voice="listening"] .da-felcan-orb{filter:drop-shadow(0 0 7px #bc8cff88)}',
+    '#da-felcan-float[data-voice="speaking"] .da-felcan-orb{animation:da-felcan-speak .3s ease-in-out infinite alternate}',
+    '#da-felcan-float[data-voice="speaking"] .da-toy-smile{animation:da-felcan-mouth .21s linear infinite alternate}',
+    '#da-felcan-float[data-voice="speaking"] .da-felcan-orb::before{animation:da-felcan-ears .23s ease-in-out infinite alternate}',
+    '#da-felcan-float[data-voice="muted"] .da-felcan-orb{filter:grayscale(.4);opacity:.78}',
+    '#da-felcan-float[data-voice="error"] .da-felcan-orb{filter:hue-rotate(55deg)}',
+    '@keyframes da-felcan-ears{from{transform:rotate(-26deg) translateY(0)}to{transform:rotate(-9deg) translateY(-6px)}}',
+    '@keyframes da-felcan-mouth{from{transform:scaleY(.45);opacity:.7}to{transform:scaleY(1.65) translateY(2px);opacity:1}}',
+    '@keyframes da-felcan-speak{from{transform:rotate(-5deg) scale(1)}to{transform:rotate(5deg) scale(1.06)}}',
+    '@keyframes da-felcan-thinking{from{transform:rotate(-4deg)}to{transform:rotate(4deg)}}',
     '@keyframes da-felcan-fly{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}',
     '@keyframes da-felcan-appear{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}',
     '@media(max-width:600px){#da-felcan-float{bottom:82px;right:12px;padding:6px;border-radius:19px}#da-felcan-float .da-felcan-text{display:none}#da-felcan-float .da-felcan-orb{width:44px;height:44px}#da-felcan-window{right:8px;bottom:149px;width:calc(100vw - 16px);height:min(570px,calc(100dvh - 168px));border-radius:21px}}',
@@ -190,7 +207,10 @@
     };
   }
 
-  let lastFelcanContext='';
+
+  // Felcan speaks as a small animated character; a same-origin, visually-hidden
+  // iframe keeps the Live connection alive while the learner navigates lessons.
+  let lastFelcanContext='', felcanReady=false, felcanRequested=false, felcanState='idle';
   function felcanScreenContext(){
     const root=document.getElementById('view');if(!root)return null;
     const title=root.querySelector('.top h1')?.textContent?.trim()||'DeutschAI';
@@ -205,51 +225,88 @@
       grammar:root.querySelector('details[open]')?.textContent?.slice(0,600)||''
     };
   }
+  function felcanFrame(){
+    return document.querySelector('#da-felcan-runtime iframe');
+  }
   function sendFelcanContext(force=false,explain=false){
-    const frame=document.querySelector('#da-felcan-window iframe');
-    if(!frame?.contentWindow)return;
+    const frame=felcanFrame();
+    if(!frame?.contentWindow||!felcanReady)return;
     const context=felcanScreenContext();if(!context)return;
     const serialized=JSON.stringify(context);
     if(!force&&serialized===lastFelcanContext)return;
     lastFelcanContext=serialized;
     frame.contentWindow.postMessage({type:explain?'deutschai:explain':'deutschai:context',context},location.origin);
   }
-  function setFelcanVisible(panel,visible){
-    panel.hidden=!visible;
-    const frame=panel.querySelector('iframe');
-    if(frame?.contentWindow)frame.contentWindow.postMessage({type:'deutschai:visibility',visible},location.origin);
-    if(visible)sendFelcanContext(true);
+  function felcanVisual(state,message){
+    felcanState=state;
+    const button=document.getElementById('da-felcan-float');
+    if(!button)return;
+    button.dataset.voice=state;
+    button.setAttribute('aria-pressed',String(['connecting','listening','speaking','muted'].includes(state)));
+    button.setAttribute('aria-label',state==='idle'?'Felcan ile sesli konuşmaya başla':state==='error'?'Felcan bağlantısını yeniden dene':state==='muted'?'Felcan mikrofonunu aç':'Felcan mikrofonunu duraklat');
+    const sub=button.querySelector('.da-felcan-sub');
+    if(sub)sub.textContent=message||({idle:'Konuşmak için dokun',connecting:'Bağlanıyor…',listening:'Seni dinliyorum',speaking:'Felcan konuşuyor',muted:'Mikrofon duraklatıldı',error:'Tekrar dokun'}[state]||'Felcan');
   }
-  function felkan(){
+  function ensureFelcanRuntime(){
+    if(!auth)return null;
+    let runtime=document.getElementById('da-felcan-runtime');
+    if(runtime)return runtime;
+    runtime=document.createElement('div');
+    runtime.id='da-felcan-runtime';
+    const iframe=document.createElement('iframe');
+    iframe.title='Felcan sesli bağlantı';
+    iframe.allow='microphone; autoplay';
+    iframe.tabIndex=-1;
+    iframe.setAttribute('aria-hidden','true');
+    iframe.src='./felkan.html?compact=1&v=toy-voice-1';
+    iframe.addEventListener('load',()=>{
+      felcanReady=true;
+      sendFelcanContext(true);
+      if(felcanRequested){
+        felcanRequested=false;
+        startFelcanVoice();
+      }
+    });
+    runtime.append(iframe);
+    document.body.append(runtime);
+    return runtime;
+  }
+  function startFelcanVoice(){
     if(!auth)return show();
-    let panel=document.getElementById('da-felcan-window');
-    if(!panel){
-      panel=document.createElement('section');
-      panel.id='da-felcan-window';
-      panel.setAttribute('role','dialog');
-      panel.setAttribute('aria-label','Felcan yardımcı öğretmen');
-      panel.innerHTML='<div class="da-felcan-head"><strong>✦ Felcan <span>· Öğretmenin</span></strong><div style="display:flex;gap:6px"><button type="button" class="da-explain">Bu soruyu açıkla</button><button type="button" class="da-felcan-close" aria-label="Felcanı küçült">− Küçült</button></div></div><iframe title="Felcan Almanca öğretmeni" allow="microphone;autoplay" src="./felkan.html?compact=1&v=toy-2"></iframe>';
-      panel.querySelector('.da-felcan-close').onclick=()=>{setFelcanVisible(panel,false);document.getElementById('da-felcan-float')?.focus()};
-      panel.querySelector('.da-explain').onclick=()=>sendFelcanContext(true,true);
-      panel.querySelector('iframe').addEventListener('load',()=>sendFelcanContext(true));
-      document.body.append(panel);
+    ensureFelcanRuntime();
+    if(!felcanReady){felcanRequested=true;felcanVisual('connecting','Hazırlanıyor…');return}
+    try{
+      const voice=felcanFrame()?.contentWindow?.FelcanVoiceControl;
+      if(!voice?.toggle){felcanVisual('error','Bağlantıyı yeniden dene');return}
+      voice.toggle();
+    }catch(error){
+      console.warn('Felcan ses bağlantısı:',error);
+      felcanVisual('error','Ses başlatılamadı');
     }
-    setFelcanVisible(panel,true);
   }
+  function felkan(){startFelcanVoice()}
   function floatingFelcan(){
     if(!auth||document.getElementById('da-felcan-float'))return;
     const button=document.createElement('button');
     button.type='button';button.id='da-felcan-float';
-    button.setAttribute('aria-label','Felcan yardımcı öğretmeni aç veya küçült');
-    button.innerHTML='<span class="da-felcan-orb" aria-hidden="true"><span class="da-toy-eyes">● ●</span><span class="da-toy-smile">ᴗ</span><span class="da-toy-feet"></span><span class="da-toy-spark">✦</span></span><span class="da-felcan-text">Felcan<span class="da-felcan-sub">Yanında, hazır ✨</span></span>';
-    button.onclick=()=>{const panel=document.getElementById('da-felcan-window');if(panel&&!panel.hidden){setFelcanVisible(panel,false);return}felkan()};
+    button.dataset.voice='idle';
+    button.setAttribute('aria-label','Felcan ile sesli konuşmaya başla');
+    button.setAttribute('aria-pressed','false');
+    button.innerHTML='<span class="da-felcan-orb" aria-hidden="true"><span class="da-toy-eyes">● ●</span><span class="da-toy-smile">ᴗ</span><span class="da-toy-feet"></span><span class="da-toy-spark">✦</span></span><span class="da-felcan-text">Felcan<span class="da-felcan-sub">Konuşmak için dokun</span></span>';
+    button.onclick=startFelcanVoice;
     document.body.append(button);
-    setInterval(()=>{if(document.getElementById('da-felcan-window'))sendFelcanContext()},1300);
+    ensureFelcanRuntime();
+    setInterval(()=>{if(felcanReady)sendFelcanContext()},1400);
   }
   window.deutschaiStore=store;
   window.DeutschAI={api:request,store,get user(){return auth?.user||null;},get ready(){return !!origin && !!auth;},logout,showAdmin:admin,openFelkan:felkan};
   window.addEventListener('message',event=>{
-    if (event.origin!==location.origin || event.data?.type!=='deutschai:navigate') return;
+    if(event.origin!==location.origin)return;
+    if(event.data?.type==='deutschai:voice-state' && event.source===felcanFrame()?.contentWindow){
+      felcanVisual(event.data.state||'idle',String(event.data.message||'').slice(0,90));
+      return;
+    }
+    if(event.data?.type!=='deutschai:navigate')return;
     if(!['home','lessons','grammar','words','practice','writing','exam','placement','progress'].includes(event.data.page))return;
     if(typeof window.setPage==='function')window.setPage(event.data.page);
     const current=document.querySelector('#nav [aria-current="page"]')?.dataset.page;
