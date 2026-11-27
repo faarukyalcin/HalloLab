@@ -11,9 +11,14 @@ const bytes = str => Uint8Array.from(atob(str), c => c.charCodeAt(0));
 const rand = size => b64(crypto.getRandomValues(new Uint8Array(size))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 const hex = x => Array.from(new Uint8Array(x)).map(c => c.toString(16).padStart(2, '0')).join('');
 const sha = async s => hex(await crypto.subtle.digest('SHA-256', enc.encode(s)));
-async function passwordHash(p, salt) {
- const key = await crypto.subtle.importKey('raw', enc.encode(p), 'PBKDF2', false, ['deriveBits']);
- return hex(await crypto.subtle.deriveBits({ name:'PBKDF2', salt:bytes(salt), iterations:310000, hash:'SHA-256' },key,256));
+// Workerd WebCrypto caps PBKDF2 at 100,000 rounds. Add a separate server-only
+// HMAC pepper so a leaked D1 dump is insufficient for offline password guessing.
+async function passwordHash(p, salt, env) {
+ if (!env.ENCRYPTION_SECRET) throw Error('ENCRYPTION_SECRET eksik');
+ const pepperKey = await crypto.subtle.importKey('raw', bytes(env.ENCRYPTION_SECRET), {name:'HMAC', hash:'SHA-256'}, false, ['sign']);
+ const peppered = await crypto.subtle.sign('HMAC', pepperKey, enc.encode(p));
+ const key = await crypto.subtle.importKey('raw', peppered, 'PBKDF2', false, ['deriveBits']);
+ return hex(await crypto.subtle.deriveBits({name:'PBKDF2', salt:bytes(salt), iterations:100000, hash:'SHA-256'}, key, 256));
 }
 const error = (message, status = 400) => Response.json({error:message}, {status});
 const answer = (data,status=200) => Response.json(data,{status,headers:{'Cache-Control':'no-store'}});
@@ -72,7 +77,7 @@ async function main(req,env){
   const first=String(x.firstName||'').trim(),last=String(x.lastName||'').trim(),p=String(x.password||'');
   if(!/^[a-zA-Z0-9_]{3,32}$/.test(username)||!/^\S+@\S+\.\S+$/.test(email)||first.length<1||first.length>80||last.length<1||last.length>80||p.length<10||p.length>128)return error('Alanları kontrol et: kullanıcı adı 3-32 karakter, şifre en az 10 karakter olmalı');
   if(!(await throttle(env,'register:'+req.headers.get('CF-Connecting-IP'),5,3600)))return error('Çok fazla kayıt denemesi',429);
-  const salt=b64(crypto.getRandomValues(new Uint8Array(16))),hash=await passwordHash(p,salt),id=crypto.randomUUID();
+  const salt=b64(crypto.getRandomValues(new Uint8Array(16))),hash=await passwordHash(p,salt,env),id=crypto.randomUUID();
   try{await env.DB.prepare('INSERT INTO users(id,username,email,first_name,last_name,password_salt,password_hash,created_at) VALUES(?,?,?,?,?,?,?,?)').bind(id,username,email,first,last,salt,hash,now()).run();}
   catch{return error('Kullanıcı adı veya e-posta zaten kayıtlı',409);}
   return loginUser(env,{id,username,email,first_name:first,last_name:last,role:'user'});
@@ -81,7 +86,7 @@ async function main(req,env){
   const x=await body(req),username=String(x.username||'').trim(),p=String(x.password||'');
   if(!(await throttle(env,'login:'+req.headers.get('CF-Connecting-IP')+':'+username,8,900)))return error('Çok fazla deneme. Sonra tekrar deneyin.',429);
   const u=await env.DB.prepare('SELECT * FROM users WHERE username=? COLLATE NOCASE').bind(username).first();
-  if(!u||!p||await passwordHash(p,u.password_salt)!==u.password_hash)return error('Kullanıcı adı veya şifre yanlış',401);
+  if(!u||!p||await passwordHash(p,u.password_salt,env)!==u.password_hash)return error('Kullanıcı adı veya şifre yanlış',401);
   return loginUser(env,u);
  }
  const user=await currentUser(req,env);
