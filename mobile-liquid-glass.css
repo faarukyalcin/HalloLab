@@ -499,3 +499,65 @@
   body .app.study-app > .study-header { padding-inline: 11px; }
   body .app.study-app > .study-header .study-brand { gap: 8px; font-size: 16px; }
 }
+
+
+/* Mobile Felcan: mascot lives inside the middle dock button, not over the page. */
+@media(max-width:999px){
+  body .app.study-app>.study-header .study-nav{
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    gap:clamp(2px,.8vw,6px)!important;
+  }
+  body .app.study-app>.study-header .study-nav>button[data-page="home"]{order:1}
+  body .app.study-app>.study-header .study-nav>button[data-page="lessons"]{order:2}
+  body .app.study-app>.study-header .study-nav>button[data-page="live"]{order:3;display:flex!important;visibility:visible!important}
+  body .app.study-app>.study-header .study-nav>button[data-page="practice"]{order:4}
+  body .app.study-app>.study-header .study-nav>.mobile-more-trigger{order:5}
+  body #da-felcan-float{display:none!important}
+  body .app.study-app>.study-header .study-nav>button[data-page="live"]{
+    position:relative;isolation:isolate;
+    padding-top:7px!important;
+    overflow:visible!important;
+    background:linear-gradient(155deg,#6d48b7b8,#2c245ad9)!important;
+    border:1px solid #d3b8ff9c!important;
+    color:#fff!important;
+  }
+  body .app.study-app>.study-header .study-nav .mobile-felcan-emblem{
+    display:block!important;position:relative!important;
+    width:36px;height:36px;margin:-13px auto 1px;
+    flex:0 0 36px;overflow:visible;
+    border:0;background:none;box-shadow:none;color:inherit;font-size:initial;
+    animation:mobile-felcan-float 3.4s ease-in-out infinite;
+  }
+  body .app.study-app>.study-header .study-nav .mobile-felcan-emblem::before,
+  body .app.study-app>.study-header .study-nav .mobile-felcan-emblem::after{display:none!important}
+  .mobile-felcan-face{
+    position:absolute;inset:0;border-radius:49% 49% 43% 43%;
+    border:1px solid #f7e5ffdd;background:radial-gradient(circle at 22% 8%,#f4dbff,#ac87e9 48%,#6e53ba);
+    box-shadow:inset 2px 3px 9px #fffc,0 4px 17px #ac7df988;
+  }
+  .mobile-felcan-eyes{
+    display:block;position:absolute;top:10px;left:8px;color:#382251;font:900 9px system-ui;
+    white-space:pre;letter-spacing:1px;font-style:normal;
+  }
+  .mobile-felcan-mouth{
+    position:absolute;left:14px;top:19px;color:#4b2b76;font:900 13px system-ui;font-style:normal;
+  }
+  .mobile-felcan-ear{
+    position:absolute;left:1px;top:-8px;width:12px;height:18px;border-radius:80% 13% 60% 25%;
+    background:#b58fe8;border:1px solid #f8e6ff99;transform:rotate(-25deg);
+    box-shadow:25px 10px 0 -2px #b58fe8;
+  }
+  .mobile-felcan-feet{
+    position:absolute;left:6px;bottom:-3px;width:9px;height:6px;background:#7654bc;
+    border-radius:6px;box-shadow:16px 0 #7654bc;
+  }
+  body .app.study-app>.study-header .study-nav>button[data-page="live"][data-voice="listening"] .mobile-felcan-ear{animation:mobile-felcan-ears .3s ease-in-out infinite alternate}
+  body .app.study-app>.study-header .study-nav>button[data-page="live"][data-voice="speaking"] .mobile-felcan-mouth{animation:mobile-felcan-mouth .22s ease-in-out infinite alternate}
+  @keyframes mobile-felcan-mouth{to{transform:scaleY(1.6)}}
+}
+@media(max-width:380px){
+  body .app.study-app>.study-header .study-nav>button:not(.mobile-secondary-route){font-size:9px!important;padding-inline:1px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ .mobile-felcan-emblem,.mobile-felcan-ear,.mobile-felcan-mouth{animation:none!important}
+}
