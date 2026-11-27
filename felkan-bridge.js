@@ -56,9 +56,14 @@
       return true;
     },
     appContext() {
-      let state = {};
+      let state = {}, plan = null, preferences = null;
       try { state = JSON.parse(storage.getItem('deutschai-online-v1') || '{}'); } catch {}
+      try { plan = JSON.parse(storage.getItem('deutschai-felcan-week-v1') || 'null'); } catch {}
+      try { preferences = JSON.parse(storage.getItem('deutschai-felcan-settings-v1') || 'null'); } catch {}
+      const day=(new Date().getDay()+6)%7;
       return {
+        studyPreferences: preferences ? {minutes:preferences.minutes,goal:preferences.goal,focus:preferences.focus} : null,
+        weeklyPlan:plan?.days?.[day] ? {week:plan.week,today:plan.days[day]} : null,
         user:auth?.user?.firstName || '',
         level:state.level || 'A1',
         daily:state.daily || 20,
