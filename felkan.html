@@ -520,7 +520,17 @@ function log(...a){const line=new Date().toLocaleTimeString()+'  '+a.map(x=>type
   LOGS.push(line);if(LOGS.length>200)LOGS.shift();console.log('[Felkan]',...a);
   const d=$('#debug');if(d.classList.contains('open')){d.textContent=LOGS.slice(-60).join('\n');d.scrollTop=d.scrollHeight}}
 const avatar=$('#avatar');
-function setStatus(state,text){avatar.dataset.state=state;if(text)$('#statusText').textContent=text}
+function setStatus(state,text){
+  avatar.dataset.state=state;
+  if(text)$('#statusText').textContent=text;
+  if(window.parent!==window){
+    window.parent.postMessage({
+      type:'deutschai:voice-state',
+      state:state==='listening'&&S.muted?'muted':state,
+      message:text||''
+    },location.origin);
+  }
+}
 
 /* ---------- Amblem konumu ---------- */
 const POS=['center','top','bottom','left','right','top-left','top-right','bottom-left','bottom-right'];
@@ -1899,6 +1909,25 @@ $('#sSave').onclick=()=>{
 $('#sDisc').onclick=()=>{disconnect();closeSettings()};
 function disconnect(silent){S.userClosed=true;if(S.ws){try{S.ws.close(1000,'user')}catch(e){}}if(!silent){setStatus('idle','Başlatmak için dokun');$('#startBtn').hidden=false;$('#startBtn').textContent='Felkan ile çalışmaya başla'}}
 $('#startBtn').onclick=()=>{S.attempt=0;S.retries=0;connect()};
+
+function toggleCompanionVoice(){
+  if(S.ws && (S.ws.readyState===WebSocket.CONNECTING || (S.ws.readyState===WebSocket.OPEN && !S.setupDone)))return;
+  if(S.setupDone && S.ws?.readyState===WebSocket.OPEN){
+    S.muted=!S.muted;
+    $('#bMute').classList.toggle('on',S.muted);
+    S.stream?.getAudioTracks().forEach(track=>track.enabled=!S.muted);
+    setStatus(S.muted?'muted':S.speaking?'speaking':'listening',S.muted?'Mikrofon duraklatıldı':'Dinliyorum… konuşabilirsin');
+  }else{
+    S.userClosed=false;
+    S.muted=false;
+    $('#bMute').classList.remove('on');
+    S.stream?.getAudioTracks().forEach(track=>track.enabled=true);
+    S.attempt=0;S.retries=0;
+    connect();
+  }
+}
+window.FelcanVoiceControl={toggle:toggleCompanionVoice};
+
 $('#bCenter').onclick=()=>{closeAll();setPos('center')};
 $('#bMute').onclick=()=>{S.muted=!S.muted;$('#bMute').classList.toggle('on',S.muted);if(S.stream)S.stream.getAudioTracks().forEach(t=>t.enabled=!S.muted);
   if(S.setupDone)setStatus(S.speaking?'speaking':'listening',S.muted?'Mikrofon kapalı':'Dinliyorum… konuşabilirsin')};
