@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="tr">
 <head>
+<script>if(new URLSearchParams(location.search).get('compact')==='1')document.documentElement.classList.add('compact-felcan');</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Felkan · DeutschAI Almanca Öğretmeni</title><script src="./api-config.js"></script><script src="./felkan-bridge.js"></script>
@@ -374,6 +375,41 @@ body::after{
  #toolbar button{transition:none}
 }
 
+
+/* Compact companion, embedded in the DeutschAI floating glass window */
+html.compact-felcan,html.compact-felcan body{
+ width:100%;height:100%;min-height:0;overflow:hidden;background:transparent;
+}
+html.compact-felcan body::before,html.compact-felcan body::after{display:none}
+html.compact-felcan #welcome{display:none!important}
+html.compact-felcan #avatar[data-pos="center"]{
+ --s:clamp(135px,42vw,195px);left:50%;top:42%;
+}
+html.compact-felcan #avatar:not([data-pos="center"]){--s:92px}
+html.compact-felcan #avatar .label{font-size:11px;padding:8px 11px;max-width:94vw;white-space:normal;text-align:center}
+html.compact-felcan #avatar[data-pos="center"] .label{font-size:12px;padding:9px 12px}
+html.compact-felcan #startBtn{
+ top:auto;bottom:34px;max-width:calc(100% - 32px);
+ padding:12px 17px;white-space:normal;text-align:center;
+ font-size:13px;border-width:1px;
+}
+html.compact-felcan #toolbar{top:9px;right:9px;gap:5px}
+html.compact-felcan #toolbar button{width:31px;height:31px;font-size:14px;border-radius:10px}
+html.compact-felcan #panelWrap{padding:46px 9px 12px!important;gap:5px}
+html.compact-felcan #panelWrap.open{align-items:stretch;overflow:auto}
+html.compact-felcan .panel{max-width:100%!important;height:100%!important;min-height:0;border-radius:16px}
+html.compact-felcan .pHead{padding:12px 12px 4px}
+html.compact-felcan .pTitle{font-size:14px}
+html.compact-felcan .pBody{padding:9px 13px 14px;font-size:13px}
+html.compact-felcan .pFoot{padding:8px 12px 12px}
+html.compact-felcan .opt{font-size:14px;gap:8px;padding:12px;border-radius:13px}
+html.compact-felcan .btn{font-size:13px;padding:11px 15px}
+html.compact-felcan .qtext{font-size:15px}
+html.compact-felcan #stageBanner{bottom:9px;max-width:95vw;margin:auto}
+html.compact-felcan #stageBanner .bt{font-size:23px}
+html.compact-felcan #caption{bottom:5px;max-width:92vw;font-size:11px}
+html.compact-felcan .modal{padding:10px}
+html.compact-felcan .mbox{padding:16px;border-radius:17px}
 </style>
 </head>
 <body>
