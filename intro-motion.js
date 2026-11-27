@@ -34,7 +34,14 @@
     setTimeout(() => { overlay.remove(); }, 600);
   }
   video.addEventListener('ended', finish, {once:true});
-  video.addEventListener('error', finish, {once:true});
+  video.addEventListener('error', () => {
+    if (video.dataset.selected === 'desktop') {
+      video.dataset.selected = 'mobile';
+      video.src = './deutschai-intro.mp4?v=2';
+      video.load();
+      video.play().catch(() => setTimeout(finish, 650));
+    } else finish();
+  });
   skip.addEventListener('click', finish);
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && !finished) finish();
@@ -45,12 +52,25 @@
     });
     observer.observe(root, {childList:true,subtree:true});
   }
-  timeoutId = setTimeout(finish, 12000);
+  timeoutId = setTimeout(finish, 15000);
   video.muted = true;
   video.playsInline = true;
-  const play = video.play();
-  if (play && typeof play.catch === 'function') play.catch(() => {
-    // Browser blocks autoplay or data cannot be loaded: do not trap the user.
-    setTimeout(finish, 650);
-  });
+  async function start() {
+    const mobile = matchMedia('(max-width: 767px)').matches;
+    const desktopUrl = './deutschai-intro-desktop.mp4?v=1';
+    let useDesktop = false;
+    if (!mobile) {
+      try {
+        const response = await fetch(desktopUrl, { method:'HEAD' });
+        useDesktop = response.ok && (response.headers.get('content-type') || '').includes('video');
+      } catch (_) { /* Existing mobile video remains available as fallback. */ }
+    }
+    if (finished) return;
+    video.dataset.selected = useDesktop ? 'desktop' : 'mobile';
+    video.src = useDesktop ? desktopUrl : './deutschai-intro.mp4?v=2';
+    video.load();
+    const play = video.play();
+    if (play && typeof play.catch === 'function') play.catch(() => setTimeout(finish, 650));
+  }
+  start();
 })();
