@@ -138,16 +138,30 @@
       catch(err){e.querySelector('.da-error').textContent=err.message;}
     };
   }
+  function claimAdmin() {
+    const e=overlay();
+    e.innerHTML='<div class="da-card"><h1>İlk Yönetici Kurulumu</h1><p>Cloudflare üzerinde oluşturduğun ADMIN_BOOTSTRAP_SECRET değerini gir. Bu parola sadece ilk yönetici için bir kere kullanılır; tarayıcıda saklanmaz.</p><form id="da-claim"><label>Kurulum sırrı<input name="bootstrapSecret" type="password" autocomplete="off" required></label><p class="da-error" role="alert"></p><button type="submit">Yönetici Hesabımı Etkinleştir</button> <button type="button" id="da-close">Kapat</button></form></div>';
+    e.querySelector('#da-close').onclick=()=>e.hidden=true;
+    e.querySelector('form').onsubmit=async event=>{
+      event.preventDefault();
+      const b=e.querySelector('[type=submit]');b.disabled=true;
+      try {
+        await request('/admin/claim',{method:'POST',body:JSON.stringify(Object.fromEntries(new FormData(event.currentTarget)))});
+        const response=await request('/auth/me');auth.user=response.user;put(authKey,JSON.stringify(auth));location.reload();
+      } catch(err) {e.querySelector('.da-error').textContent=err.message;b.disabled=false;}
+    };
+  }
   function account() {
     if (!auth?.user) return;
     const b=document.createElement('button');b.id='da-account-action';b.className='da-account-button';
     b.textContent=auth.user.firstName+' ▾';document.body.append(b);
     b.onclick=()=>{
       const e=overlay();
-      e.innerHTML='<div class="da-card"><h1>Hesabım</h1><p>'+safe(auth.user.firstName)+' '+safe(auth.user.lastName)+' · @'+safe(auth.user.username)+'</p><button id="da-logout">Çıkış Yap</button> '+(auth.user.role==='admin'?'<button id="da-admin">Admin Paneli</button> ':'')+'<button id="da-close">Kapat</button></div>';
+      e.innerHTML='<div class="da-card"><h1>Hesabım</h1><p>'+safe(auth.user.firstName)+' '+safe(auth.user.lastName)+' · @'+safe(auth.user.username)+'</p><button id="da-logout">Çıkış Yap</button> '+(auth.user.role==='admin'?'<button id="da-admin">Admin Paneli</button> ':'<button id="da-claim-admin">İlk Yönetici Kurulumu</button> ')+'<button id="da-close">Kapat</button></div>';
       e.querySelector('#da-logout').onclick=logout;
       e.querySelector('#da-close').onclick=()=>e.hidden=true;
       if(auth.user.role==='admin')e.querySelector('#da-admin').onclick=admin;
+      else e.querySelector('#da-claim-admin').onclick=claimAdmin;
     };
   }
   function felkan() {
