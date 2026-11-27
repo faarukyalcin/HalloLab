@@ -43,10 +43,16 @@
       const allowed = ['home','lessons','grammar','words','practice','writing','exam','placement','progress'];
       if (!allowed.includes(page)) return false;
       if (window.parent !== window) {
+        try {
+          if(typeof window.parent.setPage==='function'){
+            window.parent.setPage(page);
+            return window.parent.document.querySelector('#nav [aria-current="page"]')?.dataset.page===page;
+          }
+        } catch(e) { /* postMessage fallback for isolated frames */ }
         window.parent.postMessage({type:'deutschai:navigate',page},window.location.origin);
-      } else {
-        window.location.href = './?open=' + encodeURIComponent(page);
+        return true; // Navigation is asynchronous in the fallback path.
       }
+      window.location.href = './?open=' + encodeURIComponent(page);
       return true;
     },
     appContext() {
