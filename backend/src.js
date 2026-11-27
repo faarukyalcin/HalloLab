@@ -105,6 +105,7 @@ async function main(req,env){
   return answer({ok:true,revision:rev+1});
  }
  if(route==='/admin/claim'&&req.method==='POST'){
+  if(!(await throttle(env,'bootstrap:'+req.headers.get('CF-Connecting-IP'),5,3600)))return error('Yönetici kurulum denemesi sınırlandı',429);
   const x=await body(req);
   if(!env.ADMIN_BOOTSTRAP_SECRET||x.bootstrapSecret!==env.ADMIN_BOOTSTRAP_SECRET)return error('Yetkisiz',403);
   const previous=await env.DB.prepare("SELECT id FROM users WHERE role='admin' LIMIT 1").first();
