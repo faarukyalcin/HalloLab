@@ -40,7 +40,7 @@
   window.DeutschAILearningCore = core;
 
   const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
-  const parse = key => { try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch { return null; } };
+  const parse = key => { try { return JSON.parse((window.deutschaiStore || localStorage).getItem(key) || 'null'); } catch { return null; } };
   const levelFromPlacement = () => {
     const placed = parse('deutschai-ai-placement-v1')?.level;
     return isLevel(placed) ? placed : (isLevel(state.level) ? state.level : 'A1');
@@ -225,7 +225,7 @@
     } else {
       const profile = parse('deutschai-ai-profile-v1') || {};
       profile.level = result.progress.level;
-      localStorage.setItem('deutschai-ai-profile-v1', JSON.stringify(profile));
+      (window.deutschaiStore || localStorage).setItem('deutschai-ai-profile-v1', JSON.stringify(profile));
     }
     return result;
   }
