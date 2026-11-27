@@ -127,6 +127,12 @@
     '@keyframes da-felcan-mouth{from{transform:scaleY(.45);opacity:.7}to{transform:scaleY(1.65) translateY(2px);opacity:1}}',
     '@keyframes da-felcan-speak{from{transform:rotate(-5deg) scale(1)}to{transform:rotate(5deg) scale(1.06)}}',
     '@keyframes da-felcan-thinking{from{transform:rotate(-4deg)}to{transform:rotate(4deg)}}',
+    '#da-felcan-hello{position:fixed;right:25px;bottom:116px;z-index:990;width:min(310px,calc(100vw - 36px));padding:14px 35px 14px 16px;border:1px solid #d7c0ff76;border-radius:19px;background:linear-gradient(135deg,#504079ed,#242044ef);color:#fff;box-shadow:0 15px 45px #0c062d8c;backdrop-filter:blur(26px);font:600 13px/1.5 system-ui;cursor:pointer;animation:da-felcan-appear .4s ease both}',
+    '#da-felcan-hello::after{content:"";position:absolute;right:31px;bottom:-8px;width:13px;height:13px;transform:rotate(45deg);background:#31284f;border-right:1px solid #d7c0ff76;border-bottom:1px solid #d7c0ff76}',
+    '#da-felcan-hello .da-hello-dismiss{position:absolute;right:9px;top:7px;border:0;background:transparent;color:#ede3ff;font:23px system-ui;cursor:pointer}',
+    '#da-felcan-float.da-felcan-waving .da-felcan-orb::before{animation:da-felcan-ears .29s ease-in-out infinite alternate}',
+    '#da-felcan-float.da-felcan-waving .da-felcan-orb{animation:da-felcan-speak .45s ease-in-out infinite alternate}',
+    '@media(max-width:600px){#da-felcan-hello{right:12px;bottom:160px}}',
     '@keyframes da-felcan-fly{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}',
     '@keyframes da-felcan-appear{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}',
     '@media(max-width:600px){#da-felcan-float{bottom:82px;right:12px;padding:6px;border-radius:19px}#da-felcan-float .da-felcan-text{display:none}#da-felcan-float .da-felcan-orb{width:44px;height:44px}#da-felcan-window{right:8px;bottom:149px;width:calc(100vw - 16px);height:min(570px,calc(100dvh - 168px));border-radius:21px}}',
@@ -285,6 +291,38 @@
     }
   }
   function felkan(){startFelcanVoice()}
+
+  function felcanWelcome(){
+    const button=document.getElementById('da-felcan-float');
+    if(!button)return;
+    const name=String(auth?.user?.firstName||'arkadaşım').trim();
+    let bubble=document.getElementById('da-felcan-hello');
+    if(!bubble){
+      bubble=document.createElement('div');
+      bubble.id='da-felcan-hello';
+      bubble.setAttribute('role','status');
+      bubble.innerHTML='<span class="da-hello-text"></span><button type="button" class="da-hello-dismiss" aria-label="Karşılamayı kapat">×</button>';
+      button.insertAdjacentElement('beforebegin',bubble);
+      bubble.querySelector('.da-hello-dismiss').onclick=()=>bubble.remove();
+      bubble.onclick=e=>{if(e.target.closest('button'))return;startFelcanVoice();bubble.remove()};
+    }
+    bubble.querySelector('.da-hello-text').textContent='👋 Hoş geldin, '+name+'! Ben Felcan. Bugün kaldığımız yerden devam edelim mi?';
+    button.classList.add('da-felcan-waving');
+    setTimeout(()=>button.classList.remove('da-felcan-waving'),3400);
+    setTimeout(()=>bubble.remove(),13500);
+    // Only try hands-free greeting when microphone permission was previously
+    // granted. Browsers may still require a click to unlock audio.
+    const once='da:felcan-auto-greet:'+auth.user.id;
+    if(sessionStorage.getItem(once))return;
+    sessionStorage.setItem(once,'1');
+    if(!navigator.permissions?.query)return;
+    navigator.permissions.query({name:'microphone'}).then(permission=>{
+      if(permission.state==='granted'&&document.visibilityState==='visible'){
+        felcanRequested=true;
+        if(felcanReady){felcanRequested=false;startFelcanVoice()}
+      }
+    }).catch(()=>{});
+  }
   function floatingFelcan(){
     if(!auth||document.getElementById('da-felcan-float'))return;
     const button=document.createElement('button');
@@ -293,9 +331,10 @@
     button.setAttribute('aria-label','Felcan ile sesli konuşmaya başla');
     button.setAttribute('aria-pressed','false');
     button.innerHTML='<span class="da-felcan-orb" aria-hidden="true"><span class="da-toy-eyes">● ●</span><span class="da-toy-smile">ᴗ</span><span class="da-toy-feet"></span><span class="da-toy-spark">✦</span></span><span class="da-felcan-text">Felcan<span class="da-felcan-sub">Konuşmak için dokun</span></span>';
-    button.onclick=startFelcanVoice;
+    button.onclick=()=>{document.getElementById('da-felcan-hello')?.remove();startFelcanVoice()};
     document.body.append(button);
     ensureFelcanRuntime();
+    felcanWelcome();
     setInterval(()=>{if(felcanReady)sendFelcanContext()},1400);
   }
   window.deutschaiStore=store;
