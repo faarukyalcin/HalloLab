@@ -88,6 +88,43 @@
     '#da-auth-screen button,.da-account-button{cursor:pointer;border:1px solid #a893f1;border-radius:13px;padding:10px 13px;background:linear-gradient(135deg,#8d66e6,#5939b6);color:white;font-weight:750}',
     '#da-auth-screen .da-tabs{display:flex;gap:8px;margin:15px 0}.da-tabs button{flex:1}',
     '#da-auth-screen .da-error{color:#ffb2c3;min-height:21px}',
+    '#da-auth-screen{background:radial-gradient(ellipse 60% 75% at 14% 10%,#6745b071,transparent 70%),radial-gradient(ellipse 55% 75% at 87% 80%,#4b429a60,transparent 70%),linear-gradient(140deg,#0a0e22,#12112f 63%,#090c21);overflow-y:auto;align-items:center}',
+    '#da-auth-screen .da-login-shell{display:grid;grid-template-columns:minmax(0,1.18fr) minmax(335px,.82fr);width:min(1110px,100%);min-height:min(680px,calc(100dvh - 48px));border:1px solid #c6a7ff44;border-radius:32px;overflow:hidden;background:linear-gradient(110deg,#292653aa,#13172dd9);box-shadow:0 35px 100px #040617b0;backdrop-filter:blur(30px)}',
+    '#da-auth-screen .da-login-hero{position:relative;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;padding:33px clamp(22px,4vw,54px);background:radial-gradient(circle at 74% 45%,#b88bff37,transparent 42%),linear-gradient(140deg,#342b6b98,#25254d66 58%,#11193488);border-right:1px solid #e2cbff25}',
+    '#da-auth-screen .da-login-hero::after{content:"";position:absolute;width:500px;height:250px;right:-200px;top:-170px;transform:rotate(-19deg);border-radius:50%;border:1px solid #ceb0ff65;background:linear-gradient(160deg,#c899ff32,transparent);box-shadow:inset 0 -20px 55px #bd8bff1d;pointer-events:none}',
+    '#da-auth-screen .da-login-brand{display:flex;align-items:center;gap:11px;font-size:19px;font-weight:800;position:relative;z-index:1}',
+    '#da-auth-screen .da-brand-mark{display:grid;place-items:center;width:38px;height:38px;border-radius:13px;background:linear-gradient(150deg,#a98af7,#6149a8);border:1px solid #dec8ff99;box-shadow:0 7px 22px #673fb777}',
+    '#da-auth-screen .da-brand-pill{margin-left:auto;font-size:9px;letter-spacing:.09em;color:#ded0ff;border:1px solid #c5afff44;border-radius:99px;padding:7px 10px}',
+    '#da-auth-screen .da-hero-content{position:relative;z-index:1;padding:27px 0}',
+    '#da-auth-screen .da-login-kicker,#da-auth-screen .da-form-kicker{color:#ba9cf9;font-size:11px;font-weight:800;letter-spacing:.19em}',
+    '#da-auth-screen .da-login-hero h1{font-size:clamp(34px,4.1vw,60px);line-height:1.09;letter-spacing:-.045em;max-width:560px;margin:19px 0 15px}',
+    '#da-auth-screen .da-login-hero h1 em{font-style:normal;color:#cfb3ff}',
+    '#da-auth-screen .da-login-hero p{font-size:15px;line-height:1.7;max-width:490px;color:#d2cbea}',
+    '#da-auth-screen .da-hero-mascot{position:relative;width:118px;height:115px;margin:26px auto 14px;filter:drop-shadow(0 15px 27px #b680ff55);animation:da-felcan-fly 4s ease-in-out infinite}',
+    '#da-auth-screen .da-hero-face{display:flex;flex-direction:column;justify-content:center;align-items:center;position:absolute;inset:10px 10px 8px;border-radius:47% 47% 41% 41%;background:radial-gradient(circle at 30% 10%,#f4e0ff,#ab8beb 46%,#6f56bb);border:1px solid #fffb;box-shadow:inset 3px 4px 16px #fff8;font-size:18px;font-weight:900;color:#342051;line-height:1.7}',
+    '#da-auth-screen .da-hero-face span{font-size:22px;line-height:.6}',
+    '#da-auth-screen .da-hero-ears{position:absolute;width:35px;height:53px;top:-15px;left:12px;border-radius:90% 10% 70% 20%;background:#c5a4f3;transform:rotate(-20deg);box-shadow:83px 26px 0 -6px #a788dc}',
+    '#da-auth-screen .da-hero-feet{position:absolute;bottom:2px;left:22px;width:24px;height:13px;border-radius:8px;background:#7053af;box-shadow:48px 0 #7053af}',
+    '#da-auth-screen .da-hero-star{position:absolute;right:-3px;top:9px;color:#fbe2a8;font-size:31px;text-shadow:0 0 13px #d7aaff}',
+    '#da-auth-screen .da-login-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:17px}',
+    '#da-auth-screen .da-login-stats>div{padding:14px 11px;border:1px solid #d0b7ff36;border-radius:17px;background:#ffffff0b;backdrop-filter:blur(15px)}',
+    '#da-auth-screen .da-login-stats b{display:block;font-size:21px;color:#fff}',
+    '#da-auth-screen .da-login-stats span{display:block;color:#c8bfe0;font-size:10px;line-height:1.5;margin-top:4px}',
+    '#da-auth-screen .da-hero-note{margin:10px 0 0;font-size:12px;color:#beb7db}',
+    '#da-auth-screen .da-login-card{margin:0;width:100%;max-height:none;overflow-y:auto;box-shadow:none;border:0;border-radius:0;background:linear-gradient(150deg,#1c1d3acc,#12142fe6);padding:clamp(24px,4vw,55px);display:flex;flex-direction:column;justify-content:center}',
+    '#da-auth-screen .da-login-card h2{font-size:clamp(25px,3vw,35px);letter-spacing:-.035em;margin:11px 0 5px}',
+    '#da-auth-screen .da-login-card p{font-size:13px;line-height:1.55}',
+    '#da-auth-screen .da-login-card .da-tabs{background:#100e2a;border:1px solid #a992e94f;border-radius:14px;padding:5px;margin:24px 0 14px}',
+    '#da-auth-screen .da-login-card .da-tabs button{background:transparent;border:0;box-shadow:none;color:#afa7d0;font-size:13px}',
+    '#da-auth-screen .da-login-card .da-tabs button[aria-pressed="true"]{color:#fff;background:linear-gradient(135deg,#9774ed,#6044bd);box-shadow:0 5px 17px #6044bd77}',
+    '#da-auth-screen .da-login-card label{margin:9px 0 13px;font-size:12px;font-weight:600}',
+    '#da-auth-screen .da-login-card input{border:1px solid #baa7fa57;border-radius:13px;background:#0e112caa;transition:border-color .2s,box-shadow .2s}',
+    '#da-auth-screen .da-login-card input:focus{outline:0;border-color:#cbb6ff;box-shadow:0 0 0 3px #b28bff33}',
+    '#da-auth-screen .da-name-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}',
+    '#da-auth-screen .da-login-submit{display:block;width:100%;margin-top:10px;padding:14px 18px;font-size:14px;box-shadow:0 9px 27px #7455d255}',
+    '#da-auth-screen .da-login-secure{margin:20px 0 0!important;text-align:center;font-size:11px!important}',
+    '@media(max-width:780px){#da-auth-screen{padding:10px;align-items:flex-start}#da-auth-screen .da-login-shell{grid-template-columns:1fr;min-height:unset;border-radius:23px}#da-auth-screen .da-login-hero{padding:22px 23px 17px;border-right:0;border-bottom:1px solid #e2cbff25}#da-auth-screen .da-login-hero h1{font-size:33px}#da-auth-screen .da-hero-mascot{display:none}#da-auth-screen .da-login-stats{margin:16px 0 0}#da-auth-screen .da-brand-pill{display:none}#da-auth-screen .da-login-card{padding:24px 23px 30px}#da-auth-screen .da-hero-content{padding:20px 0 0}#da-auth-screen .da-login-hero p{font-size:13px}#da-auth-screen .da-login-stats b{font-size:17px}}',
+    '@media(max-width:370px){#da-auth-screen .da-name-row{grid-template-columns:1fr}#da-auth-screen .da-login-stats>div{padding:9px 7px}#da-auth-screen .da-login-stats span{font-size:9px}}',
     '#da-account-action{position:fixed;top:97px;right:12px;z-index:98;font-size:12px}',
     '#da-felcan-float{position:fixed;right:22px;bottom:24px;z-index:990;display:flex;align-items:center;gap:10px;cursor:pointer;border:1px solid #d9c6ff77;border-radius:24px;padding:7px 16px 7px 8px;background:linear-gradient(135deg,#6550a9b8,#242148e3);color:#fff;backdrop-filter:blur(26px) saturate(150%);box-shadow:0 16px 45px #160d4570,inset 0 1px #ffffff50;font:700 13px system-ui;animation:da-felcan-fly 5s ease-in-out infinite}',
     '#da-felcan-float:hover{border-color:#e2ceff;box-shadow:0 18px 48px #6c43b766;animation-play-state:paused}',
@@ -152,13 +189,19 @@
       screen.innerHTML='<div class="da-card"><h1>DeutschAI</h1><p>Hesap sunucusu henüz yapılandırılmadı.</p></div>';
       return;
     }
-    screen.innerHTML='<div class="da-card"><h1>DeutschAI</h1><p>Felkan ile kişisel Almanca çalışma alanın.</p>'
-      +'<div class="da-tabs"><button type="button" id="da-login-tab">Giriş Yap</button><button type="button" id="da-signup-tab">Kayıt Ol</button></div>'
-      +'<form id="da-auth-form"><label>Kullanıcı Adı<input name="username" autocomplete="username" minlength="3" maxlength="32" required></label>'
-      +(mode==='register' ? '<label>İsim<input name="firstName" autocomplete="given-name" maxlength="80" required></label><label>Soyisim<input name="lastName" autocomplete="family-name" maxlength="80" required></label><label>E-posta<input name="email" type="email" autocomplete="email" required></label>' : '')
-      +'<label>Şifre<input name="password" type="password" minlength="'+(mode==='register'?'10':'1')+'" autocomplete="'+(mode==='register'?'new-password':'current-password')+'" required></label>'
-      +'<p class="da-error" role="alert">'+safe(message)+'</p><button type="submit">'+(mode==='register'?'Hesap Oluştur':'Giriş Yap')+'</button></form>'
-      +'<p>API anahtarı istemiyoruz. İlerlemen hesabına özel saklanır.</p></div>';
+    screen.innerHTML='<div class="da-login-shell">'
+      +'<section class="da-login-hero"><div class="da-login-brand"><span class="da-brand-mark">✦</span><strong>DeutschAI</strong><span class="da-brand-pill">ALMANCA ÖĞRENMENİN YENİ YOLU</span></div>'
+      +'<div class="da-hero-content"><div class="da-login-kicker">✦ KİŞİSEL YAPAY ZEKÂ ÖĞRETMENİN</div><h1>Almanca öğrenmek <em>seninle</em> başlar.</h1><p>Felcan seni tanır, hedeflerini öğrenir ve günlük derslerini ilerlemene göre şekillendirir. Her gün küçük bir adım, her gün gerçek gelişim.</p>'
+      +'<div class="da-hero-mascot" aria-hidden="true"><span class="da-hero-ears"></span><span class="da-hero-face">● &nbsp; ●<span>ᴗ</span></span><span class="da-hero-feet"></span><span class="da-hero-star">✧</span></div>'
+      +'<div class="da-login-stats"><div><b>7 gün</b><span>Kişisel haftalık plan</span></div><div><b>4 beceri</b><span>Okuma · Yazma · Dinleme · Konuşma</span></div><div><b>AI</b><span>Felcan ile öğrenme</span></div></div></div>'
+      +'<p class="da-hero-note">Kendi hızında öğren. Kaldığın yerden devam et.</p></section>'
+      +'<section class="da-card da-login-card"><div class="da-form-kicker">DEUTSCHAI HESABIN</div><h2>'+(mode==='register'?'Yolculuğuna başla':'Yeniden hoş geldin!')+'</h2><p>'+(mode==='register'?'Hesabını oluştur; Felcan ilk programını birlikte hazırlasın.':'Almanca yolculuğuna kaldığın yerden devam et.')+'</p>'
+      +'<div class="da-tabs" role="group" aria-label="Hesap işlemi"><button type="button" id="da-login-tab" aria-pressed="'+(mode==='login')+'">Giriş Yap</button><button type="button" id="da-signup-tab" aria-pressed="'+(mode==='register')+'">Kayıt Ol</button></div>'
+      +'<form id="da-auth-form"><label>Kullanıcı adı<input name="username" autocomplete="username" minlength="3" maxlength="32" required placeholder="Kullanıcı adın"></label>'
+      +(mode==='register' ? '<div class="da-name-row"><label>Adın<input name="firstName" autocomplete="given-name" maxlength="80" required placeholder="Adın"></label><label>Soyadın<input name="lastName" autocomplete="family-name" maxlength="80" required placeholder="Soyadın"></label></div><label>E-posta<input name="email" type="email" autocomplete="email" required placeholder="ornek@eposta.com"></label>' : '')
+      +'<label>Şifre<input name="password" type="password" minlength="'+(mode==='register'?'10':'1')+'" autocomplete="'+(mode==='register'?'new-password':'current-password')+'" required placeholder="Şifren"></label>'
+      +'<p class="da-error" role="alert">'+safe(message)+'</p><button class="da-login-submit" type="submit">'+(mode==='register'?'Hesap Oluştur ✦':'Öğrenmeye Devam Et ✦')+'</button></form>'
+      +'<p class="da-login-secure">🔒 İlerlemen hesabına özel saklanır. API anahtarı istenmez.</p></section></div>';
     screen.querySelector('#da-login-tab').onclick=()=>show('login');
     screen.querySelector('#da-signup-tab').onclick=()=>show('register');
     screen.querySelector('#da-auth-form').onsubmit=async event=>{
