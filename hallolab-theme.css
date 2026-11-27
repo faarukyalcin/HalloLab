@@ -1,0 +1,80 @@
+body.hallolab-shell{
+  --bg:#f4efe4;--paper:#fffcf4;--ink:#162e25;--muted:#53655b;--line:#d8dfd3;
+  --green:#215a46;--mint:#e4eddf;--gold:#ad7832;--red:#a63c3e;--shadow:0 8px 26px #18392a0a;
+  --shell-side:#153f34;--shell-side-line:#3b5f50;--shell-side-ink:#f7efdd;--shell-side-muted:#cadaad;
+  --shell-lime:#d9ef79;--shell-side-hover:#245345;
+  background:var(--bg)!important;color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
+}
+body.hallolab-shell.theme-dark{
+  --bg:#101e19;--paper:#172b22;--ink:#f2eddf;--muted:#b7c6b7;--line:#345044;
+  --green:#c6e78a;--mint:#223b30;--gold:#edbb6e;--red:#ffb0ab;--shadow:none
+}
+.hallolab-shell .app,.hallolab-shell .app>.main{background:var(--bg)!important}
+body.hallolab-shell .app>.main{padding:clamp(18px,4vw,52px)!important}
+.hallolab-shell .main>.top{max-width:1220px;margin:0 auto 24px;padding-bottom:18px;border-bottom:1px solid var(--line);gap:10px}
+.hallolab-shell .top .eyebrow{color:var(--green);font-size:.73rem;letter-spacing:.14em}
+.hallolab-shell .top h1,.hallolab-shell .study-hero h2{font-family:Georgia,"Times New Roman",serif;font-weight:400;letter-spacing:-.045em}
+.hallolab-shell .top h1{color:var(--ink);font-size:clamp(1.7rem,4vw,2.85rem);line-height:1.04}
+.hallolab-shell .top .date{color:var(--muted);white-space:nowrap}
+body.hallolab-shell .app>.side{
+  background:var(--shell-side)!important;color:var(--shell-side-ink);border-color:var(--shell-side-line);
+  scrollbar-color:#638475 transparent;padding:22px 14px!important;gap:17px
+}
+.hallolab-shell .app>.side .brand b{font-size:1.38rem;font-weight:780;letter-spacing:-.04em;color:var(--shell-side-ink)}
+.hallolab-shell .app>.side .brand small{color:var(--shell-side-muted);letter-spacing:.09em}
+.hallolab-shell .app>.side .nav-group-title{color:var(--shell-side-muted);font-size:.76rem;padding-top:11px}
+.hallolab-shell .app>.side .nav .nav-item{color:var(--shell-side-ink)}
+.hallolab-shell .app>.side .nav .nav-item:hover{background:var(--shell-side-hover)!important;color:var(--shell-side-ink)!important}
+.hallolab-shell .app>.side .nav .nav-item[aria-current=page],
+.hallolab-shell .app>.side .nav .nav-item[aria-current=page]:hover{
+  color:#1b3827!important;background:var(--shell-lime)!important;border-color:transparent
+}
+.hallolab-shell .app>.side .nav .nav-item.active::before{content:none}
+.hallolab-shell .app>.side .theme-picker{padding:0!important;border:0!important;box-shadow:none!important;background:none!important}
+.hallolab-shell .app>.side .theme-mode-toggle,.hallolab-shell .app>.side .nav-toggle{
+  min-height:39px;border:1px solid var(--shell-side-line);border-radius:11px;background:#1d4a3c;color:var(--shell-side-ink)
+}
+.hallolab-shell .app>.side .theme-mode-toggle:hover,.hallolab-shell .app>.side .nav-toggle:hover{background:var(--shell-side-hover)}
+.hallolab-shell .study-panel{
+  --study-surface:var(--paper);--study-text:var(--ink);--study-muted:var(--muted);--study-line:var(--line);
+  --study-accent:var(--green);gap:18px
+}
+.hallolab-shell .study-hero{
+  --study-text:#f7efdd;--study-muted:#dfebd2;--study-accent:#d9ef79;
+  color:var(--study-text);background:#153f34;border-color:#335c49;border-radius:24px;
+  padding:clamp(24px,4.8vw,54px);grid-template-columns:minmax(0,1fr) minmax(200px,30%)
+}
+.hallolab-shell .study-hero h2{font-size:clamp(2.8rem,6vw,5.1rem);line-height:.95}
+.hallolab-shell .study-hero .study-kicker{letter-spacing:.12em;font-size:.78rem;margin-bottom:15px}
+.hallolab-shell .study-hero .study-button{background:#234e40;border-color:#577564;color:#f7efdd}
+.hallolab-shell .study-hero .study-button.primary{background:#d9ef79;border-color:#d9ef79;color:#1d391e}
+.hallolab-shell .study-goal{border-color:#608173;background:#214e40}
+.hallolab-shell .study-goal strong{color:#d9ef79}
+.hallolab-shell .study-goal progress,.hallolab-shell .study-goal progress::-webkit-progress-bar{background:#496c5c}
+.hallolab-shell .study-card,.hallolab-shell .study-stat{border-radius:18px;box-shadow:var(--shadow)}
+.hallolab-shell .study-stat{border-top:2px solid #94ad81}
+.hallolab-shell .study-stat strong{font-family:Georgia,serif;font-weight:500;font-size:clamp(1.35rem,3vw,2rem)}
+.hallolab-shell .study-row{background:var(--mint)}
+.hallolab-shell .study-row:hover{filter:none;border-color:var(--green)}
+.hallolab-shell .study-link{color:var(--green)}
+.hallolab-shell .main .card,.hallolab-shell .main .stat,.hallolab-shell .main .row,
+.hallolab-shell .main .question,.hallolab-shell .main .empty,.hallolab-shell .main .example{
+  background:var(--paper);color:var(--ink);border-color:var(--line);box-shadow:var(--shadow)
+}
+.hallolab-shell .main .btn:not(.ghost){background:var(--green);color:var(--bg);border-color:transparent;box-shadow:none}
+.hallolab-shell .main .btn.ghost,.hallolab-shell .main .filter button,.hallolab-shell .main .option:not(.correct):not(.wrong){
+  color:var(--ink);background:var(--paper);border-color:var(--line);box-shadow:none
+}
+.hallolab-shell .main .filter button.active,.hallolab-shell .main .badge{background:var(--mint);color:var(--ink);border-color:var(--line)}
+.hallolab-shell .main .hero{background:#153f34;color:#f7efdd;border-color:#335c49;box-shadow:none}
+.hallolab-shell .main .hero :is(h1,h2,h3,p,.eyebrow){color:inherit}
+.hallolab-shell .main :is(button,a,input,select,textarea):focus-visible{outline:2px solid var(--green);outline-offset:3px}
+.hallolab-shell.welcome-mode:has(.assistant-dashboard) .main .assistant-dashboard,
+.hallolab-shell .assistant-dashboard :is(.assistant-left,.assistant-program-column,.assistant-progress-column){
+  background:var(--paper)!important;color:var(--ink)!important;border-color:var(--line)!important
+}
+.hallolab-shell .assistant-dashboard :is(h1,h2,h3,p,.assistant-welcome span,.assistant-column-title span){color:var(--ink)}
+@media(max-width:850px){.hallolab-shell .study-hero{grid-template-columns:1fr}}
+@media(max-width:760px){body.hallolab-shell .app>.side{padding:8px 13px!important}}
+@media(max-width:460px){.hallolab-shell .top .date{white-space:normal;text-align:right}.hallolab-shell .main>.top{margin-bottom:16px}}
+.hallolab-shell .hallolab-mark img{border-radius:12px;border:1px solid #638475}
