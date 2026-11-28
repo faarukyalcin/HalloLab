@@ -552,6 +552,50 @@
     }
     more.onclick=load;await load();
   }
+  const tourKey='deutschai-welcome-tour-v1';
+  const tourPages=[
+    {tag:'HOŞ GELDİN',title:'Almanca yolculuğun başlıyor.',desc:'Ben Edit, kişisel Almanca öğretmenin. Birlikte hedeflerine ve seviyene uygun çalışacağız.',items:[],route:'home'},
+    {tag:'KİŞİSEL ÖĞRETMENİN',title:'Edit her an yanında.',desc:'Ekrandaki Edit simgesine veya menüde Edit’e dokun. Konuşarak soru sor, konuları tekrar anlatmasını iste ve birlikte çalış.',items:['Sesli konuşma','Eğitim hafızası','Ekrandaki çalışmaya destek'],route:null},
+    {tag:'SANA ÖZEL EĞİTİM',title:'Kendi hızında öğren.',desc:'Dersler, gramer ve kelimeler seviyene göre hazırlanır. Ders programında günün adımlarını takip edebilirsin.',items:['Aşamalı dersler','Kelime ve gramer çalışmaları','Günlük görevler'],route:'program'},
+    {tag:'GELİŞİMİNİ TAKİP ET',title:'Nerede zorlandığını öğren.',desc:'Alıştırmalar ve denemelerle kendini ölç. İlerleme bölümünde bilgi haritanı ve tekrar edilmesi gereken konuları gör.',items:['Bilgi haritası','Akıllı tekrar','Deneme sınavları'],route:'progress'},
+    {tag:'BAŞLAMAYA HAZIR MISIN?',title:'Önce seni tanıyalım.',desc:'Edit’e neden Almanca öğrenmek istediğini anlat. İstersen seviye tespitine geç veya uygulamayı kendin keşfet.',items:[],route:null}
+  ];
+  function tourState(){try{return JSON.parse(store.getItem(tourKey)||'null')||{step:0,status:'new'}}catch{return {step:0,status:'new'}}}
+  function tourSave(step,status){store.setItem(tourKey,JSON.stringify({step,status,updatedAt:new Date().toISOString()}))}
+  function showWelcomeTour(replay=false){
+    if(!auth)return;
+    const saved=tourState();if(!replay&&['done','skipped'].includes(saved.status))return;
+    let step=replay?0:Math.max(0,Math.min(tourPages.length-1,Number(saved.step)||0));
+    const dialog=overlay();let voice=false;
+    if(!document.getElementById('da-tour-style')){
+      const css=document.createElement('style');css.id='da-tour-style';css.textContent=`
+      #da-auth-screen:has(.da-tour){background:color-mix(in srgb,var(--bg,#15152a) 64%,transparent);backdrop-filter:blur(13px);-webkit-backdrop-filter:blur(13px);color:var(--ink,#fff)}
+      #da-auth-screen .da-tour{width:min(460px,100%);max-height:calc(100dvh - 30px);overflow:auto;box-sizing:border-box;padding:22px;border-radius:30px;color:var(--ink,#fff);background:radial-gradient(ellipse at 50% 0%,color-mix(in srgb,var(--accent,#9670ed) 22%,transparent),transparent 65%),linear-gradient(145deg,color-mix(in srgb,var(--paper,#252347) 92%,transparent),color-mix(in srgb,var(--bg,#15152a) 90%,transparent));border:1px solid color-mix(in srgb,var(--accent,#9670ed) 45%,var(--line,#ffffff44));box-shadow:inset 0 1px 1px #ffffff45,0 20px 80px #0005;display:grid;gap:14px}
+      .da-tour-top{display:flex;justify-content:space-between;align-items:center;gap:10px}.da-tour-top strong{font-size:15px}.da-tour-tag{font-size:11px;letter-spacing:.14em;font-weight:800;color:var(--accent,#b59aff)}
+      .da-tour-art{min-height:155px;display:grid;place-items:center;position:relative;overflow:hidden;border-radius:24px;background:radial-gradient(circle,color-mix(in srgb,var(--accent,#9670ed) 18%,transparent),transparent 70%);border:1px solid var(--line,#ffffff22)}
+      .da-tour-orb{width:92px;height:92px;position:relative;display:grid;place-items:center;border-radius:48% 48% 45% 45%;background:linear-gradient(145deg,#e3d2ff,#8e62d6);box-shadow:inset 0 2px 3px #fff9,0 10px 40px #9263e550;color:#392858;font-size:21px;font-weight:800}
+      .da-tour-orb:before,.da-tour-orb:after{content:'';position:absolute;top:-26px;width:22px;height:43px;border-radius:60%;background:linear-gradient(145deg,#e4d5ff,#a47de8);z-index:-1}.da-tour-orb:before{left:11px;transform:rotate(-20deg)}.da-tour-orb:after{right:11px;transform:rotate(20deg)}.da-tour-orb{isolation:isolate}.da-tour-orb small{position:absolute;top:52px;font-size:26px;color:#392858}.da-tour-spark{position:absolute;right:18%;top:18%;font-size:27px;color:var(--accent,#b59aff)}
+      #da-auth-screen .da-tour h1{font-size:clamp(24px,6vw,31px);line-height:1.13;margin:0;letter-spacing:-.035em;color:var(--ink,#fff)}#da-auth-screen .da-tour p{color:var(--muted,#c9c1e4);margin:0;line-height:1.55;font-size:14px}
+      .da-tour-items{display:grid;gap:7px}.da-tour-items div{padding:10px 12px;border-radius:13px;border:1px solid var(--line,#ffffff33);font-size:13px}.da-tour-items span{color:var(--accent,#b59aff);margin-right:9px}.da-tour-dots{display:flex;justify-content:center;gap:6px}.da-tour-dots i{width:6px;height:6px;border-radius:8px;background:var(--line,#ffffff40)}.da-tour-dots i.active{width:25px;background:var(--accent,#b59aff)}.da-tour-actions{display:flex;gap:8px}.da-tour-actions button{flex:1}
+      #da-auth-screen .da-tour button{border:1px solid var(--line,#ffffff33);border-radius:14px;padding:11px 14px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;background:color-mix(in srgb,var(--paper,#252347) 78%,transparent);color:var(--ink,#fff)}#da-auth-screen .da-tour button.da-tour-primary{background:var(--accent,#7650ca);color:white;border-color:transparent}#da-auth-screen .da-tour button:focus-visible{outline:2px solid var(--accent,#b59aff);outline-offset:2px}.da-tour-status{font-size:11px!important}
+      @media(max-height:650px){.da-tour-art{min-height:110px}.da-tour-orb{transform:scale(.78)}#da-auth-screen .da-tour{gap:9px;padding:17px}}
+      `;document.head.append(css);
+    }
+    const exit=(status,route)=>{if(!replay)tourSave(step,status);dialog.hidden=true;dialog.innerHTML='';if(route==='live')felkan();else if(route)window.setPage?.(route)};
+    const render=()=>{
+      if(!replay)tourSave(step,'in_progress');
+      const p=tourPages[step],last=step===tourPages.length-1;
+      dialog.innerHTML='<section class="da-card da-tour" role="dialog" aria-modal="true" aria-labelledby="da-tour-title"><div class="da-tour-top"><strong>DilAtölyesi</strong><button id="da-tour-skip">'+(replay?'Kapat':'Atla')+'</button></div><div class="da-tour-art" aria-hidden="true"><div class="da-tour-orb">●　●<small>ᴗ</small></div><span class="da-tour-spark">✦</span></div><div class="da-tour-tag">✦ '+p.tag+' · '+(step+1)+' / '+tourPages.length+'</div><h1 id="da-tour-title">'+p.title+'</h1><p>'+p.desc+'</p>'+(p.items.length?'<div class="da-tour-items">'+p.items.map(x=>'<div><span>✓</span>'+x+'</div>').join('')+'</div>':'')+'<div class="da-tour-dots" aria-hidden="true">'+tourPages.map((_,i)=>'<i class="'+(i===step?'active':'')+'"></i>').join('')+'</div><div class="da-tour-actions">'+(step>0?'<button id="da-tour-back">Geri</button>':'')+'<button class="da-tour-primary" id="da-tour-next">'+(last?'Edit ile tanış':'Devam et →')+'</button></div>'+(last?'<button id="da-tour-placement">Seviye tespitine geç</button><button id="da-tour-home">Ana sayfayı keşfet</button><p class="da-tour-status">Sesli tanışma için mikrofon izni gerekebilir. Yazılı turu tamamlamak için izin gerekmez.</p>':'<button id="da-tour-listen">Sesli dinle</button><p class="da-tour-status" id="da-tour-audio-status" role="status"></p>')+'</section>';
+      const q=id=>dialog.querySelector(id);
+      q('#da-tour-skip').onclick=()=>{if('speechSynthesis'in window)speechSynthesis.cancel();exit('skipped','home')};
+      q('#da-tour-next').onclick=()=>{if('speechSynthesis'in window)speechSynthesis.cancel();if(last){exit('done','live');return}step++;render()};
+      if(q('#da-tour-back'))q('#da-tour-back').onclick=()=>{if('speechSynthesis'in window)speechSynthesis.cancel();step--;render()};
+      if(last){q('#da-tour-placement').onclick=()=>exit('done','placement');q('#da-tour-home').onclick=()=>exit('done','home')}
+      else q('#da-tour-listen').onclick=()=>{const status=q('#da-tour-audio-status');if(!('speechSynthesis'in window)){status.textContent='Bu cihazda sesli okuma yok. Yazılı turla devam edebilirsin.';return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(p.title+' '+p.desc);u.lang='tr-TR';u.onerror=()=>{if(status.isConnected)status.textContent='Sesli okuma başlatılamadı. Yazılı olarak devam edebilirsin.'};speechSynthesis.speak(u)};
+      q('#da-tour-title').setAttribute('tabindex','-1');q('#da-tour-title').focus({preventScroll:true});
+    };
+    render();
+  }
   function account() {
     if (!auth?.user || document.getElementById('da-account-action')) return;
     const key='deutschai-personal-profile-v1';
@@ -607,14 +651,14 @@
       const e=overlay(),p=read(key),learning=read('deutschai-ai-profile-v1'),placement=read('deutschai-ai-placement-v1'),progress=read('deutschai-online-v1');
       const level=levels.includes(placement.level)?placement.level:levels.includes(learning.level)?learning.level:'Belirlenmedi';
       const fullName=[auth.user.firstName,auth.user.lastName].filter(Boolean).join(' ');
-      e.innerHTML='<div class="da-card da-profile-card"><div class="da-profile-actions" style="justify-content:space-between;margin:0"><strong>PROFİLİM</strong><button type="button" id="da-close" aria-label="Kapat">✕</button></div><div class="da-profile-head"><span id="da-profile-photo"></span><div><h2 id="da-profile-name"></h2><small id="da-profile-handle"></small></div></div><div class="da-profile-level"><small class="da-profile-muted">Almanca seviyen</small><h2 style="margin:5px 0">'+safe(level)+'</h2><small class="da-profile-muted">'+(levels.includes(placement.level)?'Seviye tespit sınavı sonucu':level==='Belirlenmedi'?'Seviye tespit sınavını tamamla':'Mevcut çalışma seviyesi')+'</small></div><div class="da-profile-stats"><div class="da-profile-stat"><b>'+safe(Array.isArray(progress.completed)?progress.completed.length:0)+'</b><small>Ders</small></div><div class="da-profile-stat"><b>'+safe(Number(progress.xp)||0)+'</b><small>XP</small></div><div class="da-profile-stat"><b>'+safe(Number(learning.dailyMinutes)||Number(progress.daily)||0)+'</b><small>Günlük dk.</small></div></div><p id="da-profile-bio" class="da-profile-muted"></p><button type="button" id="da-profile-edit">Profili düzenle</button> <button type="button" id="da-community-open">Öğrenci topluluğu</button><form id="da-profile-form" hidden><label>Profil fotoğrafı<input type="file" accept="image/*" id="da-profile-file"></label><button type="button" id="da-profile-remove">Fotoğrafı kaldır</button><label>Görünen ad<input name="displayName" maxlength="60"></label><label>Şehir<input name="city" maxlength="60"></label><label>Doğum tarihi (isteğe bağlı)<input name="birthday" type="date"></label><label>Hakkımda<textarea name="bio" maxlength="240" rows="3"></textarea></label><label>Hedef seviye<select name="goal"><option value="">Seçiniz</option>'+levels.map(x=>'<option>'+x+'</option>').join('')+'</select></label><p class="da-profile-muted">Görünen adın, fotoğrafın, seviyen ve rozetlerin giriş yapmış topluluk üyelerine görünür. Şehir, doğum tarihi ve biyografin paylaşılmaz.</p><button type="submit">Değişiklikleri kaydet</button></form><p id="da-profile-status" role="status" class="da-profile-muted"></p><div class="da-profile-actions">'+(auth.user.role==='admin'?'<button id="da-admin">Admin Paneli</button>':'<button id="da-claim-admin">İlk Yönetici Kurulumu</button>')+'<button id="da-logout">Çıkış Yap</button></div></div>';
+      e.innerHTML='<div class="da-card da-profile-card"><div class="da-profile-actions" style="justify-content:space-between;margin:0"><strong>PROFİLİM</strong><button type="button" id="da-close" aria-label="Kapat">✕</button></div><div class="da-profile-head"><span id="da-profile-photo"></span><div><h2 id="da-profile-name"></h2><small id="da-profile-handle"></small></div></div><div class="da-profile-level"><small class="da-profile-muted">Almanca seviyen</small><h2 style="margin:5px 0">'+safe(level)+'</h2><small class="da-profile-muted">'+(levels.includes(placement.level)?'Seviye tespit sınavı sonucu':level==='Belirlenmedi'?'Seviye tespit sınavını tamamla':'Mevcut çalışma seviyesi')+'</small></div><div class="da-profile-stats"><div class="da-profile-stat"><b>'+safe(Array.isArray(progress.completed)?progress.completed.length:0)+'</b><small>Ders</small></div><div class="da-profile-stat"><b>'+safe(Number(progress.xp)||0)+'</b><small>XP</small></div><div class="da-profile-stat"><b>'+safe(Number(learning.dailyMinutes)||Number(progress.daily)||0)+'</b><small>Günlük dk.</small></div></div><p id="da-profile-bio" class="da-profile-muted"></p><button type="button" id="da-profile-edit">Profili düzenle</button> <button type="button" id="da-community-open">Öğrenci topluluğu</button> <button type="button" id="da-tour-replay">Uygulama turu</button><form id="da-profile-form" hidden><label>Profil fotoğrafı<input type="file" accept="image/*" id="da-profile-file"></label><button type="button" id="da-profile-remove">Fotoğrafı kaldır</button><label>Görünen ad<input name="displayName" maxlength="60"></label><label>Şehir<input name="city" maxlength="60"></label><label>Doğum tarihi (isteğe bağlı)<input name="birthday" type="date"></label><label>Hakkımda<textarea name="bio" maxlength="240" rows="3"></textarea></label><label>Hedef seviye<select name="goal"><option value="">Seçiniz</option>'+levels.map(x=>'<option>'+x+'</option>').join('')+'</select></label><p class="da-profile-muted">Görünen adın, fotoğrafın, seviyen ve rozetlerin giriş yapmış topluluk üyelerine görünür. Şehir, doğum tarihi ve biyografin paylaşılmaz.</p><button type="submit">Değişiklikleri kaydet</button></form><p id="da-profile-status" role="status" class="da-profile-muted"></p><div class="da-profile-actions">'+(auth.user.role==='admin'?'<button id="da-admin">Admin Paneli</button>':'<button id="da-claim-admin">İlk Yönetici Kurulumu</button>')+'<button id="da-logout">Çıkış Yap</button></div></div>';
       const q=s=>e.querySelector(s),form=q('#da-profile-form'),status=q('#da-profile-status');
       let photo=validPhoto(p.photo)?p.photo:'',busy=false;
       const paint=()=>q('#da-profile-photo').replaceChildren(avatar(photo,fullName));
       paint();q('#da-profile-name').textContent=p.displayName||fullName;q('#da-profile-handle').textContent='@'+auth.user.username+' · '+(auth.user.role==='admin'?'Yönetici':'Öğrenci');
       q('#da-profile-bio').textContent=[p.city,p.bio,p.goal?'Hedef: '+p.goal:''].filter(Boolean).join(' · ');
       for(const field of ['displayName','city','birthday','bio','goal'])form.elements[field].value=p[field]||'';
-      q('#da-community-open').onclick=community;
+      q('#da-community-open').onclick=community;q('#da-tour-replay').onclick=()=>showWelcomeTour(true);
       q('#da-profile-edit').onclick=()=>{form.hidden=!form.hidden;q('#da-profile-edit').textContent=form.hidden?'Profili düzenle':'Düzenlemeyi kapat'};
       q('#da-profile-remove').onclick=()=>{photo='';q('#da-profile-file').value='';paint()};
       q('#da-profile-file').onchange=async ev=>{
@@ -682,7 +726,7 @@
     const s=read('deutschai-online-v1'),p=read('deutschai-ai-profile-v1'),t=read('deutschai-ai-placement-v1'),d=read('deutschai-ai-daily-v1'),personal=read('deutschai-personal-profile-v1');
     const levels=['A1','A2','B1','B2','C1','C2'];
     const level=[t.level,p.level,s.level].find(x=>levels.includes(x))||'A1';
-    return {conversationMemory:editMemory(),mastery:window.deutschaiMasterySummary?.()||null,learningGoal:window.deutschaiGetLearningGoal?.()||null,weeklyProgram:window.deutschaiWeeklyContext?.()||null,level,placementLevel:levels.includes(t.level)?t.level:null,goal:levels.includes(personal.goal)?personal.goal:null,dailyMinutes:Number(p.dailyMinutes)||Number(s.daily)||20,completedLessons:Array.isArray(s.completed)?s.completed.length:0,learnedWords:Object.keys(s.learned||{}).length,focusAreas:Array.isArray(p.focusAreas)?p.focusAreas.filter(x=>typeof x==='string').slice(0,10).map(x=>x.slice(0,100)):[],planDate:d.date||null,plan:Array.isArray(d.content?.schedule)?d.content.schedule.slice(0,12).map((x,i)=>({title:String(x.activity||x.title||'').slice(0,150),minutes:Number(x.minutes)||0,done:s.dailyPlanProgress?.date===d.date&&!!s.dailyPlanProgress?.completed?.[i]})):[],theme:s.theme||'dark',shortcuts:Array.isArray(s.mobileShortcuts)?s.mobileShortcuts.filter(x=>editRoutes.includes(x)).slice(0,3):['home','lessons','practice']};
+    return {welcomeTour:tourState(),conversationMemory:editMemory(),mastery:window.deutschaiMasterySummary?.()||null,learningGoal:window.deutschaiGetLearningGoal?.()||null,weeklyProgram:window.deutschaiWeeklyContext?.()||null,level,placementLevel:levels.includes(t.level)?t.level:null,goal:levels.includes(personal.goal)?personal.goal:null,dailyMinutes:Number(p.dailyMinutes)||Number(s.daily)||20,completedLessons:Array.isArray(s.completed)?s.completed.length:0,learnedWords:Object.keys(s.learned||{}).length,focusAreas:Array.isArray(p.focusAreas)?p.focusAreas.filter(x=>typeof x==='string').slice(0,10).map(x=>x.slice(0,100)):[],planDate:d.date||null,plan:Array.isArray(d.content?.schedule)?d.content.schedule.slice(0,12).map((x,i)=>({title:String(x.activity||x.title||'').slice(0,150),minutes:Number(x.minutes)||0,done:s.dailyPlanProgress?.date===d.date&&!!s.dailyPlanProgress?.completed?.[i]})):[],theme:s.theme||'dark',shortcuts:Array.isArray(s.mobileShortcuts)?s.mobileShortcuts.filter(x=>editRoutes.includes(x)).slice(0,3):['home','lessons','practice']};
   }
   function felcanScreenContext(questionNumber){
     const root=document.getElementById('view');
@@ -765,7 +809,7 @@
     iframe.allow='microphone; autoplay';
     iframe.tabIndex=-1;
     iframe.setAttribute('aria-hidden','true');
-    iframe.src='./felkan.html?compact=1&v=memory-1';
+    iframe.src='./felkan.html?compact=1&v=welcome-tour-1';
     iframe.addEventListener('load',()=>{
       felcanReady=true;
       sendFelcanContext(true);
@@ -834,7 +878,7 @@
     setInterval(()=>{if(felcanReady&&document.visibilityState==='visible')sendFelcanContext()},5000);
   }
   window.deutschaiStore=store;
-  window.DeutschAI={api:request,store,getEditMemory:editMemory,saveEditMemory,openCommunity:community,get user(){return auth?.user||null;},get ready(){return !!origin && !!auth;},logout,showAdmin:admin,openFelkan:felkan,openStudySection:editOpenSection,getLearningSummary:()=>auth?editLearningSummary():null,getStudyContext:number=>auth?felcanScreenContext(number):null};
+  window.DeutschAI={api:request,store,showWelcomeTour:()=>showWelcomeTour(true),getEditMemory:editMemory,saveEditMemory,openCommunity:community,get user(){return auth?.user||null;},get ready(){return !!origin && !!auth;},logout,showAdmin:admin,openFelkan:felkan,openStudySection:editOpenSection,getLearningSummary:()=>auth?editLearningSummary():null,getStudyContext:number=>auth?felcanScreenContext(number):null};
   window.addEventListener('message',event=>{
     const frame=felcanFrame();
     if(event.origin!==location.origin||!frame||event.source!==frame.contentWindow)return;
@@ -870,6 +914,7 @@
       account();
       floatingFelcan();
       startStudyAttendance();
+      if(cloudState||hydratingReload)showWelcomeTour();
       // Reset once after successful startup, including state hydration reloads.
       if(document.querySelector('#nav [aria-current="page"]')?.dataset.page==='home'){
         window.deutschaiResetStudyScroll?.();
