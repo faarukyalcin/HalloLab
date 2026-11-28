@@ -10,7 +10,6 @@
   grid-template-columns: minmax(0, 1.32fr) minmax(0, 1fr);
   grid-template-areas: "search search" "hero hero" "metrics metrics" "study extra";
   gap: clamp(9px, 1.05vw, 14px);
-  max-width: 1260px;
   margin: 0 auto;
   padding: 0 0 12px;
   align-content: start;
@@ -117,7 +116,7 @@ body .app.study-app > .study-header .study-brand { font-weight: 800; }
 body .app.study-app > .study-header .study-mark { border-radius: 50%; background: linear-gradient(#111 33%, #dd2d37 33% 66%, #ffcb32 66%) !important; border: 0 !important; box-shadow: none !important; }
 body .app.study-app > .study-header .study-mark svg { visibility: hidden; }
 @media (min-width: 1000px) {
-  html body .app.study-app:has(.hl-dashboard) { grid-template-columns: clamp(186px, 18vw, 228px) minmax(0, 1fr) !important; gap: clamp(12px, 1.5vw, 22px) !important; max-width: 1500px; margin-inline: auto; padding: 12px 18px 12px 12px !important; }
+  html body .app.study-app:has(.hl-dashboard) { grid-template-columns: clamp(186px, 18vw, 300px) minmax(0, 1fr) !important; gap: clamp(12px, 1.25vw, 24px) !important; box-sizing: border-box; width: 100%; max-width: none; margin-inline: 0; padding: 12px clamp(12px, .75vw, 24px) !important; }
   html body .app.study-app .main#view:has(.hl-dashboard) { grid-column: 2; grid-row: 1; margin-left: 0 !important; width: 100% !important; max-width: none !important; min-width: 0; padding: 6px 0 !important; overflow: visible; }
   html body .app.study-app:has(.hl-dashboard) > .study-header { grid-column: 1; grid-row: 1; width: auto !important; top: 12px !important; height: auto; min-height: 0; max-height: calc(100dvh - 24px); align-self: start; padding: 14px 12px 12px; }
   .study-brand-text small { display: block; }
@@ -132,7 +131,7 @@ body .app.study-app > .study-header .study-mark svg { visibility: hidden; }
   body .app.study-app > .study-header .study-nav { background: transparent !important; box-shadow: none !important; }
   body .app.study-app > .study-header .study-nav > button:not([aria-current="page"]):not([data-current]):not([aria-expanded="true"]) { background: transparent !important; border-color: transparent !important; box-shadow: none !important; }
   body .app.study-app > .study-header .study-nav > button:not([aria-current="page"]):hover { background: var(--mint) !important; }
-  .hl-search { max-width: min(525px, calc(100% - 174px)); }
+  .hl-search { width: min(56%, 1200px); max-width: calc(100% - 174px); }
 }
 @media (max-width: 999px) {
   html body:has(.study-app) { background: linear-gradient(155deg, #14132e, #080a21 55%, #07091c) !important; }
