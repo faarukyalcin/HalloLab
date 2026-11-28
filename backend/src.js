@@ -142,12 +142,14 @@ async function main(req,env){
   if(!(await throttle(env,'bootstrap:'+req.headers.get('CF-Connecting-IP'),5,3600)))return error('Yönetici kurulum denemesi sınırlandı',429);
   const x=await body(req);
   if(!env.ADMIN_BOOTSTRAP_SECRET||x.bootstrapSecret!==env.ADMIN_BOOTSTRAP_SECRET)return error('Yetkisiz',403);
-  const changed=await env.DB.prepare("UPDATE users SET role='admin' WHERE id=? AND NOT EXISTS (SELECT 1 FROM users WHERE role='admin')").bind(user.id).run();
+  const [changed]=await env.DB.batch([env.DB.prepare("UPDATE users SET role='admin' WHERE id=? AND NOT EXISTS (SELECT 1 FROM users WHERE role='admin') AND NOT EXISTS (SELECT 1 FROM app_settings WHERE key='founder_user_id')").bind(user.id),env.DB.prepare("INSERT OR IGNORE INTO app_settings(key,value,updated_at) SELECT 'founder_user_id',id,? FROM users WHERE id=? AND role='admin' AND (SELECT COUNT(*) FROM users WHERE role='admin')=1").bind(now(),user.id)]);
   if(!changed.meta?.changes)return error('Yönetici zaten oluşturulmuş',409);
   return answer({ok:true});
  }
  if(route.startsWith('/admin/')){
   if(user.role!=='admin')return error('Yönetici yetkisi gerekli',403);
+  const founder=await env.DB.prepare("SELECT value FROM app_settings WHERE key='founder_user_id'").first();
+  const isFounder=founder?.value===user.id;
   if(route==='/admin/users'&&req.method==='GET'){
    // Never expose password hashes, salts, session tokens or API secrets.
    const rows=await env.DB.prepare("SELECT id,username,first_name,last_name,email,role,created_at FROM users ORDER BY created_at DESC LIMIT 500").all();
@@ -161,8 +163,8 @@ async function main(req,env){
    const stats=new Map(totals.results.map(row=>[row.user_id,row]));
    return answer({users:rows.results.map(u=>{
     const v=stats.get(u.id)||{};
-    return {...safeUser(u),createdAt:u.created_at,totalSeconds:v.total_seconds||0,last7Seconds:v.last7_seconds||0,visitedDays:v.visited_days||0,lastVisit:v.last_day||null};
-   }),total:count.count,accountManagement:true});
+    return {...safeUser(u),isFounder:founder?.value===u.id,createdAt:u.created_at,totalSeconds:v.total_seconds||0,last7Seconds:v.last7_seconds||0,visitedDays:v.visited_days||0,lastVisit:v.last_day||null};
+   }),total:count.count,accountManagement:true,isFounder});
   }
   if(route==='/admin/users/activity'&&req.method==='GET'){
    const id=String(url.searchParams.get('userId')||'');
@@ -180,6 +182,8 @@ async function main(req,env){
    if(!/^[a-f0-9-]{36}$/i.test(id)||!['admin','user'].includes(role))return error('Geçersiz hesap veya rol');
    const target=await env.DB.prepare('SELECT id,role FROM users WHERE id=?').bind(id).first();
    if(!target)return error('Hesap bulunamadı',404);
+   if(!isFounder)return error('Yönetici yetkilerini yalnızca kurucu değiştirebilir',403);
+   if(target.id===founder?.value)return error('Kurucu hesabının yetkisi değiştirilemez',403);
    if(target.id===user.id&&role!=='admin')return error('Kendi yönetici yetkini kaldıramazsın',403);
    const [changed]=await env.DB.batch([
     env.DB.prepare(`UPDATE users SET role=? WHERE id=?
@@ -193,8 +197,10 @@ async function main(req,env){
    const x=await body(req),id=String(x.userId||'');
    if(!/^[a-f0-9-]{36}$/i.test(id))return error('Geçersiz hesap');
    if(id===user.id)return error('Kendi hesabını bu panelden silemezsin',403);
-   const target=await env.DB.prepare('SELECT username FROM users WHERE id=?').bind(id).first();
+   if(id===founder?.value)return error('Kurucu hesabı silinemez',403);
+   const target=await env.DB.prepare('SELECT username,role FROM users WHERE id=?').bind(id).first();
    if(!target)return error('Hesap bulunamadı',404);
+   if(target.role==='admin'&&!isFounder)return error('Yönetici hesaplarını yalnızca kurucu silebilir',403);
    if(x.confirmUsername!==target.username)return error('Kullanıcı adı doğrulanamadı');
    const removed=await env.DB.prepare(`DELETE FROM users WHERE id=? AND username=?
     AND (role<>'admin' OR (SELECT COUNT(*) FROM users WHERE role='admin')>1)`).bind(id,target.username).run();
@@ -217,6 +223,7 @@ async function main(req,env){
   }
   if(route==='/admin/status'&&req.method==='GET')return answer({geminiConfigured:!!(await geminiKey(env))});
   if(route==='/admin/gemini-key'&&req.method==='PUT'){
+   if(!isFounder)return error('API anahtarını yalnızca kurucu değiştirebilir',403);
    const x=await body(req),key=String(x.apiKey||'').trim();if(key.length<20||key.length>200)return error('Geçersiz API anahtarı');
    const encrypted=await seal(env,key);
    await env.DB.prepare("INSERT INTO app_settings(key,value,updated_at) VALUES('gemini_api_key',?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").bind(encrypted,now()).run();return answer({ok:true});
