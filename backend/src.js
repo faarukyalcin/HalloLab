@@ -135,16 +135,19 @@ async function main(req,env){
   const offset=Math.max(0,Math.min(100000,Number.parseInt(url.searchParams.get('offset')||'0',10)||0));
   const rows=await env.DB.prepare("SELECT u.id,u.username,u.role,CASE WHEN u.id=(SELECT value FROM app_settings WHERE key='founder_user_id') THEN 1 ELSE 0 END AS is_founder FROM users u ORDER BY is_founder DESC,CASE WHEN u.role='admin' THEN 0 ELSE 1 END,u.username,u.id LIMIT 25 OFFSET ?").bind(offset).all();
   const members=await Promise.all(rows.results.map(async u=>{
-   const entries=await env.DB.prepare("SELECT bucket,data FROM user_states WHERE user_id=? AND bucket IN ('deutschai-personal-profile-v1','deutschai-ai-profile-v1','deutschai-ai-placement-v1','deutschai-online-v1')").bind(u.id).all();
+   const entries=await env.DB.prepare("SELECT bucket,data FROM user_states WHERE user_id=? AND bucket IN ('deutschai-personal-profile-v1','deutschai-ai-profile-v1','deutschai-ai-placement-v1','deutschai-ai-placement-exam-v1','deutschai-online-v1')").bind(u.id).all();
    const parsed={};for(const entry of entries.results){try{parsed[entry.bucket]=JSON.parse(JSON.parse(entry.data).raw)||{}}catch{}}
    const p=parsed['deutschai-personal-profile-v1']||{},l=parsed['deutschai-ai-profile-v1']||{},t=parsed['deutschai-ai-placement-v1']||{},s=parsed['deutschai-online-v1']||{};
    const visible=true;
    const levels=['A1','A2','B1','B2','C1','C2'];
-   const level=levels.includes(t.level)?t.level:levels.includes(l.level)?l.level:null;
+   const exam=parsed['deutschai-ai-placement-exam-v1']||{},result=exam.status==='completed'?exam.results:null;
+   const assessedLevel=levels.includes(result?.level)?result.level:levels.includes(t.level)?t.level:null;
+   const provisional=!!assessedLevel&&(result?.level===assessedLevel?(result.confidence==='Düşük'||result.source==='local-fallback'):Number(t.confidence)<.65);
+   const level=assessedLevel;
    const lessons=Array.isArray(s.completed)?new Set(s.completed.filter(v=>typeof v==='string')).size:0;
-   const badges=[];if(levels.includes(t.level))badges.push('Seviye tespiti');if(lessons>=1)badges.push('İlk ders');if(lessons>=5)badges.push('5 ders');if(lessons>=10)badges.push('10 ders');
+   const badges=[];if(assessedLevel)badges.push('Seviye tespiti');if(lessons>=1)badges.push('İlk ders');if(lessons>=5)badges.push('5 ders');if(lessons>=10)badges.push('10 ders');
    const photo=typeof p.photo==='string'&&p.photo.length<60000&&/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(p.photo)?p.photo:'';
-   return {username:u.username,role:u.is_founder?'founder':u.role==='admin'?'admin':'user',displayName:typeof p.displayName==='string'&&p.displayName.trim()?p.displayName.trim().slice(0,60):u.username,photo:visible?photo:'',level:visible?level:null,badges:visible?badges:[],lessons:visible?lessons:null,visible};
+   return {username:u.username,role:u.is_founder?'founder':u.role==='admin'?'admin':'user',displayName:typeof p.displayName==='string'&&p.displayName.trim()?p.displayName.trim().slice(0,60):u.username,photo:visible?photo:'',level:visible?level:null,assessedLevel:visible?assessedLevel:null,provisional,badges:visible?badges:[],lessons:visible?lessons:null,visible};
   }));
   return answer({members,nextOffset:rows.results.length===25?offset+25:null});
  }
