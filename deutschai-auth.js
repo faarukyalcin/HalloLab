@@ -295,7 +295,7 @@
     e.innerHTML='<div class="da-card da-admin-card"><div class="da-admin-top"><div><h1>Yönetici Paneli</h1><p>DilAtölyesi hesapları, roller ve Gemini yönetimi</p></div><button type="button" id="da-admin-close">✕ Kapat</button></div>'
       +'<div class="da-admin-stat-grid"><div><b id="da-users-count">—</b><small>Toplam kayıtlı hesap</small></div><div><b id="da-admins-count">—</b><small>Yöneticiler</small></div><div><b id="da-members-count">—</b><small>Öğrenciler</small></div></div>'
       +'<section class="da-admin-section"><h2>Hesap yönetimi</h2><div class="da-admin-toolbar"><label for="da-user-search">Hesap ara</label><input id="da-user-search" type="search" placeholder="Ad, kullanıcı adı veya e-posta"><button type="button" id="da-reload-users">Yenile</button></div><p id="da-admin-account-status" role="status"></p><div class="da-admin-users" id="da-admin-users" aria-live="polite">Üyeler yükleniyor…</div></section>'
-      +'<section class="da-admin-section"><h2>Gemini API anahtarı</h2><p>Ortak anahtarı yalnızca kurucu değiştirebilir. Mevcut anahtar tarayıcıya geri gönderilmez.</p><form id="da-admin-form"><label>Yeni Gemini API anahtarı<input name="apiKey" type="password" autocomplete="off" required></label><p class="da-error" role="alert"></p><button type="submit">Anahtarı Kaydet</button></form></section></div>';
+      +'<section class="da-admin-section"><h2>Gemini API anahtarı</h2><p>Ortak anahtarı yöneticiler değiştirebilir. Mevcut anahtar tarayıcıya geri gönderilmez.</p><form id="da-admin-form"><label>Yeni Gemini API anahtarı<input name="apiKey" type="password" autocomplete="off" required></label><p class="da-error" role="alert"></p><button type="submit">Anahtarı Kaydet</button></form></section></div>';
     const list=e.querySelector('#da-admin-users');
     const search=e.querySelector('#da-user-search');
     const accountStatus=e.querySelector('#da-admin-account-status');
@@ -353,7 +353,6 @@
         e.querySelector('#da-admins-count').textContent=String(users.filter(u=>u.role==='admin').length);
         e.querySelector('#da-members-count').textContent=String(users.filter(u=>u.role!=='admin').length);
         list.replaceChildren();
-        if(data.isFounder===false)e.querySelector('#da-admin-form').hidden=true;
         if(data.isFounder===false&&!users.some(u=>u.isFounder)&&data.total===users.length){const setup=document.createElement('button');setup.type='button';setup.textContent='Kurucu hesabını doğrula';setup.onclick=claimAdmin;list.append(setup)}
         if(!users.length)list.textContent='Henüz kayıtlı hesap yok.';
         for(const u of users){
