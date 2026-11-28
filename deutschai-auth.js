@@ -292,7 +292,7 @@
   function admin() {
     if(auth?.user.role!=='admin')return;
     const e=overlay();
-    e.innerHTML='<div class="da-card da-admin-card"><div class="da-admin-top"><div><h1>Yönetici Paneli</h1><p>DilAtölyesi hesapları, roller ve Gemini yönetimi</p></div><button type="button" id="da-admin-close">✕ Kapat</button></div>'
+    e.innerHTML='<div class="da-card da-admin-card"><div class="da-admin-top"><div class="da-admin-heading"><span class="da-admin-emblem" aria-hidden="true">✦</span><div><small>YÖNETİM MERKEZİ</small><h1>Yönetici Paneli</h1><p>Hesaplar, roller ve Gemini yönetimi</p></div></div><button type="button" id="da-admin-close" aria-label="Kapat">✕</button></div>'
       +'<div class="da-admin-stat-grid"><div><b id="da-users-count">—</b><small>Toplam kayıtlı hesap</small></div><div><b id="da-admins-count">—</b><small>Yöneticiler</small></div><div><b id="da-members-count">—</b><small>Öğrenciler</small></div></div>'
       +'<section class="da-admin-section"><h2>Hesap yönetimi</h2><div class="da-admin-toolbar"><label for="da-user-search">Hesap ara</label><input id="da-user-search" type="search" placeholder="Ad, kullanıcı adı veya e-posta"><button type="button" id="da-reload-users">Yenile</button></div><p id="da-admin-account-status" role="status"></p><div class="da-admin-users" id="da-admin-users" aria-live="polite">Üyeler yükleniyor…</div></section>'
       +'<section class="da-admin-section"><h2>Gemini API anahtarı</h2><p>Ortak anahtarı yöneticiler değiştirebilir. Mevcut anahtar tarayıcıya geri gönderilmez.</p><form id="da-admin-form"><label>Yeni Gemini API anahtarı<input name="apiKey" type="password" autocomplete="off" required></label><p class="da-error" role="alert"></p><button type="submit">Anahtarı Kaydet</button></form></section></div>';
@@ -356,7 +356,7 @@
         if(data.isFounder===false&&!users.some(u=>u.isFounder)&&data.total===users.length){const setup=document.createElement('button');setup.type='button';setup.textContent='Kurucu hesabını doğrula';setup.onclick=claimAdmin;list.append(setup)}
         if(!users.length)list.textContent='Henüz kayıtlı hesap yok.';
         for(const u of users){
-          const item=document.createElement('article');item.className='da-admin-user';
+          const item=document.createElement('article');item.className='da-admin-user';if(u.isFounder||u.role==='admin')item.dataset.staff=u.isFounder?'founder':'admin';
           item.dataset.search=[u.firstName,u.lastName,u.username,u.email,u.id].join(' ').toLocaleLowerCase('tr-TR');
           const details=document.createElement('div');details.className='da-admin-user-info';
           const title=document.createElement('strong');title.textContent=(u.firstName||'')+' '+(u.lastName||'')+' · @'+u.username+(u.isFounder?' · 👑 Kurucu':'');
@@ -460,7 +460,7 @@
         if(!list.isConnected)return;
         if(offset===0)list.replaceChildren();
         for(const m of data.members||[]){
-          const card=document.createElement('article');card.className='da-community-member da-profile-level';
+          const card=document.createElement('article');card.className='da-community-member da-profile-level';if(m.role==='founder'||m.role==='admin')card.dataset.staff=m.role;
           const avatar=document.createElement('span');avatar.className='da-profile-avatar';
           const name=m.displayName||m.username;
           if(typeof m.photo==='string'&&m.photo.length<60000&&/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(m.photo)){const img=document.createElement('img');img.src=m.photo;img.alt='';avatar.append(img)}else avatar.textContent=String(name||'?').slice(0,2).toLocaleUpperCase('tr');
@@ -503,6 +503,25 @@
       #da-auth-screen .da-profile-card button{color:var(--ink,#fff);background:linear-gradient(145deg,color-mix(in srgb,var(--green,#b59aff) 25%,var(--paper,#252347)),color-mix(in srgb,var(--green,#b59aff) 10%,var(--paper,#252347)));border-color:color-mix(in srgb,var(--green,#b59aff) 38%,var(--line,#ffffff44));box-shadow:inset 0 1px 0 #ffffff28}
       #da-auth-screen .da-profile-card input,#da-auth-screen .da-profile-card textarea,#da-auth-screen .da-profile-card select{width:100%;box-sizing:border-box;background:var(--paper,#252347);color:var(--ink,#fff);border:1px solid var(--line,#ffffff44);border-radius:10px;padding:10px;font:inherit}
       .da-community-card{width:min(540px,100%)!important}.da-community-member{display:flex;gap:12px;align-items:flex-start;margin:10px 0;overflow-wrap:anywhere}.da-community-member .da-profile-avatar{width:48px;height:48px}.da-community-member small{display:block;margin:4px 0}.da-community-badges{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}.da-community-badges span{font-size:11px;padding:5px 8px;border-radius:999px;border:1px solid var(--line,#ffffff33);background:color-mix(in srgb,var(--green,#b59aff) 12%,transparent)}
+      /* Shared theme glass for management, with subtle purple staff accents. */
+      #da-auth-screen:has(.da-admin-card){background:color-mix(in srgb,var(--bg,#101329) 35%,#09091d44);-webkit-backdrop-filter:blur(10px) saturate(125%);backdrop-filter:blur(10px) saturate(125%);color:var(--ink,#fff)}
+      #da-auth-screen .da-admin-card{box-sizing:border-box;width:min(1040px,100%);max-height:calc(100dvh - 36px);padding:clamp(14px,3vw,28px);border-radius:28px;color:var(--ink,#fff);border:1px solid color-mix(in srgb,var(--green,#b59aff) 35%,var(--line,#ffffff44));background:radial-gradient(ellipse at 5% 0%,color-mix(in srgb,var(--green,#b59aff) 19%,transparent),transparent 50%),linear-gradient(145deg,color-mix(in srgb,var(--paper,#252347) 94%,transparent),color-mix(in srgb,var(--bg,#101329) 88%,transparent));-webkit-backdrop-filter:blur(32px) saturate(160%);backdrop-filter:blur(32px) saturate(160%);box-shadow:inset 0 1px 0 #ffffff55,0 24px 80px #0006;overscroll-behavior:contain}
+      #da-auth-screen .da-admin-heading{display:flex;align-items:center;gap:12px;min-width:0}#da-auth-screen .da-admin-heading h1{font-size:clamp(20px,4.5vw,29px);letter-spacing:-.045em;margin:3px 0}#da-auth-screen .da-admin-heading small{font-size:10px;letter-spacing:.13em;font-weight:800;color:var(--green,#b59aff)}#da-auth-screen .da-admin-heading p{font-size:12px;margin:0}
+      #da-auth-screen .da-admin-emblem{display:grid;place-items:center;flex:none;width:45px;height:45px;border:1px solid color-mix(in srgb,var(--green,#b59aff) 40%,transparent);border-radius:15px;background:color-mix(in srgb,var(--green,#b59aff) 20%,transparent);box-shadow:inset 0 1px 0 #ffffff30;color:var(--green,#b59aff);font-size:26px}
+      #da-auth-screen .da-admin-top{align-items:center;padding-bottom:14px;border-bottom:1px solid var(--line,#ffffff33)}#da-auth-screen #da-admin-close{border-radius:50%;width:36px;height:36px;padding:0;flex:none}
+      #da-auth-screen .da-admin-card :is(p,label,small,.da-admin-activity-summary){color:var(--muted,#c9c1e4)}
+      #da-auth-screen .da-admin-card :is(.da-admin-section,.da-admin-stat-grid>div,.da-admin-user,.da-admin-activity,.da-admin-day){background:linear-gradient(145deg,color-mix(in srgb,var(--green,#b59aff) 8%,var(--paper,#252347)),color-mix(in srgb,var(--paper,#252347) 65%,transparent));border:1px solid var(--line,#ffffff33);box-shadow:inset 0 1px 0 #ffffff19}
+      #da-auth-screen .da-admin-card .da-admin-section{border-radius:21px;padding:clamp(12px,3vw,18px)}#da-auth-screen .da-admin-card .da-admin-stat-grid{margin-top:16px}#da-auth-screen .da-admin-card .da-admin-stat-grid b{color:var(--green,#b59aff);font-variant-numeric:tabular-nums}
+      #da-auth-screen .da-admin-card :is(input,select){background:var(--paper,#252347);color:var(--ink,#fff);border:1px solid var(--line,#ffffff44);border-radius:12px}
+      #da-auth-screen .da-admin-card button{background:linear-gradient(145deg,color-mix(in srgb,var(--green,#b59aff) 20%,var(--paper,#252347)),color-mix(in srgb,var(--green,#b59aff) 8%,var(--paper,#252347)));color:var(--ink,#fff);border-color:color-mix(in srgb,var(--green,#b59aff) 35%,var(--line,#ffffff44));box-shadow:inset 0 1px 0 #ffffff22;border-radius:12px}
+      #da-auth-screen .da-admin-card .da-admin-danger{background:color-mix(in srgb,#dc557b 17%,var(--paper,#252347));color:var(--ink,#fff);border-color:#dc557b80}
+      #da-auth-screen .da-admin-card .da-admin-user-extra span{background:color-mix(in srgb,var(--green,#b59aff) 10%,transparent);color:var(--ink,#fff);border-color:var(--line,#ffffff33)}
+      #da-auth-screen .da-admin-card .da-admin-day b{color:var(--ink,#fff)}#da-auth-screen .da-admin-card .da-admin-day.visited{background:color-mix(in srgb,var(--green,#b59aff) 22%,var(--paper,#252347));border-color:var(--green,#b59aff)}
+      #da-auth-screen :is(.da-community-member,.da-admin-user)[data-staff]{border:1px solid #b28aff85;background:radial-gradient(ellipse at 0% 0%,#ad7aff20,transparent 72%),color-mix(in srgb,var(--paper,#252347) 85%,transparent);box-shadow:0 0 15px #a16bfa25,inset 0 1px 0 #c5a5ff44}
+      #da-auth-screen :is(.da-community-member,.da-admin-user)[data-staff="founder"]{border-color:#c2a0ffb0;box-shadow:0 0 20px #b17aff38,inset 0 1px 0 #d9c2ff60}
+      #da-auth-screen .da-community-member[data-staff] .da-profile-avatar{border-color:#c2a0ffb0;box-shadow:0 0 12px #b184ff55}
+      #da-auth-screen .da-community-member[data-staff] .da-community-badges span{border-color:#b28aff70}
+      @media(max-width:600px){#da-auth-screen:has(.da-admin-card){padding:10px}#da-auth-screen .da-admin-card{max-height:calc(100dvh - 20px);padding:14px;border-radius:24px}#da-auth-screen .da-admin-heading{gap:8px}#da-auth-screen .da-admin-emblem{width:38px;height:38px}#da-auth-screen .da-admin-actions{flex-wrap:wrap;gap:6px}#da-auth-screen .da-admin-actions button{flex:1;min-height:40px}}
       .da-profile-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.da-profile-card form{display:grid;gap:10px}.da-profile-card [hidden]{display:none!important}
     `;document.head.append(style);
     function avatar(photo,name){const s=document.createElement('span');s.className='da-profile-avatar';if(validPhoto(photo)){const img=document.createElement('img');img.src=photo;img.alt='';s.append(img)}else{s.textContent=(name||'?').trim().slice(0,2).toLocaleUpperCase('tr')}return s}
