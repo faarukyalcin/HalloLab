@@ -198,12 +198,12 @@
 
     '@media(max-width:600px){#da-auth-screen .da-admin-card{max-height:calc(100dvh - 20px)}#da-auth-screen .da-admin-stat-grid{gap:6px}#da-auth-screen .da-admin-stat-grid>div{padding:9px}#da-auth-screen .da-admin-stat-grid b{font-size:22px}#da-auth-screen .da-admin-user{flex-direction:column;align-items:stretch}#da-auth-screen .da-admin-user select{max-width:none}}',
     '#da-account-action{position:fixed;top:97px;right:12px;z-index:98;font-size:12px}',
-    '#da-felcan-float{position:fixed;right:22px;bottom:24px;z-index:990;display:flex;align-items:center;gap:10px;cursor:pointer;border:1px solid #d9c6ff77;border-radius:24px;padding:7px 16px 7px 8px;background:linear-gradient(135deg,#6550a9b8,#242148e3);color:#fff;backdrop-filter:blur(26px) saturate(150%);box-shadow:0 16px 45px #160d4570,inset 0 1px #ffffff50;font:700 13px system-ui;animation:da-felcan-fly 5s ease-in-out infinite}',
+    '#da-felcan-float{position:fixed;right:22px;bottom:24px;z-index:1200;display:flex;align-items:center;gap:10px;cursor:pointer;border:1px solid #d9c6ff77;border-radius:24px;padding:7px 16px 7px 8px;background:linear-gradient(135deg,#6550a9b8,#242148e3);color:#fff;backdrop-filter:blur(26px) saturate(150%);box-shadow:0 16px 45px #160d4570,inset 0 1px #ffffff50;font:700 13px system-ui;animation:da-felcan-fly 5s ease-in-out infinite}',
     '#da-felcan-float:hover{border-color:#e2ceff;box-shadow:0 18px 48px #6c43b766;animation-play-state:paused}',
     '#da-felcan-float .da-felcan-orb{width:44px;height:44px;display:grid;place-items:center;position:relative;overflow:hidden;border:1px solid #fffa;border-radius:17px;background:radial-gradient(circle at 22% 13%,#f0d8ffbb,transparent 55%),linear-gradient(130deg,#a889ef,#5449ac 75%);box-shadow:inset 0 2px 8px #ffffff65,0 0 16px #986ae655;font-size:19px;color:white}',
     '#da-felcan-float .da-felcan-orb::after{content:"";position:absolute;top:8px;left:7px;right:7px;height:8px;border-radius:100%;background:#ffffff60;filter:blur(4px)}',
     '#da-felcan-float .da-felcan-sub{display:block;font-size:10px;font-weight:500;color:#ded5fa;margin-top:2px}',
-    '#da-felcan-window{position:fixed;right:20px;bottom:96px;z-index:991;width:min(415px,calc(100vw - 24px));height:min(610px,calc(100dvh - 116px));min-height:320px;overflow:hidden;border:1px solid #e2cfff60;border-radius:26px;background:linear-gradient(150deg,#282348f5,#11152cf8);backdrop-filter:blur(30px);box-shadow:0 25px 90px #09071dbb,inset 0 1px #fff4;display:flex;flex-direction:column;animation:da-felcan-appear .3s ease both}',
+    '#da-felcan-window{position:fixed;right:20px;bottom:96px;z-index:1201;width:min(415px,calc(100vw - 24px));height:min(610px,calc(100dvh - 116px));min-height:320px;overflow:hidden;border:1px solid #e2cfff60;border-radius:26px;background:linear-gradient(150deg,#282348f5,#11152cf8);backdrop-filter:blur(30px);box-shadow:0 25px 90px #09071dbb,inset 0 1px #fff4;display:flex;flex-direction:column;animation:da-felcan-appear .3s ease both}',
     '#da-felcan-window[hidden]{display:none}',
     '#da-felcan-window .da-felcan-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px;color:#f8f3ff;border-bottom:1px solid #c9b5fc33;background:#9a80e712}',
     '#da-felcan-window .da-felcan-head strong{font-size:14px}',
@@ -249,6 +249,7 @@
     '@media(min-width:1000px){#da-account-action{top:70px;right:23px}}'
   ].join('');
   document.head.append(style);
+  const editLayer=document.createElement('style');editLayer.textContent='body #da-felcan-float,body #da-felcan-hello{z-index:1200!important}body #da-felcan-window{z-index:1201!important}body:has(#da-auth-screen:not([hidden])) #da-felcan-float{visibility:hidden}';document.head.append(editLayer);
   const loginStyle=document.createElement('style');
   loginStyle.textContent=`
     #da-auth-screen:has(.da-login-modern){box-sizing:border-box;padding:clamp(12px,4vw,40px);background:radial-gradient(ellipse at 12% 12%,#6441a46b,transparent 56%),radial-gradient(ellipse at 88% 88%,#4550ad50,transparent 58%),#101226;align-items:center;justify-items:center}
