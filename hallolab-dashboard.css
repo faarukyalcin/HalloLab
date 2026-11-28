@@ -507,7 +507,7 @@ body .study-app #view > :is(.top, .card, #adaptive-ai-root, .placement-exam, .le
     box-shadow: none !important;
   }
   body .app.study-app > .study-header::before, body .app.study-app > .study-header::after { display: none; }
-  body .app.study-app > .study-header .study-brand { gap: 8px; font-size: clamp(1.16rem, 5.1vw, 1.42rem); }
+  html body .app.study-app > .study-header .study-brand { gap: 8px; font-size: clamp(1.16rem, 5.6vw, 1.42rem); }
   body .app.study-app > .study-header .study-mark { width: 32px; height: 32px; }
   body .app.study-app > .study-header .study-tools { display: flex; gap: 1px; align-items: center; }
   body .app.study-app > .study-header :is(#theme-picker .study-appearance > summary, .hl-search-toggle) { display: none; }
@@ -543,6 +543,7 @@ body .study-app #view > :is(.top, .card, #adaptive-ai-root, .placement-exam, .le
   html body .app.study-app #view.main:has(.hl-dashboard) { padding-top: 0; padding-inline: 0; }
   .hl-dashboard {
     --hl-phone-inset: clamp(9px, 3vw, 15px);
+    --hl-phone-extra: clamp(0px, calc(100svh - 650px), 270px);
     max-width: 560px; gap: clamp(10px, 3.05vw, 15px);
     padding-bottom: 0;
   }
@@ -550,7 +551,7 @@ body .study-app #view > :is(.top, .card, #adaptive-ai-root, .placement-exam, .le
   .hl-dashboard .hl-phone-copy { display: inline; }
   .hl-banner {
     align-items: flex-start;
-    min-height: clamp(132px, 41vw, 172px);
+    min-height: calc(clamp(132px, 41vw, 172px) + var(--hl-phone-extra) * .24);
     padding: clamp(15px, 4.3vw, 23px) calc(var(--hl-phone-inset) + 8px);
     border: 0; border-radius: 0; box-shadow: none;
     background:
@@ -584,7 +585,7 @@ body .study-app #view > :is(.top, .card, #adaptive-ai-root, .placement-exam, .le
 
   .hl-link-grid { gap: clamp(8px, 2.6vw, 12px); }
   .hl-shortcut {
-    min-height: clamp(81px, 24vw, 98px);
+    min-height: calc(clamp(81px, 24vw, 98px) + var(--hl-phone-extra) * .17);
     border-radius: 15px; padding: 8px 4px;
     font-size: .8rem !important; font-weight: 600 !important;
     gap: 5px; line-height: 1.16;
@@ -592,7 +593,7 @@ body .study-app #view > :is(.top, .card, #adaptive-ai-root, .placement-exam, .le
   .hl-shortcut .hl-icon svg { width: clamp(28px, 8.1vw, 36px); height: auto; }
   .hl-shortcut:is([data-shortcut="writing"],[data-shortcut="words"],[data-shortcut="placement"],[data-shortcut="live"]) > span:last-child { max-width: 12ch; }
 
-  .hl-recommendation { min-height: clamp(100px, 30vw, 118px); padding: 9px 12px 11px; border-radius: 16px; }
+  .hl-recommendation { display: grid; grid-template-rows: auto 1fr; min-height: calc(clamp(100px, 30vw, 118px) + var(--hl-phone-extra) * .14); padding: 9px 12px 11px; border-radius: 16px; }
   .hl-recommendation .hl-tag { display: block; margin: 0 0 7px; padding: 0; border: 0; background: none; font-size: .92rem; font-weight: 750; }
   .hl-recommendation .hl-tag .hl-phone-copy { display: flex; align-items: center; gap: 6px; }
   .hl-recommendation .hl-tag svg { width: 16px; height: 16px; fill: #c66cc6; color: #f5b9ef; }
@@ -609,16 +610,27 @@ body .study-app #view > :is(.top, .card, #adaptive-ai-root, .placement-exam, .le
     transform: none !important;
     max-width: 540px !important;
     margin-inline: auto !important;
-    width: auto !important;
+    width: calc(100% - clamp(16px, 5.6vw, 32px)) !important;
+    justify-self: stretch !important;
     min-height: 68px !important;
     padding: 5px 5px 3px !important;
     gap: 3px !important;
     border-radius: 20px !important;
     background: linear-gradient(150deg,#231c3a,#1a1d35 58%) !important;
   }
-  html body .app.study-app > .study-header #nav > button.mobile-more-trigger { display: none !important; }
-  html body .app.study-app > .study-header #nav > .hl-phone-profile { display: flex !important; order: 5 !important; }
-  html body .app.study-app > .study-header #nav > button:not(.mobile-secondary-route):not([data-page="live"]) {
+  html body .app.study-app > .study-header #nav > button { display: none !important; }
+  html body .app.study-app > .study-header #nav > :is([data-page="home"],[data-page="lessons"],[data-page="live"],[data-page="progress"],.hl-phone-profile) {
+    display: flex !important; flex-direction: column; align-items: center; justify-content: center;
+    width: 100% !important; min-width: 0; text-align: center; white-space: normal;
+    font-size: .71rem !important;
+  }
+  html body .app.study-app > .study-header #nav > [data-page="home"] { order: 1 !important; }
+  html body .app.study-app > .study-header #nav > [data-page="lessons"] { order: 2 !important; }
+  html body .app.study-app > .study-header #nav > [data-page="live"] { order: 3 !important; }
+  html body .app.study-app > .study-header #nav > [data-page="progress"] { order: 4 !important; }
+  html body .app.study-app > .study-header #nav > .hl-phone-profile { order: 5 !important; }
+  html body .app.study-app > .study-header #nav .study-route-label { font-size: .71rem !important; }
+  html body .app.study-app > .study-header #nav > button:not([data-page="live"]) {
     background: transparent !important; border-color: transparent !important; box-shadow: none !important;
     min-height: 55px !important; padding: 5px 2px !important; gap: 4px !important;
   }
