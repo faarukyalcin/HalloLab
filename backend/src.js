@@ -47,8 +47,10 @@ async function logLogin(env,userId){
 }
 async function loginUser(env,u) {
  const token = rand(36);
- await env.DB.prepare('INSERT INTO sessions(token_hash,user_id,expires_at,created_at) VALUES (?,?,?,?)')
-  .bind(await sha(token),u.id,now()+7*86400,now()).run();
+ const issued=await env.DB.prepare(`INSERT INTO sessions(token_hash,user_id,expires_at,created_at)
+  SELECT ?,id,?,? FROM users WHERE id=? AND password_hash=?`)
+  .bind(await sha(token),now()+7*86400,now(),u.id,u.password_hash).run();
+ if(!issued.meta?.changes)return error('Kullanıcı adı veya şifre yanlış',401);
  await logLogin(env,u.id);
  return answer({token,user:safeUser(u),expiresIn:7*86400});
 }
@@ -88,7 +90,7 @@ async function main(req,env){
   const salt=b64(crypto.getRandomValues(new Uint8Array(16))),hash=await passwordHash(p,salt,env),id=crypto.randomUUID();
   try{await env.DB.prepare('INSERT INTO users(id,username,email,first_name,last_name,password_salt,password_hash,created_at) VALUES(?,?,?,?,?,?,?,?)').bind(id,username,email,first,last,salt,hash,now()).run();}
   catch{return error('Kullanıcı adı veya e-posta zaten kayıtlı',409);}
-  return loginUser(env,{id,username,email,first_name:first,last_name:last,role:'user'});
+  return loginUser(env,{id,username,email,first_name:first,last_name:last,role:'user',password_hash:hash});
  }
  if(route==='/auth/login'&&req.method==='POST'){
   const x=await body(req),username=String(x.username||'').trim(),p=String(x.password||'');
@@ -158,7 +160,7 @@ async function main(req,env){
    return answer({users:rows.results.map(u=>{
     const v=stats.get(u.id)||{};
     return {...safeUser(u),createdAt:u.created_at,totalSeconds:v.total_seconds||0,last7Seconds:v.last7_seconds||0,visitedDays:v.visited_days||0,lastVisit:v.last_day||null};
-   }),total:count.count});
+   }),total:count.count,accountManagement:true});
   }
   if(route==='/admin/users/activity'&&req.method==='GET'){
    const id=String(url.searchParams.get('userId')||'');
@@ -187,6 +189,32 @@ async function main(req,env){
    // Revoke sessions when privileges are removed or changed.
    await env.DB.prepare('DELETE FROM sessions WHERE user_id=?').bind(id).run();
    return answer({ok:true,role});
+  }
+  if(route==='/admin/users'&&req.method==='DELETE'){
+   const x=await body(req),id=String(x.userId||'');
+   if(!/^[a-f0-9-]{36}$/i.test(id))return error('Geçersiz hesap');
+   if(id===user.id)return error('Kendi hesabını bu panelden silemezsin',403);
+   const target=await env.DB.prepare('SELECT username FROM users WHERE id=?').bind(id).first();
+   if(!target)return error('Hesap bulunamadı',404);
+   if(x.confirmUsername!==target.username)return error('Kullanıcı adı doğrulanamadı');
+   const removed=await env.DB.prepare(`DELETE FROM users WHERE id=? AND username=?
+    AND (role<>'admin' OR (SELECT COUNT(*) FROM users WHERE role='admin')>1)`).bind(id,target.username).run();
+   if(!removed.meta?.changes)return error('Hesap silinemedi veya son yönetici korunuyor',409);
+   return answer({ok:true});
+  }
+  if(route==='/admin/users/password'&&req.method==='PUT'){
+   const x=await body(req),id=String(x.userId||''),password=x.password;
+   if(!/^[a-f0-9-]{36}$/i.test(id)||typeof password!=='string'||password.length<10||password.length>128)return error('Geçerli hesap ve 10–128 karakterlik parola gerekli');
+   const target=await env.DB.prepare('SELECT role FROM users WHERE id=?').bind(id).first();
+   if(!target)return error('Hesap bulunamadı',404);
+   if(target.role!=='user')return error('Bu işlem öğrenci hesapları için kullanılabilir',403);
+   const salt=b64(crypto.getRandomValues(new Uint8Array(16))),hash=await passwordHash(password,salt,env);
+   const [updated]=await env.DB.batch([
+    env.DB.prepare("UPDATE users SET password_salt=?,password_hash=? WHERE id=? AND role='user'").bind(salt,hash,id),
+    env.DB.prepare('DELETE FROM sessions WHERE user_id=? AND EXISTS (SELECT 1 FROM users WHERE id=? AND password_hash=?)').bind(id,id,hash)
+   ]);
+   if(!updated.meta?.changes)return error('Hesap artık sıfırlanamıyor',409);
+   return answer({ok:true});
   }
   if(route==='/admin/status'&&req.method==='GET')return answer({geminiConfigured:!!(await geminiKey(env))});
   if(route==='/admin/gemini-key'&&req.method==='PUT'){
@@ -222,7 +250,7 @@ async function main(req,env){
 export default {async fetch(req,env){
  const origin=req.headers.get('Origin')||'';
  const allowed=origin===env.SITE_ORIGIN || origin==='http://localhost:5173';
- const headers={'Access-Control-Allow-Origin':allowed?origin:'null','Vary':'Origin','Access-Control-Allow-Headers':'Authorization, Content-Type','Access-Control-Allow-Methods':'GET,POST,PUT,OPTIONS','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'};
+ const headers={'Access-Control-Allow-Origin':allowed?origin:'null','Vary':'Origin','Access-Control-Allow-Headers':'Authorization, Content-Type','Access-Control-Allow-Methods':'GET,POST,PUT,DELETE,OPTIONS','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'};
  if(req.method==='OPTIONS')return new Response(null,{status:allowed?204:403,headers});
  if(origin&&!allowed)return error('Bu kaynağa erişim engellendi',403);
  try{const res=await main(req,env);const h=new Headers(res.headers);Object.entries(headers).forEach(([k,v])=>h.set(k,v));return new Response(res.body,{status:res.status,headers:h});}
