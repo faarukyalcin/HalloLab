@@ -142,6 +142,11 @@ async function main(req,env){
   if(!(await throttle(env,'bootstrap:'+req.headers.get('CF-Connecting-IP'),5,3600)))return error('Yönetici kurulum denemesi sınırlandı',429);
   const x=await body(req);
   if(!env.ADMIN_BOOTSTRAP_SECRET||x.bootstrapSecret!==env.ADMIN_BOOTSTRAP_SECRET)return error('Yetkisiz',403);
+  if(user.role==='admin'){
+   const recovered=await env.DB.prepare("INSERT OR IGNORE INTO app_settings(key,value,updated_at) SELECT 'founder_user_id',id,? FROM users WHERE id=? AND role='admin'").bind(now(),user.id).run();
+   if(recovered.meta?.changes)return answer({ok:true});
+   return error('Kurucu zaten belirlenmiş',409);
+  }
   const [changed]=await env.DB.batch([env.DB.prepare("UPDATE users SET role='admin' WHERE id=? AND NOT EXISTS (SELECT 1 FROM users WHERE role='admin') AND NOT EXISTS (SELECT 1 FROM app_settings WHERE key='founder_user_id')").bind(user.id),env.DB.prepare("INSERT OR IGNORE INTO app_settings(key,value,updated_at) SELECT 'founder_user_id',id,? FROM users WHERE id=? AND role='admin' AND (SELECT COUNT(*) FROM users WHERE role='admin')=1").bind(now(),user.id)]);
   if(!changed.meta?.changes)return error('Yönetici zaten oluşturulmuş',409);
   return answer({ok:true});
