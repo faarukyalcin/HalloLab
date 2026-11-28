@@ -590,7 +590,7 @@ async function startMic(){
   if(S.micCtx.state==='suspended')await S.micCtx.resume();
   const src=S.micCtx.createMediaStreamSource(S.stream);
   const onChunk=f32=>{
-    if(S.muted||S.ttsBusy||!S.setupDone||!S.ws||S.ws.readyState!==1)return;
+    if(S.muted||S.ttsBusy||felcanGreetingPending||!S.setupDone||!S.ws||S.ws.readyState!==1)return;
     const i16=new Int16Array(f32.length);
     for(let i=0;i<f32.length;i++){const x=Math.max(-1,Math.min(1,f32[i]));i16[i]=x<0?x*32768:x*32767}
     send({realtimeInput:{audio:{data:bytesToB64(new Uint8Array(i16.buffer)),mimeType:'audio/pcm;rate='+S.micCtx.sampleRate}}});
@@ -738,6 +738,20 @@ function buildSetup(c){
 }
 function send(o){if(S.ws&&S.ws.readyState===1){S.ws.send(JSON.stringify(o));return true}return false}
 function notify(text){log('→ Felkan:',text.slice(0,160));return send({realtimeInput:{text}})}
+let felcanGreetingPending=false;
+let felcanGreetingTimer=null;
+function requestSpokenGreeting(text){
+  // Gemini Live requires a completed client turn to start generating audio.
+  // realtimeInput.text alone does not reliably trigger an immediate reply.
+  const ok=send({clientContent:{turns:[{role:'user',parts:[{text}]}],turnComplete:true}});
+  if(!ok)return false;
+  felcanGreetingPending=true;
+  clearTimeout(felcanGreetingTimer);
+  felcanGreetingTimer=setTimeout(()=>{felcanGreetingPending=false},14000);
+  setStatus('connecting','Felcan seni karşılıyor…');
+  return true;
+}
+
 let felcanScreen=null,felcanPendingExplain=false;
 let felcanMinimizedMute=false;
 function describeFelcanScreen(context){
@@ -828,15 +842,28 @@ async function onMsg(ev){
     S.setupDone=true;setStatus('listening','Dinliyorum… konuşabilirsin');log('Kurulum tamam');
     clearTimeout(S.stableTimer);S.stableTimer=setTimeout(()=>{S.retries=0},30000);
     $('#welcomeTitle').textContent='Hoş geldin, '+cfg.name+'.';
-    if(felcanScreen){
-      notify('[Uygulama] Şu anki DeutschAI ekranı:\n'+describeFelcanScreen(felcanScreen)+(felcanPendingExplain?'\nÖğrenci bu sorunun açıklamasını istedi. Kısa ve öğretici bir ipucu ver.':''));
+    if(!S.greeted){
+      if(!DATA.plan)makePlan({});
+      const ctx='Merhaba! Sen Felcan, bu öğrencinin kişisel Almanca öğretmenisin. ŞİMDİ, herhangi bir soru veya ses beklemeden Türkçe olarak yüksek sesle kısa bir selam ver; öğrenciye ismiyle '+cfg.name+' diye hitap et. Bugün kaldığı yerden çalışmaya devam etmeyi öner. En fazla 2-3 cümle söyle. Bu metni tekrar etme, doğal bir selamlama oluştur. '+resumeContext()+(felcanScreen?' Ekrandaki mevcut DeutschAI çalışma bağlamı: '+describeFelcanScreen(felcanScreen):'');
       felcanPendingExplain=false;
+      if(requestSpokenGreeting(ctx)){
+        S.greeted=true;
+        DATA.visits=(DATA.visits||0)+1;
+        DATA.lastVisit=today();
+        saveData();
+      }
     }
-    if(!S.greeted){S.greeted=true;if(!DATA.plan)makePlan({});const ctx='Öğrenciyi ismiyle '+cfg.name+' diye kısa, sıcak ve doğal TÜRKÇE SESLİ karşıla. Ardından bugünkü Almanca çalışmasına kaldığı yerden devam etmeyi öner. CEVABINI SESLİ OLARAK HEMEN VER; kullanıcıdan ilk konuşmasını bekleme. '+resumeContext()+' Gerekirse DeutschAI genel Almanca programından bir sonraki gramer, kelime veya pratiği öner. Öğrenci onay verirse open_app_section çağır.';DATA.visits=(DATA.visits||0)+1;DATA.lastVisit=today();saveData();notify('[Uygulama] Oturum başladı. '+ctx)}
     return}
-  if(m.error){log('API hatası',m.error)}
+  if(m.error){
+    log('API hatası',m.error);
+    if(felcanGreetingPending){felcanGreetingPending=false;clearTimeout(felcanGreetingTimer);setStatus('error','Sesli selamlama başlatılamadı')}
+  }
   const sc=m.serverContent;
   if(sc){
+    if((sc.turnComplete||sc.interrupted)&&felcanGreetingPending){
+      felcanGreetingPending=false;clearTimeout(felcanGreetingTimer);
+      if(!S.speaking)setStatus('listening','Dinliyorum… konuşabilirsin');
+    }
     if(sc.interrupted){stopPlayback()}
     const parts=sc.modelTurn&&sc.modelTurn.parts||[];
     for(const p of parts){const d=p.inlineData;if(d&&d.data){const mt=/rate=(\d+)/.exec(d.mimeType||'');playPCM(d.data,mt?+mt[1]:24000)}}
