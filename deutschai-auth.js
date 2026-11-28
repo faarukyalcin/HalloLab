@@ -12,15 +12,23 @@
   const rememberUsername = name => {
     if(typeof name==='string'&&/^[a-zA-Z0-9_]{3,32}$/.test(name))put(usernameKey,name);
   };
-  const saveSession = () => sessionStorage.setItem(authKey,JSON.stringify(auth));
-  let auth = null;
-  try { auth = JSON.parse(sessionStorage.getItem(authKey) || 'null'); } catch {}
-  const oldSession=get(authKey);
-  if(oldSession){
-    try{if(get(rememberKey)==='1'&&!get(usernameKey))rememberUsername(JSON.parse(oldSession)?.user?.username)}catch{}
-    del(authKey);
-  }
-  if (!auth?.token || !auth?.user?.id) auth = null;
+  const persistentKey='deutschai:remembered-session:v1';
+  const clearSession=()=>{sessionStorage.removeItem(authKey);del(persistentKey);del(authKey)};
+  let auth=null;
+  const validSession=s=>!!(s?.token&&s?.user?.id)&&(!s.expiresAt||s.expiresAt>Date.now());
+  const parseSession=raw=>{try{return JSON.parse(raw||'null')}catch{return null}};
+  const saveSession=()=>{
+    sessionStorage.setItem(authKey,JSON.stringify(auth));
+    if(get(rememberKey)==='1'&&auth?.expiresAt>Date.now())put(persistentKey,JSON.stringify(auth));
+    else del(persistentKey);
+  };
+  del(authKey); // Retire the old, unscoped persistent session key.
+  const tabSession=parseSession(sessionStorage.getItem(authKey));
+  const savedSession=get(rememberKey)==='1'?parseSession(get(persistentKey)):null;
+  if(validSession(tabSession))auth=tabSession;
+  else if(validSession(savedSession)&&savedSession.expiresAt>Date.now())auth=savedSession;
+  if(auth){saveSession()}else{clearSession()}
+
   const prefix = () => 'deutschai:user:' + (auth?.user?.id || 'guest') + ':';
   const syncKeys = key => /^deutschai-|^felkan_/.test(key);
   const pending = new Map();
@@ -326,7 +334,7 @@
       +'<form id="da-auth-form" autocomplete="on"><label>Kullanıcı adı<input name="username" autocomplete="username" autocapitalize="none" spellcheck="false" minlength="3" maxlength="32" required placeholder="Kullanıcı adın"></label>'
       +(mode==='register'?'<div class="da-name-row"><label>Ad<input name="firstName" autocomplete="given-name" maxlength="80" required placeholder="Adın"></label><label>Soyad<input name="lastName" autocomplete="family-name" maxlength="80" required placeholder="Soyadın"></label></div><label>E-posta<input name="email" type="email" autocomplete="email" autocapitalize="none" required placeholder="ornek@eposta.com"></label>':'')
       +'<label>Şifre<span class="da-password-wrap"><input name="password" type="password" minlength="'+(mode==='register'?'10':'1')+'" autocomplete="'+(mode==='register'?'new-password':'current-password')+'" required placeholder="'+(mode==='register'?'En az 10 karakter':'Şifren')+'"><button type="button" id="da-password-toggle" aria-label="Şifreyi göster" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/></svg></button></span></label>'
-      +(mode==='login'?'<label class="da-remember-login"><input type="checkbox" id="da-remember-login" '+(get(rememberKey)==='1'?'checked':'')+'><span>Beni hatırla<small>Bu cihazda kullanıcı adımı hatırla. Şifreyi tarayıcının parola yöneticisine kaydedebilirsin.</small></span></label>':'')
+      +(mode==='login'?'<label class="da-remember-login"><input type="checkbox" id="da-remember-login" '+(get(rememberKey)==='1'?'checked':'')+'><span>Beni hatırla<small>Bu cihazda oturumumu 7 güne kadar açık tut. Ortak cihazlarda kullanma.</small></span></label>':'')
       +'<p class="da-error" role="alert">'+safe(message)+'</p><button class="da-login-submit" type="submit">'+(mode==='register'?'Hesap oluştur':'Giriş yap')+' <span aria-hidden="true">→</span></button></form>'
       +'<p class="da-login-switch">'+(mode==='register'?'Zaten hesabın var mı? <button type="button" id="da-switch-mode">Giriş yap</button>':'<button type="button" id="da-switch-mode">Yeni hesap oluştur</button>')+'</p><details class="da-login-discover"><summary>DilAtölyesi&#39;ni keşfet</summary><div class="da-discover-list"><div><b>Edit ile öğren</b><small>Yapay zekâ destekli Almanca konuşma pratiği.</small></div><div><b>Kendi seviyende ilerle</b><small>Seviye tespiti, dersler, kelime ve gramer çalışmaları.</small></div><div><b>Gelişimini takip et</b><small>Kişisel program, rozetler ve öğrenci topluluğu.</small></div></div></details><details class="da-login-privacy"><summary>Hesap ve gizlilik</summary><p>Öğrenme ilerlemen hesabında saklanır. Görünen adın, fotoğrafın, seviyen ve rozetlerin giriş yapmış topluluk üyelerine görünür. Yöneticiler giriş günlerini ve yaklaşık aktif çalışma sürelerini görebilir. API anahtarı gerekmez.</p></details></section></div>';
     const form=screen.querySelector('#da-auth-form');
@@ -336,7 +344,7 @@
     if(mode==='login'){
       const username=get(rememberKey)==='1'?(get(usernameKey)||''):'';
       const remember=form.querySelector('#da-remember-login');
-      remember.onchange=()=>{if(!remember.checked){del(rememberKey);del(usernameKey);}};
+      remember.onchange=()=>{if(!remember.checked){del(rememberKey);del(usernameKey);del(persistentKey);}};
       form.elements.username.value=username;
       // Keep the keyboard closed until the learner taps a field.
     }
@@ -347,6 +355,7 @@
       try {
         auth=await request('/auth/'+(mode==='login'?'login':'register'),{method:'POST',body:JSON.stringify(fields)});
         if(mode==='login'&&form.querySelector('#da-remember-login')?.checked){put(rememberKey,'1');rememberUsername(auth?.user?.username);}else{del(rememberKey);del(usernameKey);}
+        auth.expiresAt=Date.now()+Math.min(7*86400,Number(auth.expiresIn)||7*86400)*1000;
         saveSession();sessionStorage.removeItem('da-hydrated');
         location.reload();
       } catch(e) {screen.querySelector('.da-error').textContent=e.message;submit.disabled=false;submit.innerHTML=original;form.removeAttribute('aria-busy');}
@@ -354,7 +363,7 @@
   }
   async function logout() {
     try {await request('/auth/logout',{method:'POST'});} catch {}
-    auth=null;sessionStorage.removeItem(authKey);sessionStorage.removeItem('da-hydrated');location.reload();
+    auth=null;clearSession();sessionStorage.removeItem('da-hydrated');location.reload();
   }
   function admin() {
     if(auth?.user.role!=='admin')return;
@@ -837,7 +846,7 @@
       startStudyAttendance();
     } catch(error) {
       auth=null;
-      if(error.status===401)sessionStorage.removeItem(authKey);
+      if(error.status===401)clearSession();
       show('login',error.message);
     }
   });
