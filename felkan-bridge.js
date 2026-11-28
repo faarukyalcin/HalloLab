@@ -41,17 +41,18 @@
       return result.token;
     },
     navigate(page) {
-      const allowed = ['home','lessons','grammar','words','practice','writing','exam','placement','progress'];
+      const allowed = ['home','lessons','program','grammar','words','practice','writing','exam','placement','progress','community','profile'];
       if (!allowed.includes(page)) return false;
       if (window.parent !== window) {
         try {
+          if(typeof window.parent.DeutschAI?.openStudySection==='function')return window.parent.DeutschAI.openStudySection(page);
           if(typeof window.parent.setPage==='function'){
             window.parent.setPage(page);
             return window.parent.document.querySelector('#nav [aria-current="page"]')?.dataset.page===page;
           }
         } catch(e) { /* postMessage fallback for isolated frames */ }
         window.parent.postMessage({type:'deutschai:navigate',page},window.location.origin);
-        return true; // Navigation is asynchronous in the fallback path.
+        return false; // No verified completion in the fallback path.
       }
       window.location.href = './?open=' + encodeURIComponent(page);
       return true;
@@ -74,7 +75,9 @@
       try { plan = JSON.parse(storage.getItem('deutschai-felcan-week-v1') || 'null'); } catch {}
       try { preferences = JSON.parse(storage.getItem('deutschai-felcan-settings-v1') || 'null'); } catch {}
       const day=(new Date().getDay()+6)%7;
+      let current=null;try{current=window.parent!==window?window.parent.DeutschAI?.getLearningSummary():null}catch{}
       return {
+        currentLearning:current,
         studyPreferences: preferences ? {minutes:preferences.minutes,goal:preferences.goal,focus:preferences.focus} : null,
         weeklyPlan:plan?.days?.[day] ? {week:plan.week,today:plan.days[day]} : null,
         user:auth?.user?.firstName || '',
