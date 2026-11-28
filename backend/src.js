@@ -250,10 +250,18 @@ async function main(req,env){
    if(!updated.meta?.changes)return error('Hesap artık sıfırlanamıyor',409);
    return answer({ok:true});
   }
-  if(route==='/admin/status'&&req.method==='GET')return answer({geminiConfigured:!!(await geminiKey(env))});
+  if(route==='/admin/status'&&req.method==='GET'){
+   const row=await env.DB.prepare("SELECT key FROM app_settings WHERE key='gemini_api_key'").first();
+   let usable=false;try{usable=!!(await geminiKey(env))}catch{}
+   return answer({geminiConfigured:!!row,geminiReadable:usable});
+  }
+  if(route==='/admin/gemini-key'&&req.method==='DELETE'){
+   await env.DB.prepare("DELETE FROM app_settings WHERE key='gemini_api_key'").run();
+   return answer({ok:true,geminiConfigured:false});
+  }
   if(route==='/admin/gemini-key'&&req.method==='PUT'){
-   const x=await body(req),key=String(x.apiKey||'').trim();if(key.length<20||key.length>200)return error('Geçersiz API anahtarı');
-   const encrypted=await seal(env,key);
+   const x=await body(req),key=String(x.apiKey||'').trim();if(key.length<20||key.length>200||/\s/.test(key))return error('Geçersiz API anahtarı');
+   let encrypted;try{encrypted=await seal(env,key)}catch{return error('Sunucunun anahtar şifreleme ayarı geçersiz. ENCRYPTION_SECRET kontrol edilmeli.',503)}
    await env.DB.prepare("INSERT INTO app_settings(key,value,updated_at) VALUES('gemini_api_key',?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").bind(encrypted,now()).run();return answer({ok:true});
   }
   return error('Bilinmeyen yönetici işlemi',404);
