@@ -55,6 +55,18 @@
       window.location.href = './?open=' + encodeURIComponent(page);
       return true;
     },
+    generate(page) {
+      const allowed=['lessons','placement','words','grammar','practice','exam','writing','progress'];
+      if(!allowed.includes(page))return false;
+      if(window.parent!==window){
+        try{
+          if(typeof window.parent.deutschaiRegenerateSection==='function')return window.parent.deutschaiRegenerateSection(page);
+        }catch(error){ console.warn('Felcan çalışma başlatamadı',error); }
+        window.parent.postMessage({type:'deutschai:generate',page},window.location.origin);
+        return true;
+      }
+      return typeof window.deutschaiRegenerateSection==='function'&&window.deutschaiRegenerateSection(page);
+    },
     appContext() {
       let state = {}, plan = null, preferences = null;
       try { state = JSON.parse(storage.getItem('deutschai-online-v1') || '{}'); } catch {}
