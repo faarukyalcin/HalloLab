@@ -507,7 +507,7 @@ body .app.study-app .main .glass-shortcuts > button { display:grid; justify-item
   .home-section-grid button { gap:6px; padding-inline:7px; font-size:13px; }
   .home-section-arrow { display:none; }
 }
-</style><link rel="stylesheet" href="./mobile-liquid-glass.css?v=felcan-speaking-glow-1"><script src="./api-config.js"></script><script src="./deutschai-auth.js?v=theme-glass-profile-3"></script></head><body><div class="scene-ribbons" aria-hidden="true"></div><div class="app study-app"><header class="study-header"><div class="study-head"><div class="study-brand"><div class="study-mark"><svg class="deutschai-book-mark" viewBox="0 0 48 48" aria-hidden="true" fill="none">
+</style><link rel="stylesheet" href="./mobile-liquid-glass.css?v=felcan-speaking-glow-1"><script src="./api-config.js"></script><script src="./deutschai-auth.js?v=community-badges-1"></script></head><body><div class="scene-ribbons" aria-hidden="true"></div><div class="app study-app"><header class="study-header"><div class="study-head"><div class="study-brand"><div class="study-mark"><svg class="deutschai-book-mark" viewBox="0 0 48 48" aria-hidden="true" fill="none">
   <path d="M12 11h13c8 0 14 5.5 14 13s-6 13-14 13H12z" stroke="#fcfaff" stroke-width="3.1" stroke-linejoin="round"/>
   <path d="M12 18c4-1 8.2.2 12 3.2 3.5-2.8 7.3-4.1 11-3.4M12 27c4-1 8.2.2 12 3.2 4.2-3.3 8.5-4.6 13-3.1M24 21.2v9" stroke="#ded0ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
   <path d="M14.5 41h5" stroke="#f28a9c" stroke-width="2.2" stroke-linecap="round"/>
@@ -541,14 +541,15 @@ const defaults={completed:[],learned:{},attempts:[],minutes:0,level:'A1',daily:2
 let state={...defaults,...JSON.parse(window.deutschaiStore.getItem(KEY)||'{}')};
 if(!state.themeVersion){if(state.theme==='light')state.theme='dark';else if(['ocean','violet','rose','sunset'].includes(state.theme))state.theme+='-dark';state.themeVersion=1;window.deutschaiStore.setItem(KEY,JSON.stringify(state))}
 function save(){window.deutschaiStore.setItem(KEY,JSON.stringify(state))}
-const navItems=[['home','⌂','Ana sayfa'],['lessons','▤','Dersler'],['program','▦','Ders programı'],['placement','◈','Seviye tespiti'],['words','Aa','Kelime kartları'],['grammar','≋','Gramer'],['practice','✓','Alıştırmalar'],['exam','◷','Deneme sınavı'],['writing','✎','Yazma & konuşma'],['live','◉','Edit'],['progress','↗','İlerleme']];
-const navGroups=[['Öğren',['home','lessons','program','words','grammar']],['Çalış',['practice','writing']],['Kendini değerlendir',['placement','exam','progress']]];
+const navItems=[['home','⌂','Ana sayfa'],['lessons','▤','Dersler'],['program','▦','Ders programı'],['placement','◈','Seviye tespiti'],['words','Aa','Kelime kartları'],['grammar','≋','Gramer'],['practice','✓','Alıştırmalar'],['exam','◷','Deneme sınavı'],['writing','✎','Yazma & konuşma'],['live','◉','Edit'],['progress','↗','İlerleme'],['community','♧','Öğrenci topluluğu']];
+const navGroups=[['Öğren',['home','lessons','program','words','grammar']],['Çalış',['practice','writing']],['Kendini değerlendir',['placement','exam','progress']],['Topluluk',['community']]];
 const primaryMobile=['home','lessons','live','practice'];
-function navIcon(id){const paths={program:'M5 5h14v15H5zm0 4h14M8 3v4m8-4v4m-7 6h2m3 0h2m-7 3h2m3 0h2',menu:'M4 6h16M4 12h16M4 18h16',placement:'M12 3 20 8v8l-8 5-8-5V8zm-3 9 2 2 4-5',home:'M3.5 10.5 12 3.5l8.5 7v9.2a1.3 1.3 0 0 1-1.3 1.3h-5v-6h-4.4v6h-5a1.3 1.3 0 0 1-1.3-1.3z',lessons:'M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22zm0 0V22m4-15h8m-8 4h8',words:'M8 4h12v15H8zm-3 3H4v14h12v-2m-5-11h6m-6 4h6',grammar:'M5 6h14M8 3v6m8-6v6M7 13h10m-8 4h6m-4 4h2',practice:'M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17zm-4 8.5 2.5 2.5 5-5',exam:'M7 3.5h8l4 4V21H5V3.5zm8 0V8h4m-9 5h6m-6 4h6',writing:'m14 5 5 5M4 20l4.2-.9L20 7.3 16.7 4 4.9 15.8z',live:'M4 10v4m4-7v10m4-13v16m4-11v6m4-8v10',ai:'m12 3 2.1 6.2L20 12l-5.9 2.1L12 21l-2.1-6.9L4 12l5.9-2.8z',progress:'M4 20V5m0 15h17M8 15l3-4 3 2 5-7'};return `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[id]||paths.home}"/></svg>`}
+function navIcon(id){const paths={community:'M16 11a4 4 0 1 0-8 0m-5 9v-2a6 6 0 0 1 6-6h6a6 6 0 0 1 6 6v2M12 3a4 4 0 1 0 0 8',program:'M5 5h14v15H5zm0 4h14M8 3v4m8-4v4m-7 6h2m3 0h2m-7 3h2m3 0h2',menu:'M4 6h16M4 12h16M4 18h16',placement:'M12 3 20 8v8l-8 5-8-5V8zm-3 9 2 2 4-5',home:'M3.5 10.5 12 3.5l8.5 7v9.2a1.3 1.3 0 0 1-1.3 1.3h-5v-6h-4.4v6h-5a1.3 1.3 0 0 1-1.3-1.3z',lessons:'M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22zm0 0V22m4-15h8m-8 4h8',words:'M8 4h12v15H8zm-3 3H4v14h12v-2m-5-11h6m-6 4h6',grammar:'M5 6h14M8 3v6m8-6v6M7 13h10m-8 4h6m-4 4h2',practice:'M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17zm-4 8.5 2.5 2.5 5-5',exam:'M7 3.5h8l4 4V21H5V3.5zm8 0V8h4m-9 5h6m-6 4h6',writing:'m14 5 5 5M4 20l4.2-.9L20 7.3 16.7 4 4.9 15.8z',live:'M4 10v4m4-7v10m4-13v16m4-11v6m4-8v10',ai:'m12 3 2.1 6.2L20 12l-5.9 2.1L12 21l-2.1-6.9L4 12l5.9-2.8z',progress:'M4 20V5m0 15h17M8 15l3-4 3 2 5-7'};return `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[id]||paths.home}"/></svg>`}
 let page='home',filter='Tümü',wordIndex=0,wordBack=false,wordFilter='Tümü',wordMode='kart';
 function escapeHtml(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function setPage(p){
   toggleMobileMore(false);
+  if (p === 'community') { if(window.DeutschAI?.ready)window.DeutschAI.openCommunity();return; }
   if (p === 'live' && window.DeutschAI?.ready) { window.DeutschAI.openFelkan(); return; }
 
   trackTime();
