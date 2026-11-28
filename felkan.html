@@ -4,14 +4,14 @@
 <script>if(new URLSearchParams(location.search).get('compact')==='1')document.documentElement.classList.add('compact-felcan');</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Felkan · DeutschAI Almanca Öğretmeni</title><script src="./api-config.js"></script><script src="./felkan-bridge.js?v=welcome-admin-1"></script>
+<title>Edit · DeutschAI Almanca Öğretmeni</title><script src="./api-config.js"></script><script src="./felkan-bridge.js?v=edit-assistant-1"></script>
 <style>
 :root{--card:#1b1338;--opt:#130d2b;--txt:#e8eaf0;--mut:#9aa3b5;--blue:#4c8dff;--pad:56px}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0;overflow:hidden;color:var(--txt);font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;background:radial-gradient(1200px 800px at 50% 40%,#1d1145 0%,#100a2c 45%,#070418 100%)}
 button{font:inherit;color:inherit;cursor:pointer}
 
-/* ---------- Felkan amblemi ---------- */
+/* ---------- Edit amblemi ---------- */
 #avatar{position:fixed;z-index:60;width:var(--s);height:var(--h);--h:calc(var(--s)*.68);transform:translate(-50%,-50%);
  transition:left .7s cubic-bezier(.65,0,.25,1),top .7s cubic-bezier(.65,0,.25,1),width .7s cubic-bezier(.65,0,.25,1),height .7s cubic-bezier(.65,0,.25,1)}
 #avatar[data-pos="center"]{--s:clamp(220px,min(42vw,50vh),440px);left:50%;top:calc(50% - 30px)}
@@ -211,7 +211,7 @@ textarea.wr{width:100%;min-height:240px;background:#0f0a26;border:1px solid #333
 #debug{position:fixed;z-index:90;top:52px;right:10px;width:min(480px,92vw);max-height:60vh;overflow:auto;display:none;background:rgba(5,10,25,.95);border:1px solid #2c3f73;border-radius:12px;padding:10px;font:12px/1.5 Consolas,monospace;color:#a9c1ff;white-space:pre-wrap}
 #debug.open{display:block}
 
-/* DeutschAI Liquid Glass · Felcan voice experience */
+/* DeutschAI Liquid Glass · Edit voice experience */
 :root{
  --card:rgba(26,31,65,.76);
  --opt:rgba(44,42,86,.5);
@@ -428,13 +428,13 @@ html.compact-felcan #startBtn{bottom:24px}
 <div id="welcome"><small>DEUTSCHAI · KİŞİSEL ALMANCA ÖĞRETMENİN</small><h1 id="welcomeTitle">Hoş geldin.</h1></div>
 
 <div id="toolbar">
-  <button id="bCenter" title="Felkan'ı ortaya getir">⌖</button>
+  <button id="bCenter" title="Edit'ı ortaya getir">⌖</button>
   <button id="bMute" title="Mikrofonu sustur / aç">🎙</button>
-  <button id="bType" title="Felkan'a yaz">⌨</button>
+  <button id="bType" title="Edit'e yaz">⌨</button>
   <button id="bDebug" title="Hata ayıklama">🐞</button>
   <button id="bSet" title="Ayarlar">⚙</button>
 </div>
-<div id="cmdbox"><input id="cmdInput" type="text" placeholder="Felkan'a yaz, Enter'a bas…"><button class="btn pri" id="cmdSend" style="padding:8px 16px">Gönder</button></div>
+<div id="cmdbox"><input id="cmdInput" type="text" placeholder="Edit'e yaz, Enter'a bas…"><button class="btn pri" id="cmdSend" style="padding:8px 16px">Gönder</button></div>
 <div id="debug"></div>
 
 <div id="avatar" data-pos="center" data-state="idle">
@@ -442,7 +442,7 @@ html.compact-felcan #startBtn{bottom:24px}
   <div class="orb"><div class="bars"><i></i><i></i><i></i></div><div class="spark"></div></div>
   <div class="label"><span id="dot"></span><span id="statusText">Başlatmak için dokun</span></div>
 </div>
-<button id="startBtn">Felkan ile çalışmaya başla</button>
+<button id="startBtn">Edit ile çalışmaya başla</button>
 
 <div id="panelWrap"></div>
 <div id="stageBanner"></div>
@@ -456,9 +456,9 @@ html.compact-felcan #startBtn{bottom:24px}
   <input type="text" id="sModel" list="models">
   <datalist id="models"><option value="gemini-3.1-flash-live-preview"><option value="gemini-2.5-flash-native-audio-latest"><option value="gemini-2.5-flash-native-audio-preview-09-2025"></datalist>
   <div class="hint">Bağlantı kurulamazsa uygulama otomatik olarak yedek modeli dener.</div>
-  <label>Felkan'ın sesi</label>
+  <label>Edit'in sesi</label>
   <select id="sVoice"><option value="Aoede">Aoede · Neşeli kadın sesi</option><option value="Leda">Leda · Genç ve yumuşak kadın sesi</option><option value="Zephyr">Zephyr · Parlak kadın sesi</option><option value="Kore">Kore · Net kadın sesi</option><option>Puck</option><option>Charon</option><option>Fenrir</option><option>Orus</option></select>
-  <label><input type="checkbox" id="sComment"> Test cevaplarıma Felkan sesli yorum yapsın</label>
+  <label><input type="checkbox" id="sComment"> Test cevaplarıma Edit sesli yorum yapsın</label>
   <div class="row"><button class="btn" id="sDisc">Bağlantıyı kes</button><button class="btn" id="sCancel">Kapat</button><button class="btn pri" id="sSave">Kaydet ve bağlan</button></div>
 </div></div>
 
@@ -492,7 +492,7 @@ const defSchedule=()=>[
   {skill:'Gramer',title:'A1 düzeyinde Sentence Structure çalışması',min:36,done:false},
   {skill:'Okuma',title:'A1 düzeyinde kısa metin okuma ve anlama',min:30,done:false},
   {skill:'Yazma',title:'Goethe formatında Verbs',min:30,done:false},
-  {skill:'Konuşma',title:'Felkan ile bugünkü konularda sesli tekrar',min:24,done:false}];
+  {skill:'Konuşma',title:'Edit ile bugünkü konularda sesli tekrar',min:24,done:false}];
 function syncFromPlan(d){const p=d.plan;if(!p||!Array.isArray(p.days)||!p.days.length)return false;
   const di=p.days.findIndex(x=>x.items.some(i=>!i.done));
   if(di<0){d.schedule=[{skill:'Sınav',title:'Goethe A1 Modellsatz provası',min:60,done:false},{skill:'Konuşma',title:'Rollenspiel senaryosu',min:30,done:false},{skill:'Kelime',title:'Karışık kelime tekrarı',min:30,done:false}];p.finished=true;return true}
@@ -519,7 +519,7 @@ const S={panels:{left:null,center:null,right:null},sizes:{left:{w:1,h:1},center:
   playCtx:null,micCtx:null,stream:null,analyser:null,stableTimer:null,panelText:'',ttsBusy:false,lastAudio:0};
 const LOGS=[];
 function log(...a){const line=new Date().toLocaleTimeString()+'  '+a.map(x=>typeof x==='string'?x:JSON.stringify(x)).join(' ');
-  LOGS.push(line);if(LOGS.length>200)LOGS.shift();console.log('[Felkan]',...a);
+  LOGS.push(line);if(LOGS.length>200)LOGS.shift();console.log('[Edit]',...a);
   const d=$('#debug');if(d.classList.contains('open')){d.textContent=LOGS.slice(-60).join('\n');d.scrollTop=d.scrollHeight}}
 const avatar=$('#avatar');
 function setStatus(state,text){
@@ -548,7 +548,7 @@ function updateInsets(){
   const s=$('#panelWrap').style;s.setProperty('--pt',t+'px');s.setProperty('--pr',r+'px');s.setProperty('--pb',b+'px');s.setProperty('--pl',l+'px');
 }
 addEventListener('resize',updateInsets);
-setInterval(()=>{ // Felkan ekrandan çıkarsa geri getir
+setInterval(()=>{ // Edit ekrandan çıkarsa geri getir
   const r=avatar.getBoundingClientRect();
   if(r.right<20||r.left>innerWidth-20||r.bottom<20||r.top>innerHeight-20){log('Amblem ekran dışında, ortaya alındı');setPos('center')}
 },2000);
@@ -593,7 +593,7 @@ function playPCM(b64,rate,isGreetingClip=false){
 }
 function stopPlayback(){greetingClipPlaying=false;for(const s of S.sources){try{s.onended=null;s.stop()}catch(e){}}S.sources.clear();S.nextTime=0;setSpeaking(false)}
 function setSpeaking(v){if(S.speaking===v)return;S.speaking=v;S.vizDirty=true;
-  if(v)setStatus('speaking','Felcan konuşuyor…');else if(S.setupDone)readyToListen()}
+  if(v)setStatus('speaking','Edit konuşuyor…');else if(S.setupDone)readyToListen()}
 (function viz(){requestAnimationFrame(viz);
   const bars=avatar.querySelectorAll('.bars i');
   if(S.speaking&&S.analyser){const d=new Uint8Array(S.analyser.fftSize);S.analyser.getByteTimeDomainData(d);
@@ -646,7 +646,7 @@ function ulSample(k,n){let l=UL[k].slice();if(n&&n<l.length){for(let i=l.length-
 const rpScFields={type:'OBJECT',properties:{id:{type:'STRING'},emo:{type:'STRING',description:'1-3 emoji sahne görseli'},title:{type:'STRING',description:'Türkçe kısa başlık'},place:{type:'STRING',description:'Mekan (Almanca ad + isteğe bağlı Türkçe)'},situation_tr:{type:'STRING'},npc_name:{type:'STRING'},npc_role:{type:'STRING'},user_role:{type:'STRING',description:'Kullanıcının rolü (Türkçe)'},goal_tr:{type:'STRING'},phrases:{type:'ARRAY',items:{type:'STRING'},description:'4-6 faydalı Almanca kalıp'}}};
 const DECLS=[
  {name:'read_current_study',description:'Açık DeutschAI sayfasını o anda okur. Belirli bir soru numarası söylendiyse number ver; ekran dışındaki sorular da bulunur. Bu soru gibi bir ifadede numara vermeden çağır.',parameters:{type:'OBJECT',properties:{number:{type:'INTEGER'}}}},
- {name:'set_layout',description:'Felkan amblemini ekranda istenen konuma taşır. center seçilirse tüm paneller kapanır ve amblem ortada büyür.',
+ {name:'set_layout',description:'Edit amblemini ekranda istenen konuma taşır. center seçilirse tüm paneller kapanır ve amblem ortada büyür.',
   parameters:{type:'OBJECT',properties:{avatar_position:POSPROP},required:['avatar_position']}},
  {name:'show_quiz',description:'Çoktan seçmeli test paneli açar. Okuma metni sorularında passage kullan. Soruları sen sıfırdan üret.',
   parameters:common({title:{type:'STRING'},level:{type:'STRING'},passage:{type:'STRING',description:'İsteğe bağlı Almanca okuma metni'},
@@ -697,7 +697,7 @@ const DECLS=[
   parameters:{type:'OBJECT',properties:{daily_minutes:{type:'INTEGER',description:'Günlük çalışma süresi, dakika (örn. 120)'}}}},
  {name:'update_topics',description:'Konuları bitti/kaldı olarak işaretler (kalıcı). Kullanıcı bir konuyu/üniteyi bitirdiğini söylediğinde veya sen konuyu tamamladığınızı onayladığında kullan. Konu adı Türkçe veya Almanca olabilir (örn. "Perfekt", "aile", "Modalverben", "dinleme").',
   parameters:{type:'OBJECT',properties:{done:{type:'ARRAY',items:{type:'STRING'},description:'Bitti olarak işaretlenecek konular'},undone:{type:'ARRAY',items:{type:'STRING'},description:'Tekrar kalan olarak işaretlenecek konular'}}}},
- {name:'show_scenarios',description:'Kullanıcı "Almanca konuşalım / konuşma pratiği / senaryo / rol yapalım" derse çağır: Felkan sola geçer, ortada senaryo kartları açılır. items vermezsen uygulamanın hazır senaryolarından 6 tane gösterir; kullanıcı belirli bir tema veya "yeni/farklı senaryolar" isterse kendin 6-8 özgün senaryo üretip items ile ver.',
+ {name:'show_scenarios',description:'Kullanıcı "Almanca konuşalım / konuşma pratiği / senaryo / rol yapalım" derse çağır: Edit sola geçer, ortada senaryo kartları açılır. items vermezsen uygulamanın hazır senaryolarından 6 tane gösterir; kullanıcı belirli bir tema veya "yeni/farklı senaryolar" isterse kendin 6-8 özgün senaryo üretip items ile ver.',
   parameters:{type:'OBJECT',properties:{items:{type:'ARRAY',items:rpScFields}}}},
  {name:'start_roleplay',description:'Rol yapma konuşmasını başlatır. Kullanıcı kartlardan birini seçtiyse index (1 tabanlı) ver. Kendi senaryosunu anlatırsa (örn. "fırına ekmek almaya gideyim") senaryo alanlarını kendin doldurup ver (title, place, situation_tr, npc_name, npc_role, user_role, goal_tr, phrases, emo).',
   parameters:{type:'OBJECT',properties:Object.assign({index:{type:'INTEGER'}},rpScFields.properties)}},
@@ -723,7 +723,7 @@ const DECLS=[
  {name:'close_panel',description:'Bir paneli veya hepsini kapatır. Hiç panel kalmazsa amblem ortaya döner.',
   parameters:{type:'OBJECT',properties:{slot:{type:'STRING',enum:['left','center','right','all'],description:'Kapatılacak panel; verilmezse hepsi'}}}}
 ];
-function systemPrompt(){return `Sen Felkan'sın: ${cfg.name} için DeutschAI genel Almanca öğretmeni ve sesli asistansın. Goethe sınavı sadece kullanıcı istediğinde özel bir çalışma modudur. DEUTSCHAI DERS DURUMU: ${JSON.stringify(window.FelkanBridge?.appContext()||{})}
+function systemPrompt(){return `Sen Edit'sin: ${cfg.name} için DeutschAI genel Almanca öğretmeni ve sesli asistansın. Goethe sınavı sadece kullanıcı istediğinde özel bir çalışma modudur. DEUTSCHAI DERS DURUMU: ${JSON.stringify(window.FelkanBridge?.appContext()||{})}
 MEVCUT DURUM (uygulama verisi): ${JSON.stringify(stateSummary())}
 GENEL KURALLAR:
 - Türkçe konuş, Almanca örnekler ver. Cevapların sesli okunur: kısa, sıcak ve doğal ol (genelde 1-3 cümle).
@@ -736,7 +736,7 @@ GENEL KURALLAR:
 - PANELLER: Ekranda sol, orta ve sağ olmak üzere en fazla 3 panel AYNI ANDA açık olabilir. Her show_* fonksiyonunda slot ile yerini seç (left/center/right). Slot verilmezse ders programı solda, ilerleme sağda, diğer her şey ortada açılır. Kullanıcı "sola test koy" derse slot=left ver. Dolu bir slota yeni panel açarsan eskisi yerine geçer. Diğer panelleri kapatma, sadece istenirse kapat (close_panel, slot veya all).
 - SEVİYE TESPİT SINAVI: Kullanıcı seviye tespiti isterse start_placement_test çağır ("kısa" derse short=true), sonra hiçbir şey söyleme; uygulama sana "[Uygulama] SEVİYE TESPİTİ ..." mesajlarıyla adım adım talimat gönderir. Bu talimatlara AYNEN uy: istenen fonksiyonu (pt_listening, pt_writing, pt_reading_tf, pt_questions, pt_words, pt_result) tam istenen sayıda soruyla çağır; "sessizce" denen yerde hiçbir şey söyleme, "sesli söyle" denen cümleyi aynen söyle. Fonksiyon success:false dönerse hatayı düzeltip aynı fonksiyonu tekrar çağır. Sınav sırasında ipucu verme, doğru cevapları söyleme. Konuşma bölümünde kullanıcı "devam / bitti / sonraki" derse pt_continue çağır. Sınavı bırakmak isterse cancel_placement_test çağır.
 - GOETHE MODELLSATZ: Kullanıcı resmî Goethe A1 sınavı / Modellsatz / gerçek sınav isterse start_goethe_exam çağır (tek modül isterse module ver), sonra sus. Uygulama "[Uygulama] GOETHE ..." mesajlarıyla Sprechen bölümünde sana sınav görevlisi rolü verir: Almanca, kısa ve talimata AYNEN uy, düzeltme/ipucu verme. Sprechen sırasında kullanıcı "devam / bitti / sonraki" derse ge_continue çağır. Değerlendirme istenince ge_grade çağır. Sınavı bırakmak isterse cancel_goethe_exam çağır.
-- ROLLENSPIEL (Almanca konuşma pratiği): Kullanıcı "Almanca konuşalım / konuşma pratiği / rol yapalım / senaryo" derse show_scenarios çağır (Felkan sola geçer, ortada senaryo kartları açılır) ve sus. Kullanıcı bir kart seçerse ("üçüncü", "fırın") start_roleplay{index}; kendi senaryosunu anlatırsa ("fırına ekmek almaya gideyim, sen satıcı ol") senaryoyu kendin kurup start_roleplay ile alanları ver; "yeni/farklı senaryolar" derse show_scenarios (kendi ürettiğin items ile ya da hazır). Başlayınca uygulama sana "[Uygulama] ROLLENSPIEL ..." talimatı gönderir: tamamen ALMANCA ve karakterinde kal, kısa A1 cümleler kur, kullanıcının hatalarını sesli düzeltme, rp_feedback ile sessizce ekrana yaz. İpucu isterse rp_hint, bitirmek isterse end_roleplay.
+- ROLLENSPIEL (Almanca konuşma pratiği): Kullanıcı "Almanca konuşalım / konuşma pratiği / rol yapalım / senaryo" derse show_scenarios çağır (Edit sola geçer, ortada senaryo kartları açılır) ve sus. Kullanıcı bir kart seçerse ("üçüncü", "fırın") start_roleplay{index}; kendi senaryosunu anlatırsa ("fırına ekmek almaya gideyim, sen satıcı ol") senaryoyu kendin kurup start_roleplay ile alanları ver; "yeni/farklı senaryolar" derse show_scenarios (kendi ürettiğin items ile ya da hazır). Başlayınca uygulama sana "[Uygulama] ROLLENSPIEL ..." talimatı gönderir: tamamen ALMANCA ve karakterinde kal, kısa A1 cümleler kur, kullanıcının hatalarını sesli düzeltme, rp_feedback ile sessizce ekrana yaz. İpucu isterse rp_hint, bitirmek isterse end_roleplay.
 - TANIMA VE DEVAM: Uygulama her oturumda sana kullanıcının geçmişini ("[Uygulama] Oturum başladı. ...") verir; sen onu tanıyan, kaldığınız yeri bilen bir öğretmen gibi davran (adıyla hitap et, son çalışılanı ve bugünkü programı hatırla). Durum bilgisindeki last, plan, topics_done, topics_remaining alanlarına güven.
 - PROGRAM VE KONULAR: Seviye tespitinden sonra uygulama eksik konulara göre günde 2 saatlik (30 dk x 4) program kurar. "Programı göster" → show_plan; "konuları/ilerlemeyi göster, hangi konular bitti" → show_topics (biten yeşil, kalan kırmızı); "program yap / günde X saat" → make_plan (daily_minutes). Bugünkü programdaki dersi başlatırken schedule'daki "how" alanına göre hareket et (gramer: show_grammar + show_quiz; kelime: wordlist_sample unit + show_vocabulary + show_quiz; Hören/Lesen/Schreiben: start_goethe_exam module; konuşma: show_scenarios). Bir oturumu bitirince update_schedule mark_done_matching ile işaretle; bir konu tamamen bitince update_topics done ile işaretle (kullanıcıya haber ver, "yeşile döndü" de).
 - KELİME: Kelime testi/çalışma/flashcard/liste istenirse önce wordlist_sample çağır. Kullanıcı bir ünite (kişisel bilgiler, aile, zaman, yemek, ev, alışveriş) söylerse unit ver ve dönen TÜM kelimeleri eksiltmeden kullan (listeyi göstermen istenirse hepsini göster). Ünite belirtilmezse Goethe A1 listesinden gelen sonuçtan seç (listede olmayan kelime uydurma). Harf/konu için starts_with/contains kullan. İsimlerde der/die/das yaz. Ünitelerin bir kısmı henüz eklenmedi; olmayan üniteyi sorarsa dürüstçe söyle.
@@ -757,19 +757,18 @@ function buildSetup(c){
   return {setup:s};
 }
 function send(o){if(S.ws&&S.ws.readyState===1){S.ws.send(JSON.stringify(o));return true}return false}
-function notify(text){log('→ Felkan:',text.slice(0,160));return send({realtimeInput:{text}})}
+function notify(text){log('→ Edit:',text.slice(0,160));return send({realtimeInput:{text}})}
 let felcanGreetingPending=false;
 let felcanGreetingTimer=null;
 let greetingHasAudio=false;
-let greetingRequest=null;
-let greetingReported=false;
+let greetingFinished=false;
 let greetingFallback=false;
 let greetingClipPlaying=false;
 async function fetchGeminiGreeting(){
   if(greetingFallback||!S.setupDone||window.parent===window)return;
   const socket=S.ws;
   greetingFallback=true;
-  setStatus('connecting','Felcan selamını hazırlıyor…');
+  setStatus('connecting','Edit selamını hazırlıyor…');
   try{
     const clip=await window.parent.DeutschAI.api('/ai/greeting-audio',{
       method:'POST',body:JSON.stringify({voice:cfg.voice}),signal:AbortSignal.timeout(14000)
@@ -799,13 +798,12 @@ function requestSpokenGreeting(text,model){
     : {clientContent:{turns:[{role:'user',parts:[{text}]}],turnComplete:true}};
   const ok=send(message);
   if(!ok)return false;
-  greetingRequest={text,model};
-  greetingReported=false;
+  greetingFinished=false;
   felcanGreetingPending=true;
   clearTimeout(felcanGreetingTimer);
   greetingHasAudio=false;
   felcanGreetingTimer=setTimeout(finishGreeting,6500);
-  setStatus('connecting','Felcan seni karşılıyor…');
+  setStatus('connecting','Edit seni karşılıyor…');
   return true;
 }
 
@@ -882,9 +880,8 @@ function requestCompanionMic(){
   }).finally(()=>{micRequest=null});
 }
 function readyToListen(){
-  if(greetingHasAudio&&!greetingReported&&!felcanGreetingPending&&!S.sources.size){
-    greetingReported=true;
-    if(window.parent!==window)window.parent.postMessage({type:'deutschai:greeting-played'},location.origin);
+  if(greetingHasAudio&&!greetingFinished&&!felcanGreetingPending&&!S.sources.size){
+    greetingFinished=true;
   }
   if(S.playCtx?.state==='suspended'&&S.sources.size){
     setStatus('audio-blocked','Sesi açmak için dokun');
@@ -914,12 +911,12 @@ async function connect(){
 }
 function onClosed(ev){
   log('Bağlantı kapandı',{code:ev.code,reason:ev.reason});
-  if(S.sources.size&&!greetingReported){greetingHasAudio=false;S.greeted=false}
+  if(S.sources.size&&!greetingFinished){greetingHasAudio=false;S.greeted=false}
   stopPlayback();
   const wasUp=S.setupDone;S.setupDone=false;clearTimeout(S.stableTimer);
   if(felcanGreetingPending)S.greeted=false;
   felcanGreetingPending=false;clearTimeout(felcanGreetingTimer);
-  if(S.userClosed){setStatus('idle','Başlatmak için dokun');$('#startBtn').textContent='Felkan ile çalışmaya başla';$('#startBtn').hidden=false;return}
+  if(S.userClosed){setStatus('idle','Başlatmak için dokun');$('#startBtn').textContent='Edit ile çalışmaya başla';$('#startBtn').hidden=false;return}
   if(!wasUp){
     if(S.attempt<CANDS().length-1){S.attempt++;log('Alternatif kurulum deneniyor',CANDS()[S.attempt]);setStatus('connecting','Bağlanıyor… (yeni deneme)');setTimeout(connect,500);return}
     const why=(ev.reason||'').slice(0,90)||('kod '+ev.code);
@@ -936,7 +933,7 @@ async function onMsg(ev,model){
     $('#welcomeTitle').textContent='Hoş geldin, '+cfg.name+'.';
     if(!S.greeted){
       if(!DATA.plan)makePlan({});
-      const ctx='Merhaba! Sen Felcan, bu öğrencinin kişisel Almanca öğretmenisin. ŞİMDİ, herhangi bir soru veya ses beklemeden Türkçe olarak yüksek sesle kısa bir selam ver; öğrenciye ismiyle '+cfg.name+' diye hitap et. Bugün kaldığı yerden çalışmaya devam etmeyi öner. En fazla 2-3 cümle söyle. Bu metni tekrar etme, doğal bir selamlama oluştur. '+resumeContext()+(felcanScreen?' Ekrandaki mevcut DeutschAI çalışma bağlamı: '+describeFelcanScreen(felcanScreen):'');
+      const ctx='Merhaba! Sen Edit, bu öğrencinin kişisel Almanca öğretmenisin. ŞİMDİ, herhangi bir soru veya ses beklemeden Türkçe olarak yüksek sesle kısa bir selam ver; öğrenciye ismiyle '+cfg.name+' diye hitap et. Bugün kaldığı yerden çalışmaya devam etmeyi öner. En fazla 2-3 cümle söyle. Bu metni tekrar etme, doğal bir selamlama oluştur. '+resumeContext()+(felcanScreen?' Ekrandaki mevcut DeutschAI çalışma bağlamı: '+describeFelcanScreen(felcanScreen):'');
       felcanPendingExplain=false;
       if(requestSpokenGreeting(ctx,model)){
         S.greeted=true;
@@ -1147,7 +1144,7 @@ function renderSchedule(a,P){
       tot?DATA.schedule.map(it=>h('div',{class:'dcard'+(it.done?' done':'')},h('span',{class:'mchip',text:it.min+' dk'}),
         h('div',{class:'dt'},h('div',{style:'font-weight:600',text:(ICON[it.skill.toLowerCase()]||'📌')+' '+it.title}),h('div',{style:'color:#9aa3b5;font-size:13px',text:it.skill})),
         h('button',{class:'dbtn',text:it.done?'✓ Tamamlandı':'Tamamlandı olarak işaretle',onclick:()=>{setDone(it,!it.done);saveData();refreshDataPanels()}})))
-        :h('div',{class:'sec',text:'Bugün için ders yok. Felkan\'a "programa ... ekle" diyebilirsin.'}));
+        :h('div',{class:'sec',text:'Bugün için ders yok. Edit\'a "programa ... ekle" diyebilirsin.'}));
     put(P.foot,h('button',{class:'btn pri',text:'Kapat',onclick:P.close}))};
   P.refresh=draw;draw()}
 
@@ -1163,7 +1160,7 @@ function renderProgress(a,P){
         .map(r=>h('div',{class:'krow'},h('span',{class:'cnt',text:r[0]}),h('b',{text:r[1]}))),
       h('p',{class:'qnum',style:'margin-top:22px',text:'Son günlük değerlendirmeler'}),
       ev.length?ev.map(e=>h('div',{class:'sec',style:'padding:12px 16px'},h('div',{class:'cnt',style:'font-size:12px',text:e.date}),h('div',{text:e.note})))
-        :h('div',{class:'cnt',text:'Henüz değerlendirme yok. Çalışma sonunda Felkan ekleyebilir.'}));
+        :h('div',{class:'cnt',text:'Henüz değerlendirme yok. Çalışma sonunda Edit ekleyebilir.'}));
     put(P.foot,h('button',{class:'btn pri',text:'Kapat',onclick:P.close}))};
   P.refresh=draw;draw()}
 
@@ -1204,7 +1201,7 @@ function renderQuiz(d,P){
       put(foot(),h('button',{class:'btn',text:'Sonuçlara dön',onclick:()=>{st.done=false;st.i=qs.length-1;draw()}}),
         h('button',{class:'btn',text:'Kapat',onclick:P.close}),
         h('button',{class:'btn pri',text:'Yeni test',onclick:()=>{notify(`[Uygulama] ${cfg.name} yeni bir test istiyor. Öncekinden farklı yeni sorular üret ve show_quiz ile slot=${P.slot} için göster.`);
-          body().replaceChildren(h('div',{class:'score'},h('div',{class:'sub',text:'Felkan yeni test hazırlıyor…'})))}}));
+          body().replaceChildren(h('div',{class:'score'},h('div',{class:'sub',text:'Edit yeni test hazırlıyor…'})))}}));
       return}
     const q=qs[st.i],ans=st.a[st.i];
     put(body(),
@@ -1269,7 +1266,7 @@ function renderWriting(d,P){
   put(body(),h('div',{class:'sec txt'},h('p',{text:d.task_tr||''})),
     Array.isArray(d.useful_phrases)&&d.useful_phrases.length?h('div',{class:'sec'},h('b',{text:'Faydalı kalıplar'}),d.useful_phrases.map(p=>h('div',{class:'ex'},h('div',{class:'de',text:p})))):null,ta,h('div',{style:'margin-top:8px'},cnt));
   put(foot(),h('button',{class:'btn',text:'Kapat',onclick:P.close}),
-    h('button',{class:'btn pri',text:'Felkan\'a gönder',onclick:()=>{const t=ta.value.trim();if(!t)return;
+    h('button',{class:'btn pri',text:'Edit\'a gönder',onclick:()=>{const t=ta.value.trim();if(!t)return;
       notify(`[Uygulama] ${cfg.name} yazma ödevini gönderdi:\n"""\n${t}\n"""\nHataları kısa ve nazikçe Türkçe açıkla, düzeltilmiş halini show_text ile (slot=right, ödev paneli açık kalsın) göster ve sesli kısaca özetle.`)}}));
 }
 
@@ -1351,7 +1348,7 @@ function ptPlay(it){
   if(!PT.on||PT.listen.busy||PT.listen.plays>=2)return;PT.listen.busy=true;PT.listen.plays++;ptPlayerUpdate();
   const fin=()=>{PT.listen.busy=false;ptPlayerUpdate()};
   if(!ptTTS(it.passage,fin)){
-    log('Almanca ses bulunamadı, Felkan okuyacak');
+    log('Almanca ses bulunamadı, Edit okuyacak');
     PT.msgq.unshift({text:'[Uygulama] SEVİYE TESPİTİ dinleme: Aşağıdaki Almanca metni hiçbir şey eklemeden, yavaş ve net şekilde sesli oku, sonra sus:\n"""\n'+it.passage+'\n"""'});
     setTimeout(fin,Math.min(150000,it.passage.split(/\s+/).length*650+5000))}}
 
@@ -1375,7 +1372,7 @@ function ptNext(){if(PT.on&&PT.i+1<PT.seq.length)ptGo(PT.i+1)}
 function ptShow(){
   if(!PT.on)return;const st=PT.seq[PT.i];if(!st)return;
   if(st.key&&!PT.items[st.key]){PT.waiting=true;closeAll();setPos('center');
-    showBanner('SEVİYE TESPİTİ',SECINFO[st.sec].name+(st.name?' · '+st.name:''),'Felkan soruları hazırlıyor',0,true);ptPump();return}
+    showBanner('SEVİYE TESPİTİ',SECINFO[st.sec].name+(st.name?' · '+st.name:''),'Edit soruları hazırlıyor',0,true);ptPump();return}
   PT.waiting=false;hideBanner();closeAll();
   ({listen:ptListen,write:ptWrite,tf:ptTF,speak:ptSpeak,vocab:ptUnit,gram:ptUnit,result:ptResultStage})[st.sec](st)}
 const ptTitle=st=>SECINFO[st.sec].name+(st.name?' · '+st.name+' ('+st.n+'/'+st.of+')':'');
@@ -1409,11 +1406,11 @@ function ptSpeak(st){PT.sp=0;PT.cap='intro';setPos('top-left');ptSpeakPhase()}
 function ptSpeakPhase(){
   if(!PT.on)return;closeAll();const P=openInSlot('center','show_text','Sprechen · Konuşma');P.close=ptConfirmCancel;
   const sp=PT.sp,key=sp===1?'w1':'w2',w=sp?PT.words[key]:null,labels=['Anlattım, devam et','Cümlelerimi kurdum, devam et','Cevapladım, devam et'];
-  if(sp===0)put(P.body,h('div',{class:'pcard'},h('h4',{text:'TEIL 1 · KENDİNİ TANIT'}),h('div',{style:'line-height:1.6',text:'Aşağıdaki başlıklar hakkında Almanca ve sesli konuş. Felkan seni dinliyor.'})),
+  if(sp===0)put(P.body,h('div',{class:'pcard'},h('h4',{text:'TEIL 1 · KENDİNİ TANIT'}),h('div',{style:'line-height:1.6',text:'Aşağıdaki başlıklar hakkında Almanca ve sesli konuş. Edit seni dinliyor.'})),
     h('div',{class:'bigcards'},[['Name','Adın'],['Alter','Yaşın'],['Wohnort','Yaşadığın yer'],['Hobby','Hobin']].map(x=>h('div',{class:'bigcard'},h('b',{text:x[0]}),h('span',{text:x[1]})))));
-  else if(!w)put(P.body,h('div',{class:'pcard'},h('div',{class:'cnt'},h('span',{class:'sp'}),'Felkan kelimeleri seçiyor…')));
+  else if(!w)put(P.body,h('div',{class:'pcard'},h('div',{class:'cnt'},h('span',{class:'sp'}),'Edit kelimeleri seçiyor…')));
   else put(P.body,h('div',{class:'pcard'},h('h4',{text:sp===1?'TEIL 2 · KELİMELERLE CÜMLE KUR':'TEIL 3 · FELKAN\'IN SORULARINI CEVAPLA'}),
-      h('div',{style:'line-height:1.6',text:sp===1?'Ünite: '+w.unit+'. Her kelimeyle ayrı bir Almanca cümle kur ve sesli söyle.':'Felkan bu kelimelerle ilgili sana sesli sorular soracak. Almanca cevap ver.'})),
+      h('div',{style:'line-height:1.6',text:sp===1?'Ünite: '+w.unit+'. Her kelimeyle ayrı bir Almanca cümle kur ve sesli söyle.':'Edit bu kelimelerle ilgili sana sesli sorular soracak. Almanca cevap ver.'})),
     h('div',{class:'wlist'},w.words.map((x,i)=>h('div',{class:'wrow'},h('span',{class:'n',text:(i+1)+'.'}),h('span',{class:'w '+art(x.de),text:x.de}),h('span',{class:'cnt',text:x.tr||''})))));
   PT.onContinue=ptSpeakNext;
   put(P.foot,h('button',{class:'btn pri',disabled:sp>0&&!w,text:labels[sp],onclick:ptSpeakNext}))}
@@ -1438,7 +1435,7 @@ function ptPump(){
   if(!PT.on)return;const cur=PT.seq[PT.i];
   if(PT.pending){const p=PT.pending;
     if(Date.now()-p.at>90000){if(p.tries<3){p.tries++;p.at=Date.now();PT.msgq.push({text:p.text,key:p.key})}
-      else{PT.pending=null;showBanner('SEVİYE TESPİTİ','İçerik hazırlanamadı','Felkan yanıt vermedi. Bağlantını kontrol edip testi yeniden başlat.',0)}}
+      else{PT.pending=null;showBanner('SEVİYE TESPİTİ','İçerik hazırlanamadı','Edit yanıt vermedi. Bağlantını kontrol edip testi yeniden başlat.',0)}}
     return}
   if(cur&&cur.sec==='speak')return;
   let ready=0;
@@ -1534,7 +1531,7 @@ function ptResultReq(stt){
 function ptResultStage(){
   setPos('top-left');const P=openInSlot('center','show_text','Auswertung · Analiz');P.close=ptConfirmCancel;
   put(P.body,h('div',{class:'pcard'},h('div',{style:'font-size:18px;font-weight:700',text:'Cevapların analiz ediliyor'}),
-    h('div',{class:'cnt',style:'margin-top:10px'},h('span',{class:'sp'}),'Felkan sonuçlarını dikkatle değerlendiriyor. Bu biraz sürebilir…')));
+    h('div',{class:'cnt',style:'margin-top:10px'},h('span',{class:'sp'}),'Edit sonuçlarını dikkatle değerlendiriyor. Bu biraz sürebilir…')));
   PT.stats=ptStats();PT.resultWait=true;
   if(PT.result){ptShowResult(PT.result);return}
   PT.msgq.push({text:ptResultReq(PT.stats),key:'result'});
@@ -1549,7 +1546,7 @@ function ptShowResult(res){
   const cef=Object.entries(stt.cefr).filter(([k,v])=>v.n).map(([k,v])=>k+': %'+Math.round(v.ok/v.n*100)).join('   ·   ');
   put(P.body,
     h('div',{style:'text-align:center;margin:6px 0 16px'},h('div',{class:'cnt',text:'SEVİYEN'}),h('div',{class:'rlvl',text:lvl}),
-      res&&res.level_note?h('div',{class:'cnt',style:'margin-top:6px',text:res.level_note}):(res?null:h('div',{class:'cnt',style:'margin-top:6px',text:'Felkan analiz yapamadı; sonuç doğruluk oranlarından otomatik hesaplandı.'}))),
+      res&&res.level_note?h('div',{class:'cnt',style:'margin-top:6px',text:res.level_note}):(res?null:h('div',{class:'cnt',style:'margin-top:6px',text:'Edit analiz yapamadı; sonuç doğruluk oranlarından otomatik hesaplandı.'}))),
     h('div',{class:'pcard'},h('h4',{text:'BÖLÜM SONUÇLARI'}),
       Object.keys(names).filter(k=>stt.sec[k]).map(k=>{const v=stt.sec[k],pc=ptPct(v);
         return h('div',{style:'margin:12px 0'},h('div',{style:'display:flex;justify-content:space-between;margin-bottom:6px'},h('span',{text:names[k]}),h('b',{text:'%'+pc+'  ('+v.ok+'/'+v.n+')'})),h('div',{class:'rbar'},h('i',{style:'width:'+pc+'%'})))}),
@@ -1718,7 +1715,7 @@ function geAudioStart(st){
   const b=$('#geStart');if(b){b.disabled=true;b.textContent='🔊 Dinleme sürüyor…'}
   const list=geHearList(st.part),v=ptDeVoice();
   if(!v||typeof SpeechSynthesisUtterance==='undefined'){
-    a.mode='felkan';geAudLabel('Felkan metinleri okuyor…');log('Almanca ses bulunamadı, Felkan okuyacak');
+    a.mode='felkan';geAudLabel('Edit metinleri okuyor…');log('Almanca ses bulunamadı, Edit okuyacak');
     const times=GM.hoeren[st.part].times;
     PT.msgq.unshift({text:`[Uygulama] GOETHE HÖREN ${st.part}. bölüm. Aşağıdaki sınav metinlerini sırayla oku. Önce "Beispiel" ya da "Nummer X" başlığını söyle, sonra metni ${times===1?'BİR kez':'İKİ kez (arada 2 saniye ara)'} oku; diyaloglarda erkek ve kadın için sesini değiştir; metinler arasında kısa ara ver. Hiçbir şey ekleme, açıklama yapma, cevapları söyleme, bitince sus:\n"""\n${geHearScript(st.part)}"""`});
     return}
@@ -1778,9 +1775,9 @@ function geSchr2(st){
     if(n<8&&!confirm('Metin çok kısa ('+n+' kelime). Yine de devam edelim mi?'))return;GE.write2=t;GE.res.s2={words:n};geNext()}}));
   setTimeout(()=>{if(GE.on&&GE.seq[GE.i]===st&&S.panels.center){S.sizes.center={w:1.3,h:1.15};applySize('center');updateInsets()}},450)}
 
-/* --- Sprechen: Felkan sınav görevlisi / partner --- */
+/* --- Sprechen: Edit sınav görevlisi / partner --- */
 const GE_SP_MSG={
- '1':()=>`[Uygulama] GOETHE SPRECHEN Teil 1 (Sich vorstellen). Sen sınav görevlisisin. Önce AŞAĞIDAKİ gibi Almanca söyle: "Guten Tag. Herzlich willkommen zur Prüfung Start Deutsch 1. Das ist Teil 1. Wir möchten uns kennenlernen. Hier sind ein paar Wörter als Hilfe. Als Erstes stelle ich mich vor: Mein Name ist Felkan. Ich bin dreißig Jahre alt. Ich komme aus Deutschland. Ich wohne in Berlin. Ich spreche Deutsch und Englisch. Ich bin Lehrer. Mein Hobby ist Lesen. Und Sie, wer sind Sie, bitte?" Sonra SUS ve ${cfg.name}'i dinle. Kendini tanıttıktan sonra sırayla sor (her birinden sonra yalnızca "Danke." de ve bekle): "Wie ist Ihr Familienname? Können Sie das bitte buchstabieren?" ve "Wie ist bitte Ihre Telefonnummer?". Telefon numarasından sonra "Danke. Das war Teil 1." de. Türkçe konuşma, düzeltme yapma, ipucu verme.`,
+ '1':()=>`[Uygulama] GOETHE SPRECHEN Teil 1 (Sich vorstellen). Sen sınav görevlisisin. Önce AŞAĞIDAKİ gibi Almanca söyle: "Guten Tag. Herzlich willkommen zur Prüfung Start Deutsch 1. Das ist Teil 1. Wir möchten uns kennenlernen. Hier sind ein paar Wörter als Hilfe. Als Erstes stelle ich mich vor: Mein Name ist Edit. Ich bin dreißig Jahre alt. Ich komme aus Deutschland. Ich wohne in Berlin. Ich spreche Deutsch und Englisch. Ich bin Lehrer. Mein Hobby ist Lesen. Und Sie, wer sind Sie, bitte?" Sonra SUS ve ${cfg.name}'i dinle. Kendini tanıttıktan sonra sırayla sor (her birinden sonra yalnızca "Danke." de ve bekle): "Wie ist Ihr Familienname? Können Sie das bitte buchstabieren?" ve "Wie ist bitte Ihre Telefonnummer?". Telefon numarasından sonra "Danke. Das war Teil 1." de. Türkçe konuşma, düzeltme yapma, ipucu verme.`,
  '2a':()=>`[Uygulama] GOETHE SPRECHEN Teil 2, Thema 1: Essen & Trinken. Ekranda 6 kelime kartı var (Frühstück, Lieblingsessen, Sonntag, Bier, Fleisch, Brot). Almanca söyle: "Teil 2. Sie sollen zu einem Thema Fragen stellen oder antworten. Unser erstes Thema ist Essen und Trinken. Ich nehme eine Karte und frage:" ve kartlardan BİRİNİ kullanarak kısa, basit bir Almanca soru sor (örn. "Was essen Sie zum Frühstück?"). ${cfg.name} cevaplayınca "Danke. Nehmen Sie bitte eine Karte und fragen Sie mich." de. ${cfg.name} bir kart kelimesiyle sana soru sorunca kısa ve basit Almanca cevap ver (tek cümle), sonra "Danke." de. Türkçe konuşma, düzeltme yapma.`,
  '2b':()=>`[Uygulama] GOETHE SPRECHEN Teil 2, Thema 2: Einkaufen. Ekranda yeni 6 kart var (Zeitung, Kasse, Obst, Schuhe, Buch, Stadtplan). Almanca söyle: "Unser zweites Thema ist Einkaufen. Ich nehme eine Karte und frage:" ve kartlardan birini kullanarak kısa bir soru sor (örn. "Wo kann ich einen Stadtplan bekommen?"). ${cfg.name} cevaplayınca "Danke. Nehmen Sie bitte eine Karte und fragen Sie mich." de. ${cfg.name} soru sorunca tek cümleyle cevap ver, sonra "Danke. Das war Teil 2. Wir kommen jetzt zum dritten Teil." de. Türkçe konuşma, düzeltme yapma.`,
  '3':()=>`[Uygulama] GOETHE SPRECHEN Teil 3 (Bitten formulieren). Ekranda 6 resim kartı var (CD/Musik, Heft, Flasche, Bleistift, Hocker, Taschenuhr). Almanca söyle: "In Teil 3 sprechen Sie wieder mit mir. Sie haben eine Bitte. Hier ein Beispiel: Ein Glas Wasser, bitte!" ve "Ja, natürlich. Bitte." ekle. Sonra "Nun Sie. Nehmen Sie eine Karte. Beginnen Sie!" de ve SUS. ${cfg.name} bir kartla ricada bulununca "Ja, natürlich. Bitte." de (rica anlaşılmazsa "Wie bitte?" de). İki ricadan sonra kendin bir kart seçip ona rica et: "Können Sie mir bitte das Heft geben?" gibi; ${cfg.name} cevap versin. En sonunda "Danke. Das war der dritte Teil. Wir sind nun fertig. Herzlichen Dank. Auf Wiedersehen." de. Türkçe konuşma, düzeltme yapma.`};
@@ -1789,11 +1786,11 @@ function geSprechen(st){
   GE.cap='sp'+p;GE.used={};setPos('top-left');
   const P=openInSlot('center','show_text','Sprechen · Teil '+p[0]);P.close=geConfirm;
   const D=GM.sprechen;let body;
-  if(p==='1')body=[h('div',{class:'pcard'},h('h4',{text:'TEIL 1 · SICH VORSTELLEN'}),h('div',{style:'line-height:1.6',text:'Felkan kendini tanıtacak, sonra sana soracak. Aşağıdaki başlıklarla Almanca ve sesli kendini tanıt: Mein Name ist … · Ich komme aus … · Ich wohne in … · Ich spreche … · Mein Hobby ist …'})),
+  if(p==='1')body=[h('div',{class:'pcard'},h('h4',{text:'TEIL 1 · SICH VORSTELLEN'}),h('div',{style:'line-height:1.6',text:'Edit kendini tanıtacak, sonra sana soracak. Aşağıdaki başlıklarla Almanca ve sesli kendini tanıt: Mein Name ist … · Ich komme aus … · Ich wohne in … · Ich spreche … · Mein Hobby ist …'})),
     h('div',{class:'bigcards'},D.t1.map(x=>h('div',{class:'bigcard'},h('b',{text:x[0]+'?'}),h('span',{text:x[1]}))))];
-  else if(p==='3')body=[h('div',{class:'pcard'},h('h4',{text:'TEIL 3 · BITTEN FORMULIEREN'}),h('div',{style:'line-height:1.6',text:'Bir kart seç ve resimdeki nesne için rica et (örn. "Ein Glas Wasser, bitte!" ya da "Kann ich bitte den Bleistift haben?"). Felkan cevap verecek, sonra o da senden bir şey isteyecek.'})),
+  else if(p==='3')body=[h('div',{class:'pcard'},h('h4',{text:'TEIL 3 · BITTEN FORMULIEREN'}),h('div',{style:'line-height:1.6',text:'Bir kart seç ve resimdeki nesne için rica et (örn. "Ein Glas Wasser, bitte!" ya da "Kann ich bitte den Bleistift haben?"). Edit cevap verecek, sonra o da senden bir şey isteyecek.'})),
     h('div',{class:'gcards'},D.t3.map(x=>h('div',{class:'gcard',onclick:e=>e.currentTarget.classList.toggle('used'),title:x[1]},h('div',{class:'em',text:x[0]}),h('small',{text:x[1]}))))];
-  else{const th=D.t2[p==='2a'?0:1];body=[h('div',{class:'pcard'},h('h4',{text:'TEIL 2 · THEMA: '+th.theme.toUpperCase()}),h('div',{style:'line-height:1.6',text:'Felkan bir kartla sana soru soracak, sen cevapla. Sonra bir kart seç ve o kelimeyle Felkan\'a Almanca bir soru sor (örn. "Wo kaufen Sie Brot?").'})),
+  else{const th=D.t2[p==='2a'?0:1];body=[h('div',{class:'pcard'},h('h4',{text:'TEIL 2 · THEMA: '+th.theme.toUpperCase()}),h('div',{style:'line-height:1.6',text:'Edit bir kartla sana soru soracak, sen cevapla. Sonra bir kart seç ve o kelimeyle Edit\'a Almanca bir soru sor (örn. "Wo kaufen Sie Brot?").'})),
     h('div',{class:'gcards'},th.cards.map(x=>h('div',{class:'gcard word',onclick:e=>e.currentTarget.classList.toggle('used')},h('b',{text:x}))))]}
   put(P.body,body);
   GE.onContinue=geSpNext;put(P.foot,h('button',{class:'btn pri',text:labels[p],onclick:geSpNext}));
@@ -1812,7 +1809,7 @@ function geHeurWrite(t){
   return {p1,p2,p3,comm:gr&&cl?1:(gr||cl?.5:0),est:true}}
 function geResultStage(){
   setPos('top-left');const P=openInSlot('center','show_text','Auswertung · Analiz');P.close=geConfirm;
-  put(P.body,h('div',{class:'pcard'},h('div',{style:'font-size:18px;font-weight:700',text:'Sonuçların hesaplanıyor'}),h('div',{class:'cnt',style:'margin-top:10px'},h('span',{class:'sp'}),'Felkan yazma ve konuşma bölümlerini değerlendiriyor. Bu biraz sürebilir…')));
+  put(P.body,h('div',{class:'pcard'},h('div',{style:'font-size:18px;font-weight:700',text:'Sonuçların hesaplanıyor'}),h('div',{class:'cnt',style:'margin-top:10px'},h('span',{class:'sp'}),'Edit yazma ve konuşma bölümlerini değerlendiriyor. Bu biraz sürebilir…')));
   const needW=GE.mods.includes('schreiben'),needS=GE.mods.includes('sprechen');GE.resultWait=true;
   if(!needW&&!needS){geShowResult();return}
   if(GE.grade){geShowResult();return}
@@ -1848,7 +1845,7 @@ function geShowResult(){
           h('b',{text:(v.ok==null?'—':v.ok)+' / '+v.max+(v.ok==null?'':(pass(k)?'  ✓':'  ✕'))})),h('div',{class:'rbar'},h('i',{style:'width:'+pc+'%'})))}),
       s1?h('div',{class:'cnt',style:'margin-top:10px',text:'Schreiben Teil 1 (form): '+s1.ok+'/5'+(w?'  ·  Teil 2: '+((w.p1||0)+(w.p2||0)+(w.p3||0)+(w.comm||0))+'/10 (içerik '+(w.p1||0)+'-'+(w.p2||0)+'-'+(w.p3||0)+', form '+(w.comm||0)+')':'')}):null),
     s1?h('div',{class:'pcard'},h('h4',{text:'SCHREIBEN TEIL 1 · FORM'}),s1.items.map(x=>h('div',{style:'margin:6px 0'},h('span',{text:(x.ok?'✓ ':'✕ ')+x.label+': '}),h('b',{text:x.given||'(boş)'}),x.ok?null:h('span',{class:'cnt',text:'  → doğru: '+x.expected})))):null,
-    para('YAZMA TEIL 2 · GERİ BİLDİRİM',g.writing_feedback_tr||(sc.schreiben&&sc.schreiben.est?'Felkan değerlendirme yapamadı; puan anahtar kelimelere göre otomatik tahmin edildi.':null)),
+    para('YAZMA TEIL 2 · GERİ BİLDİRİM',g.writing_feedback_tr||(sc.schreiben&&sc.schreiben.est?'Edit değerlendirme yapamadı; puan anahtar kelimelere göre otomatik tahmin edildi.':null)),
     g.corrected_de?h('div',{class:'pcard'},h('h4',{text:'DÜZELTİLMİŞ MESAJ'}),h('div',{style:'white-space:pre-line;line-height:1.6',text:g.corrected_de})):h('div',{class:'pcard'},h('h4',{text:'ÖRNEK MESAJ (Goethe örneğine uygun)'}),h('div',{style:'white-space:pre-line;line-height:1.6',text:GM.schreiben2.sample})),
     para('KONUŞMA GERİ BİLDİRİMİ',g.speaking_feedback_tr),para('GENEL YORUM',g.comment_tr),
     wrong.length?h('div',{class:'pcard'},h('h4',{text:'YANLIŞ CEVAPLADIKLARIN'}),wrong.map(({k,x})=>h('div',{style:'margin:10px 0;line-height:1.5'},h('div',{text:(k[0]==='h'?'Hören ':'Lesen ')+k[1]+' · '+String(x.q).split('\n')[0].slice(0,90)}),
@@ -2028,7 +2025,7 @@ function renderTopics(a,P){
   P.refresh=draw;draw()}
 function renderPlan(a,P){
   const draw=()=>{P.body.replaceChildren();P.foot.replaceChildren();const p=DATA.plan;
-    if(!p){put(P.body,h('div',{class:'sec',text:'Henüz program yok. Felkan\'dan "program yap" de.'}));put(P.foot,h('button',{class:'btn pri',text:'Program oluştur',onclick:()=>{makePlan({})}}));return}
+    if(!p){put(P.body,h('div',{class:'sec',text:'Henüz program yok. Edit\'dan "program yap" de.'}));put(P.foot,h('button',{class:'btn pri',text:'Program oluştur',onclick:()=>{makePlan({})}}));return}
     const cur=p.days.findIndex(d=>d.items.some(i=>!i.done)),tot=p.days.reduce((s,d)=>s+d.items.length,0),dn=p.days.reduce((s,d)=>s+d.items.filter(i=>i.done).length,0);
     P.text='Çalışma programı\n'+p.days.map((d,i)=>'Gün '+(i+1)+': '+d.items.map(x=>(x.done?'[x] ':'[ ] ')+x.title).join(' | ')).join('\n');
     put(P.body,h('div',{class:'pcard'},h('h4',{text:'PROGRAM'}),h('div',{style:'line-height:1.7',text:'Günlük '+p.dailyMin+' dk · '+p.days.length+' gün · '+dn+'/'+tot+' oturum tamamlandı'}),
@@ -2053,7 +2050,7 @@ $('#sSave').onclick=()=>{
   saveCfg();closeSettings();$('#welcomeTitle').textContent='Hoş geldin, '+cfg.name+'.';
   if(S.ws)disconnect(true);S.attempt=0;S.retries=0;S.greeted=false;connect()};
 $('#sDisc').onclick=()=>{disconnect();closeSettings()};
-function disconnect(silent){S.userClosed=true;if(S.ws){try{S.ws.close(1000,'user')}catch(e){}}if(!silent){setStatus('idle','Başlatmak için dokun');$('#startBtn').hidden=false;$('#startBtn').textContent='Felkan ile çalışmaya başla'}}
+function disconnect(silent){S.userClosed=true;if(S.ws){try{S.ws.close(1000,'user')}catch(e){}}if(!silent){setStatus('idle','Başlatmak için dokun');$('#startBtn').hidden=false;$('#startBtn').textContent='Edit ile çalışmaya başla'}}
 $('#startBtn').onclick=()=>{S.attempt=0;S.retries=0;connect()};
 
 function toggleCompanionVoice(){
@@ -2076,16 +2073,7 @@ function toggleCompanionVoice(){
     connect();
   }
 }
-function greetCompanion(){
-  unlockCompanionAudio();
-  if(avatar.dataset.state==='audio-blocked'||felcanGreetingPending||felcanConnecting||greetingFallback)return;
-  if(S.setupDone&&greetingRequest){
-    requestSpokenGreeting(greetingRequest.text,greetingRequest.model);
-    return;
-  }
-  toggleCompanionVoice();
-}
-window.FelcanVoiceControl={toggle:toggleCompanionVoice,greet:greetCompanion};
+window.FelcanVoiceControl={toggle:toggleCompanionVoice};
 
 $('#bCenter').onclick=()=>{closeAll();setPos('center')};
 $('#bMute').onclick=()=>{S.muted=!S.muted;$('#bMute').classList.toggle('on',S.muted);if(S.stream)S.stream.getAudioTracks().forEach(t=>t.enabled=!S.muted);
