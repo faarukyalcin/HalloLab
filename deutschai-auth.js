@@ -243,7 +243,7 @@
   }
   async function logout() {
     try {await request('/auth/logout',{method:'POST'});} catch {}
-    if(auth?.user?.id)sessionStorage.removeItem('da:felcan-live-greet-v1:'+auth.user.id);
+    if(auth?.user?.id)sessionStorage.removeItem('da:felcan-live-greet-v2:'+auth.user.id);
     auth=null;del(authKey);sessionStorage.removeItem('da-hydrated');location.reload();
   }
   function admin() {
@@ -463,7 +463,7 @@
   function felcanWelcome(){
     const button=document.getElementById('da-felcan-float');
     if(!button||!auth?.user)return;
-    const once='da:felcan-live-greet-v1:'+auth.user.id;
+    const once='da:felcan-live-greet-v2:'+auth.user.id;
     if(sessionStorage.getItem(once))return;
     sessionStorage.setItem(once,'1');
     // No text bubble or system TTS: begin the real Gemini Live teacher.
