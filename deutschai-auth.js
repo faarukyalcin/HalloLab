@@ -140,6 +140,16 @@
     '#da-auth-screen .da-admin-user-info strong{display:block;font-size:13px}',
     '#da-auth-screen .da-admin-user-info small{display:block;color:#b9acd9;margin-top:4px;font-size:11px}',
     '#da-auth-screen .da-admin-user select{max-width:128px;min-width:103px;border:1px solid #ab90e7;border-radius:10px;background:#211b43;color:#fff;padding:10px;font:12px system-ui}',
+    '#da-auth-screen .da-admin-activity{margin-top:12px;border:1px solid #bfa3fc66;border-radius:15px;padding:12px;background:#16152a88}',
+    '#da-auth-screen .da-admin-activity-summary{font-size:12px;color:#e2d5ff;margin:4px 0 11px}',
+    '#da-auth-screen .da-admin-daygrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}',
+    '#da-auth-screen .da-admin-day{display:flex;flex-direction:column;gap:5px;min-width:0;text-align:center;border:1px solid #bca3f541;border-radius:9px;padding:7px 2px;background:#28234388}',
+    '#da-auth-screen .da-admin-day.visited{background:#674aaf77;border-color:#b49bfa9e}',
+    '#da-auth-screen .da-admin-day b{font-size:10px;color:#fff}',
+    '#da-auth-screen .da-admin-day small{font-size:9px;color:#d1c3ef;line-height:1.3}',
+    '#da-auth-screen .da-admin-user-extra{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}',
+    '#da-auth-screen .da-admin-user-extra span{font-size:10px;border:1px solid #bea5f643;padding:4px 7px;border-radius:8px;color:#e2d3fd}',
+
     '@media(max-width:600px){#da-auth-screen .da-admin-card{max-height:calc(100dvh - 20px)}#da-auth-screen .da-admin-stat-grid{gap:6px}#da-auth-screen .da-admin-stat-grid>div{padding:9px}#da-auth-screen .da-admin-stat-grid b{font-size:22px}#da-auth-screen .da-admin-user{flex-direction:column;align-items:stretch}#da-auth-screen .da-admin-user select{max-width:none}}',
     '#da-account-action{position:fixed;top:97px;right:12px;z-index:98;font-size:12px}',
     '#da-felcan-float{position:fixed;right:22px;bottom:24px;z-index:990;display:flex;align-items:center;gap:10px;cursor:pointer;border:1px solid #d9c6ff77;border-radius:24px;padding:7px 16px 7px 8px;background:linear-gradient(135deg,#6550a9b8,#242148e3);color:#fff;backdrop-filter:blur(26px) saturate(150%);box-shadow:0 16px 45px #160d4570,inset 0 1px #ffffff50;font:700 13px system-ui;animation:da-felcan-fly 5s ease-in-out infinite}',
@@ -242,6 +252,8 @@
       +'<section class="da-admin-section"><h2>Üyeler ve yetkiler</h2><p>Şifreler güvenlik nedeniyle görüntülenemez; sistemde tek yönlü özet olarak saklanır. Rol değişikliğinde ilgili oturumlar kapatılır.</p><div class="da-admin-users" id="da-admin-users" aria-live="polite">Üyeler yükleniyor…</div><button type="button" id="da-reload-users">Listeyi yenile</button></section>'
       +'<section class="da-admin-section"><h2>Gemini API anahtarı</h2><p>Ortak anahtarı yalnızca yöneticiler değiştirebilir. Mevcut anahtar tarayıcıya geri gönderilmez.</p><form id="da-admin-form"><label>Yeni Gemini API anahtarı<input name="apiKey" type="password" autocomplete="off" required></label><p class="da-error" role="alert"></p><button type="submit">Anahtarı Kaydet</button></form></section></div>';
     const list=e.querySelector('#da-admin-users');
+    const minutes=seconds=>{const n=Math.max(0,Number(seconds)||0);return Math.floor(n/3600)+' sa '+Math.floor(n%3600/60)+' dk'};
+
     e.querySelector('#da-admin-close').onclick=()=>e.hidden=true;
     const load=async()=>{
       list.textContent='Hesaplar yükleniyor…';
@@ -258,7 +270,39 @@
           const details=document.createElement('div');details.className='da-admin-user-info';
           const title=document.createElement('strong');title.textContent=(u.firstName||'')+' '+(u.lastName||'')+' · @'+u.username;
           const meta=document.createElement('small');meta.textContent=(u.email||'')+' · '+(u.createdAt?new Date(u.createdAt*1000).toLocaleDateString('tr-TR'):'Tarih yok');
-          details.append(title,meta);
+          const summary=document.createElement('div');summary.className='da-admin-user-extra';
+          for(const value of ['Son 7 gün: '+minutes(u.last7Seconds),'Toplam: '+minutes(u.totalSeconds),'Ziyaret günleri: '+u.visitedDays,'Son giriş/ziyaret: '+(u.lastVisit||'Yok')]){
+            const chip=document.createElement('span');chip.textContent=value;summary.append(chip);
+          }
+          const historyBtn=document.createElement('button');historyBtn.type='button';historyBtn.textContent='Son 30 günü göster';
+          historyBtn.style.marginTop='8px';
+          const activity=document.createElement('div');activity.className='da-admin-activity';activity.hidden=true;
+          historyBtn.onclick=async()=>{
+            if(!activity.hidden){activity.hidden=true;historyBtn.textContent='Son 30 günü göster';return}
+            activity.hidden=false;historyBtn.textContent='Takvimi gizle';activity.textContent='Günlük kayıtlar yükleniyor…';
+            try{
+              const result=await request('/admin/users/activity?userId='+encodeURIComponent(u.id));
+              const byDay=new Map((result.days||[]).map(day=>[day.day,day]));
+              const grid=document.createElement('div');grid.className='da-admin-daygrid';
+              // Date keys are relative to Istanbul, matching server recording.
+              const ymd=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Istanbul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+              const [yy,mm,dd]=ymd.split('-').map(Number);
+              const base=Date.UTC(yy,mm-1,dd);
+              for(let i=29;i>=0;i--){
+                const date=new Date(base-i*86400000).toISOString().slice(0,10),d=byDay.get(date);
+                const cell=document.createElement('div');cell.className='da-admin-day'+(d?' visited':'');
+                const lbl=document.createElement('b');lbl.textContent=date.slice(5);
+                const detail=document.createElement('small');detail.textContent=d?(minutes(d.activeSeconds)+' / '+(d.logins||0)+' giriş'):'Kayıt yok';
+                cell.title=date+(d?' · Aktif ekran '+minutes(d.activeSeconds)+' · '+(d.logins||0)+' giriş':' · Kayıt bulunamadı');
+                cell.append(lbl,detail);grid.append(cell);
+              }
+              activity.replaceChildren();
+              const info=document.createElement('p');info.className='da-admin-activity-summary';
+              info.textContent='Son 30 gün · Türkiye saati · Mor günler ziyaret kaydı bulunan günlerdir. Süre, aktif ve görünür sekmede yaklaşık geçirilen zamandır. Eski geçmiş geriye dönük doldurulmaz.';
+              activity.append(info,grid);
+            }catch(err){activity.textContent='Günlük kayıtlar alınamadı: '+err.message}
+          };
+          details.append(title,meta,summary,historyBtn,activity);
           const select=document.createElement('select');select.setAttribute('aria-label','@'+u.username+' hesabının rolü');
           for(const [v,label] of [['user','Öğrenci'],['admin','Yönetici']]){
             const option=document.createElement('option');option.value=v;option.textContent=label;option.selected=v===u.role;select.append(option);
@@ -375,7 +419,7 @@
     iframe.allow='microphone; autoplay';
     iframe.tabIndex=-1;
     iframe.setAttribute('aria-hidden','true');
-    iframe.src='./felkan.html?compact=1&v=all-sections-female-1';
+    iframe.src='./felkan.html?compact=1&v=autogreet-attendance-1';
     iframe.addEventListener('load',()=>{
       felcanReady=true;
       sendFelcanContext(true);
@@ -403,36 +447,33 @@
   }
   function felkan(){startFelcanVoice()}
 
+  let activityTicker=null;
+  function startStudyAttendance(){
+    if(!auth||activityTicker)return;
+    const isActive=()=>document.visibilityState==='visible' && (document.hasFocus?.()!==false);
+    const ping=()=>{if(!auth||!origin)return;request('/activity/ping',{method:'POST',body:JSON.stringify({active:isActive()})}).catch(err=>console.warn('Çalışma süresi kaydedilemedi:',err.message))};
+    ping();
+    activityTicker=setInterval(ping,60000);
+    document.addEventListener('visibilitychange',ping);
+    window.addEventListener('focus',ping);
+    window.addEventListener('blur',ping);
+  }
   function felcanWelcome(){
     const button=document.getElementById('da-felcan-float');
     if(!button||!auth?.user)return;
-    // One automatic greeting per browser session. Avoid asking for microphone
-    // permission on page load; permission must be granted by the learner.
-    const once='da:felcan-auto-greet:'+auth.user.id;
+    const once='da:felcan-live-greet-v1:'+auth.user.id;
     if(sessionStorage.getItem(once))return;
     sessionStorage.setItem(once,'1');
-    const name=String(auth.user.firstName||'arkadaşım').trim().slice(0,60);
+    // No text bubble or system TTS: begin the real Gemini Live teacher.
     button.classList.add('da-felcan-waving');
     setTimeout(()=>button.classList.remove('da-felcan-waving'),4700);
-    const speakWelcome=()=>{
-      if(!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window)){
-        felcanVisual('idle','Ses için bana dokun');
-        return;
-      }
-      const text='Hoş geldin, '+name+'! Ben Felcan. Bugün Almancaya kaldığımız yerden devam edelim mi?';
-      const say=new SpeechSynthesisUtterance(text);
-      say.lang='tr-TR';say.rate=.94;say.pitch=1.09;
-      const turkish=window.speechSynthesis.getVoices().find(v=>v.lang?.toLowerCase().startsWith('tr'));
-      if(turkish)say.voice=turkish;
-      say.onstart=()=>{button.dataset.voice='speaking';const tab=document.querySelector('#nav [data-page="live"]');if(tab)tab.dataset.voice='speaking'};
-      say.onend=()=>{if(button.dataset.voice==='speaking')felcanVisual('idle','Konuşmak için dokun')};
-      say.onerror=()=>{if(button.dataset.voice==='speaking')felcanVisual('idle','Ses için bana dokun')};
-      try{window.speechSynthesis.speak(say)}catch{felcanVisual('idle','Ses için bana dokun')}
-    };
-    // The login click may have granted playback permission, but some mobile
-    // browsers still prohibit sound without a new tap.
-    setTimeout(speakWelcome,650);
+    felcanVisual('connecting','Felcan sesli karşılıyor…');
+    if(felcanReady)startFelcanVoice();
+    else felcanRequested=true;
+    // Browsers can block unattended microphone or audio playback. The
+    // character stays tappable and shows an error rather than faking speech.
   }
+
   function floatingFelcan(){
     if(!auth||document.getElementById('da-felcan-float'))return;
     const button=document.createElement('button');
@@ -481,6 +522,7 @@
       }
       account();
       floatingFelcan();
+      startStudyAttendance();
     } catch(error) {auth=null;del(authKey);show('login',error.message);}
   });
 })();
