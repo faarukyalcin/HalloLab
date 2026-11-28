@@ -832,7 +832,7 @@ async function onMsg(ev){
       notify('[Uygulama] Şu anki DeutschAI ekranı:\n'+describeFelcanScreen(felcanScreen)+(felcanPendingExplain?'\nÖğrenci bu sorunun açıklamasını istedi. Kısa ve öğretici bir ipucu ver.':''));
       felcanPendingExplain=false;
     }
-    if(!S.greeted){S.greeted=true;if(!DATA.plan)makePlan({});const ctx=resumeContext()+' DeutschAI genel Almanca programından bir sonraki gramer, kelime veya pratiği öner. Öğrenci onay verirse open_app_section çağır.';DATA.visits=(DATA.visits||0)+1;DATA.lastVisit=today();saveData();notify('[Uygulama] Oturum başladı. '+ctx)}
+    if(!S.greeted){S.greeted=true;if(!DATA.plan)makePlan({});const ctx='Öğrenciyi ismiyle '+cfg.name+' diye kısa, sıcak ve doğal TÜRKÇE SESLİ karşıla. Ardından bugünkü Almanca çalışmasına kaldığı yerden devam etmeyi öner. CEVABINI SESLİ OLARAK HEMEN VER; kullanıcıdan ilk konuşmasını bekleme. '+resumeContext()+' Gerekirse DeutschAI genel Almanca programından bir sonraki gramer, kelime veya pratiği öner. Öğrenci onay verirse open_app_section çağır.';DATA.visits=(DATA.visits||0)+1;DATA.lastVisit=today();saveData();notify('[Uygulama] Oturum başladı. '+ctx)}
     return}
   if(m.error){log('API hatası',m.error)}
   const sc=m.serverContent;
