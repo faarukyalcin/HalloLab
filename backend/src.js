@@ -119,6 +119,29 @@ async function main(req,env){
  }
  if(route.startsWith('/admin/')){
   if(user.role!=='admin')return error('Yönetici yetkisi gerekli',403);
+  if(route==='/admin/users'&&req.method==='GET'){
+   // Never expose password hashes, salts, session tokens or API secrets.
+   const rows=await env.DB.prepare("SELECT id,username,first_name,last_name,email,role,created_at FROM users ORDER BY created_at DESC LIMIT 500").all();
+   const count=await env.DB.prepare('SELECT COUNT(*) AS count FROM users').first();
+   return answer({users:rows.results.map(u=>({...safeUser(u),createdAt:u.created_at})),total:count.count});
+  }
+  if(route==='/admin/users/role'&&req.method==='PUT'){
+   const x=await body(req),id=String(x.userId||''),role=String(x.role||'');
+   if(!/^[a-f0-9-]{36}$/i.test(id)||!['admin','user'].includes(role))return error('Geçersiz hesap veya rol');
+   const target=await env.DB.prepare('SELECT id,role FROM users WHERE id=?').bind(id).first();
+   if(!target)return error('Hesap bulunamadı',404);
+   if(target.id===user.id&&role!=='admin')return error('Kendi yönetici yetkini kaldıramazsın',403);
+   if(target.role==='admin'&&role==='user'){
+    // Atomic guard prevents two concurrent demotions leaving zero admins.
+    const changed=await env.DB.prepare("UPDATE users SET role='user' WHERE id=? AND (SELECT COUNT(*) FROM users WHERE role='admin')>1").bind(id).run();
+    if(!changed.meta?.changes)return error('Son yönetici kaldırılamaz',409);
+   }else{
+    await env.DB.prepare('UPDATE users SET role=? WHERE id=?').bind(role,id).run();
+   }
+   // Revoke sessions when privileges are removed or changed.
+   await env.DB.prepare('DELETE FROM sessions WHERE user_id=?').bind(id).run();
+   return answer({ok:true,role});
+  }
   if(route==='/admin/status'&&req.method==='GET')return answer({geminiConfigured:!!(await geminiKey(env))});
   if(route==='/admin/gemini-key'&&req.method==='PUT'){
    const x=await body(req),key=String(x.apiKey||'').trim();if(key.length<20||key.length>200)return error('Geçersiz API anahtarı');
