@@ -131,13 +131,13 @@ async function main(req,env){
    const entries=await env.DB.prepare("SELECT bucket,data FROM user_states WHERE user_id=? AND bucket IN ('deutschai-personal-profile-v1','deutschai-ai-profile-v1','deutschai-ai-placement-v1','deutschai-online-v1')").bind(u.id).all();
    const parsed={};for(const entry of entries.results){try{parsed[entry.bucket]=JSON.parse(JSON.parse(entry.data).raw)||{}}catch{}}
    const p=parsed['deutschai-personal-profile-v1']||{},l=parsed['deutschai-ai-profile-v1']||{},t=parsed['deutschai-ai-placement-v1']||{},s=parsed['deutschai-online-v1']||{};
-   const visible=p.communityVisible===true;
+   const visible=true;
    const levels=['A1','A2','B1','B2','C1','C2'];
    const level=levels.includes(t.level)?t.level:levels.includes(l.level)?l.level:null;
    const lessons=Array.isArray(s.completed)?new Set(s.completed.filter(v=>typeof v==='string')).size:0;
    const badges=[];if(levels.includes(t.level))badges.push('Seviye tespiti');if(lessons>=1)badges.push('İlk ders');if(lessons>=5)badges.push('5 ders');if(lessons>=10)badges.push('10 ders');
    const photo=typeof p.photo==='string'&&p.photo.length<60000&&/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(p.photo)?p.photo:'';
-   return {username:u.username,role:u.is_founder?'founder':u.role==='admin'?'admin':'user',displayName:visible&&typeof p.displayName==='string'?p.displayName.slice(0,60):u.username,photo:visible?photo:'',level:visible?level:null,badges:visible?badges:[],lessons:visible?lessons:null,visible};
+   return {username:u.username,role:u.is_founder?'founder':u.role==='admin'?'admin':'user',displayName:typeof p.displayName==='string'&&p.displayName.trim()?p.displayName.trim().slice(0,60):u.username,photo:visible?photo:'',level:visible?level:null,badges:visible?badges:[],lessons:visible?lessons:null,visible};
   }));
   return answer({members,nextOffset:rows.results.length===25?offset+25:null});
  }
