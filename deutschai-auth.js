@@ -398,16 +398,55 @@
   #da-auth-screen .da-admin-v2 .da-admin-danger-zone p{font-size:12px;margin:7px 0}
   @media(max-width:600px){#da-auth-screen .da-admin-v2 .da-admin-user{grid-template-columns:1fr;gap:5px}#da-auth-screen .da-admin-v2 .da-admin-manage{border-top:1px solid var(--line,#fff3)}#da-auth-screen .da-admin-v2 .da-admin-daygrid{grid-template-columns:repeat(5,minmax(0,1fr))}#da-auth-screen .da-admin-v2 .da-admin-tabs button{font-size:11px}#da-auth-screen .da-admin-v2 .da-admin-stat-grid small{font-size:10px}}
   `;document.head.append(adminLayout);
+  const adminStudioStyle=document.createElement('style');adminStudioStyle.textContent=`
+  body #da-auth-screen:has(.da-admin-studio){padding:0!important;background:var(--bg,#15152b)!important;backdrop-filter:none!important}
+  body #da-auth-screen .da-admin-studio{width:min(1100px,100%)!important;max-width:100%!important;height:100dvh;max-height:100dvh!important;padding:clamp(18px,4vw,40px)!important;border:0!important;border-radius:0!important;background:var(--bg,#15152b)!important;box-shadow:none!important;overflow:auto}
+  body #da-auth-screen .da-admin-studio .da-admin-top{padding-bottom:18px;border:0}
+  body #da-auth-screen .da-admin-studio .da-admin-heading h1{font-size:30px;letter-spacing:-.05em}
+  body #da-auth-screen .da-admin-studio .da-admin-tabs{position:sticky;top:0;z-index:2;gap:0;padding:0;margin:0 0 26px;border:0;border-bottom:1px solid var(--line);border-radius:0;background:var(--bg)!important}
+  body #da-auth-screen .da-admin-studio .da-admin-tabs button{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;color:var(--muted)!important;padding:14px 6px;font-size:13px}
+  body #da-auth-screen .da-admin-studio .da-admin-tabs button[aria-pressed=true]{color:var(--green)!important;border-bottom:2px solid var(--accent)!important}
+  body #da-auth-screen .da-admin-studio h2{font-size:22px;letter-spacing:-.03em;margin:0 0 12px}
+  body #da-auth-screen .da-admin-studio .da-admin-welcome{margin:0 0 24px;font-size:14px}
+  body #da-auth-screen .da-admin-studio .da-admin-stat-grid{gap:0;border-block:1px solid var(--line);margin:24px 0}
+  body #da-auth-screen .da-admin-studio .da-admin-stat-grid>div{padding:18px 8px;background:none;border:0;border-radius:0;box-shadow:none}
+  body #da-auth-screen .da-admin-studio .da-admin-stat-grid>div+div{border-left:1px solid var(--line)}
+  body #da-auth-screen .da-admin-studio .da-admin-stat-grid b{font-size:clamp(24px,5vw,38px)}
+  body #da-auth-screen .da-admin-studio .da-admin-overview-links{gap:0}
+  body #da-auth-screen .da-admin-studio .da-admin-overview-links button{background:transparent!important;box-shadow:none!important;border:0!important;border-bottom:1px solid var(--line)!important;border-radius:0;padding:18px 0}
+  body #da-auth-screen .da-admin-studio .da-admin-toolbar{grid-template-columns:minmax(0,1fr) auto;gap:10px}
+  body #da-auth-screen .da-admin-studio .da-admin-toolbar select{grid-column:1/-1}
+  .da-admin-sr{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip-path:inset(50%)}
+  body #da-auth-screen .da-admin-studio .da-admin-users{gap:0;margin:0}
+  body #da-auth-screen .da-admin-studio .da-admin-user{display:block;padding:0;background:transparent!important;box-shadow:none!important;border:0!important;border-bottom:1px solid var(--line)!important;border-radius:0}
+  body #da-auth-screen .da-admin-studio .da-admin-user[hidden]{display:none!important}
+  body #da-auth-screen .da-admin-studio .da-admin-person{display:flex;align-items:center;text-align:left;gap:11px;width:100%;padding:14px 0;background:transparent!important;border:0!important;box-shadow:none!important}
+  .da-admin-person-avatar{display:grid;place-items:center;flex:none;width:42px;height:42px;border-radius:50%;background:var(--mint);color:var(--green);font-size:14px;font-weight:800}
+  .da-admin-person-name{flex:1;min-width:0;overflow-wrap:anywhere}.da-admin-person-name strong,.da-admin-person-name small{display:block}.da-admin-person-name small{font-size:11px;margin-top:3px}
+  .da-admin-person-role{font-size:11px;color:var(--muted);flex:none}.da-admin-arrow{font-size:23px;color:var(--muted)}
+  .da-admin-detail-head{display:flex;gap:14px;align-items:center;margin:24px 0}.da-admin-detail-head .da-admin-person-avatar{width:58px;height:58px;font-size:20px}
+  .da-admin-detail-section{padding:20px 0;border-top:1px solid var(--line)}.da-admin-detail-section h2{font-size:17px!important}
+  body #da-auth-screen .da-admin-studio .da-admin-user-extra{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  body #da-auth-screen .da-admin-studio .da-admin-user-extra span{background:none;border:0;padding:8px 0;font-size:12px}
+  body #da-auth-screen .da-admin-studio .da-admin-actions{display:grid;grid-template-columns:1fr;gap:10px;max-width:480px}
+  body #da-auth-screen .da-admin-studio #da-admin-form{max-width:560px}
+  body #da-auth-screen .da-admin-studio .da-admin-primary{background:var(--accent-deep)!important;color:white!important}
+  body #da-auth-screen .da-admin-studio .da-admin-danger{color:#db6483!important}
+  body #da-auth-screen .da-admin-studio button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+  @media(max-width:600px){body #da-auth-screen .da-admin-studio{padding:max(18px,env(safe-area-inset-top)) 18px max(20px,env(safe-area-inset-bottom))!important}.da-admin-person-role{font-size:10px}}
+  `;document.head.append(adminStudioStyle);
   function admin() {
     if(auth?.user.role!=='admin')return;
     const e=overlay();
-    e.innerHTML='<div class="da-card da-admin-card da-admin-v2"><div class="da-admin-top"><div class="da-admin-heading"><span class="da-admin-emblem" aria-hidden="true">✦</span><div><small>YÖNETİM MERKEZİ</small><h1>Yönetici Paneli</h1><p>Hesaplar, roller ve Gemini yönetimi</p></div></div><button type="button" id="da-admin-close" aria-label="Kapat">✕</button></div>'
-      +'<nav class="da-admin-tabs" aria-label="Yönetim bölümleri"><button type="button" data-admin-tab="overview" aria-pressed="true">Genel bakış</button><button type="button" data-admin-tab="accounts" aria-pressed="false">Hesaplar</button><button type="button" data-admin-tab="api" aria-pressed="false">Gemini API</button></nav><section data-admin-panel="overview"><h2>Genel bakış</h2><div class="da-admin-stat-grid"><div><b id="da-users-count">—</b><small>Toplam kayıtlı hesap</small></div><div><b id="da-admins-count">—</b><small>Yöneticiler</small></div><div><b id="da-members-count">—</b><small>Öğrenciler</small></div></div><div class="da-admin-overview-links"><button type="button" data-admin-go="accounts"><strong>Hesap yönetimi</strong><small>Öğrenciler, roller ve çalışma kayıtları</small><span>›</span></button><button type="button" data-admin-go="api"><strong>Gemini bağlantısı</strong><small id="da-api-overview">Durum sorgulanıyor…</small><span>›</span></button></div><p class="da-admin-note">Hesap sayıları sunucudan alınır. Rol ve hesap işlemleri mevcut yetkilerle sınırlandırılır.</p></section>'
-      +'<section class="da-admin-section" data-admin-panel="accounts" hidden><h2>Hesap yönetimi</h2><div class="da-admin-toolbar"><label for="da-user-search">Hesap ara</label><input id="da-user-search" type="search" placeholder="Ad, kullanıcı adı veya e-posta"><button type="button" id="da-reload-users">Yenile</button><select id="da-role-filter" aria-label="Hesap türü"><option value="all">Tüm hesaplar</option><option value="user">Öğrenciler</option><option value="admin">Yöneticiler</option></select></div><p id="da-filter-count" class="da-admin-note"></p><p id="da-admin-account-status" role="status"></p><div class="da-admin-users" id="da-admin-users" aria-live="polite">Üyeler yükleniyor…</div></section>'
-      +'<section class="da-admin-section" data-admin-panel="api" hidden><h2>Gemini API</h2><p>Ortak anahtarı yöneticiler değiştirebilir. Mevcut anahtar tarayıcıya geri gönderilmez.</p><form id="da-admin-form"><label>Yeni Gemini API anahtarı<input name="apiKey" type="password" autocomplete="off" required></label><p id="da-key-status" class="da-admin-key-state" role="status">Anahtar durumu sorgulanıyor…</p><p class="da-error" role="alert"></p><div class="da-admin-key-actions"><button type="submit" class="da-admin-primary">Anahtarı kaydet</button><button type="button" id="da-key-clear">Alanı temizle</button></div><div class="da-admin-danger-zone"><strong>Anahtarı kaldır</strong><p>AI özellikleri yeni anahtar girilene kadar durur. Öğrenci verileri korunur.</p><button type="button" id="da-key-delete" class="da-admin-danger">Kayıtlı anahtarı sil</button></div></form></section></div>';
+    e.innerHTML='<div class="da-card da-admin-card da-admin-v2 da-admin-studio"><div class="da-admin-top"><div class="da-admin-heading"><span class="da-admin-emblem" aria-hidden="true">✦</span><div><small>DİLATÖLYESİ</small><h1>Yönetim</h1></div></div><button type="button" id="da-admin-close" aria-label="Kapat">✕</button></div>'
+      +'<nav class="da-admin-tabs" aria-label="Yönetim bölümleri"><button type="button" data-admin-tab="overview" aria-pressed="true">Genel bakış</button><button type="button" data-admin-tab="accounts" aria-pressed="false">Hesaplar</button><button type="button" data-admin-tab="api" aria-pressed="false">Gemini API</button></nav><section data-admin-panel="overview"><h2>Genel bakış</h2><p class="da-admin-welcome">Hesaplarını ve uygulama bağlantısını buradan yönet.</p><div class="da-admin-stat-grid"><div><b id="da-users-count">—</b><small>Toplam kayıtlı hesap</small></div><div><b id="da-admins-count">—</b><small>Yöneticiler</small></div><div><b id="da-members-count">—</b><small>Öğrenciler</small></div></div><div class="da-admin-overview-links"><button type="button" data-admin-go="accounts"><strong>Hesap yönetimi</strong><small>Öğrenciler, roller ve çalışma kayıtları</small><span>›</span></button><button type="button" data-admin-go="api"><strong>Gemini bağlantısı</strong><small id="da-api-overview">Durum sorgulanıyor…</small><span>›</span></button></div><p id="da-admin-overview-note" class="da-admin-note"></p></section>'
+      +'<section class="da-admin-section" data-admin-panel="accounts" hidden><h2>Hesaplar</h2><div class="da-admin-toolbar"><label class="da-admin-sr" for="da-user-search">Hesap ara</label><input id="da-user-search" type="search" placeholder="Ad, kullanıcı adı veya e-posta"><button type="button" id="da-reload-users">Yenile</button><select id="da-role-filter" aria-label="Hesap türü"><option value="all">Tüm hesaplar</option><option value="user">Öğrenciler</option><option value="admin">Yöneticiler</option></select></div><p id="da-filter-count" class="da-admin-note"></p><p id="da-admin-account-status" role="status"></p><div class="da-admin-users" id="da-admin-users" aria-live="polite">Üyeler yükleniyor…</div></section>'
+      +'<section data-admin-panel="detail" hidden><button type="button" id="da-admin-detail-back">‹ Hesaplar</button><div id="da-admin-detail-content"></div></section><section class="da-admin-section" data-admin-panel="api" hidden><h2>Gemini API</h2><p>Ortak anahtarı yöneticiler değiştirebilir. Mevcut anahtar tarayıcıya geri gönderilmez.</p><form id="da-admin-form"><label>Yeni Gemini API anahtarı<input name="apiKey" type="password" autocomplete="off" required></label><p id="da-key-status" class="da-admin-key-state" role="status">Anahtar durumu sorgulanıyor…</p><p class="da-error" role="alert"></p><div class="da-admin-key-actions"><button type="submit" class="da-admin-primary">Anahtarı kaydet</button><button type="button" id="da-key-clear">Alanı temizle</button></div><div class="da-admin-danger-zone"><strong>Anahtarı kaldır</strong><p>AI özellikleri yeni anahtar girilene kadar durur. Öğrenci verileri korunur.</p><button type="button" id="da-key-delete" class="da-admin-danger">Kayıtlı anahtarı sil</button></div></form></section></div>';
     const panel=e.querySelector('.da-admin-v2');
     const showTab=id=>{for(const el of panel.querySelectorAll('[data-admin-panel]'))el.hidden=el.dataset.adminPanel!==id;for(const b of panel.querySelectorAll('[data-admin-tab]'))b.setAttribute('aria-pressed',String(b.dataset.adminTab===id));panel.scrollTop=0;};
     for(const b of panel.querySelectorAll('[data-admin-tab],[data-admin-go]'))b.onclick=()=>showTab(b.dataset.adminTab||b.dataset.adminGo);
+    const detailHost=panel.querySelector('#da-admin-detail-content');
+    panel.querySelector('#da-admin-detail-back').onclick=()=>{detailHost.replaceChildren();showTab('accounts')};
     const roleFilter=e.querySelector('#da-role-filter');
     const list=e.querySelector('#da-admin-users');
     const search=e.querySelector('#da-user-search');
@@ -446,7 +485,7 @@
           const payload=deleting?{userId:user.id,confirmUsername:input.value}:{userId:user.id,password:input.value};
           await request(deleting?'/admin/users':'/admin/users/password',{method:deleting?'DELETE':'PUT',body:JSON.stringify(payload)});
           dialog.close();
-          await load();
+          await load();showTab('accounts');detailHost.replaceChildren();
           accountStatus.textContent=deleting?'Hesap silindi.':'Parola değişti ve açık oturumlar kapatıldı.';
         }catch(error){status.textContent=error.message;submit.disabled=false}
       };
@@ -464,8 +503,8 @@
         accountStatus.textContent=data.accountManagement?'':'Silme ve parola sıfırlama için sunucu güncellemesi bekleniyor.';
         e.querySelector('#da-users-count').textContent=String(data.total??users.length);
         e.querySelector('#da-admins-count').textContent=String(users.filter(u=>u.role==='admin').length);
-        e.querySelector('#da-members-count').textContent=String(users.filter(u=>u.role!=='admin').length);
-        list.replaceChildren();
+        e.querySelector('#da-members-count').textContent=String(users.filter(u=>u.role!=='admin').length);e.querySelector('#da-admin-overview-note').textContent=data.total>users.length?'Rol sayıları ilk '+users.length+' hesaba aittir.':'';
+        list.replaceChildren();detailHost.replaceChildren();
         if(data.isFounder===false&&!users.some(u=>u.isFounder)&&data.total===users.length){const setup=document.createElement('button');setup.type='button';setup.textContent='Kurucu hesabını doğrula';setup.onclick=claimAdmin;list.append(setup)}
         if(!users.length)list.textContent='Henüz kayıtlı hesap yok.';
         for(const u of users){
@@ -507,7 +546,7 @@
               activity.append(info,grid);
             }catch(err){activity.textContent='Günlük kayıtlar alınamadı: '+err.message}
           };
-          details.append(title,meta);const more=document.createElement('details');more.className='da-admin-details';const moreTitle=document.createElement('summary');moreTitle.textContent='Çalışma bilgileri';more.append(moreTitle,summary,historyBtn,activity);details.append(more);
+          details.append(title,meta);
           const select=document.createElement('select');select.setAttribute('aria-label','@'+u.username+' hesabının rolü');
           for(const [v,label] of [['user','Öğrenci'],['admin','Yönetici']]){
             const option=document.createElement('option');option.value=v;option.textContent=label;option.selected=v===u.role;select.append(option);
@@ -517,7 +556,7 @@
             const next=select.value;
             if(!confirm('@'+u.username+' hesabının rolü '+(next==='admin'?'yönetici':'öğrenci')+' olarak değiştirilsin mi? Kullanıcının oturumu kapatılır.')){select.value=u.role;return}
             select.disabled=true;
-            try{await request('/admin/users/role',{method:'PUT',body:JSON.stringify({userId:u.id,role:next})});await load()}
+            try{await request('/admin/users/role',{method:'PUT',body:JSON.stringify({userId:u.id,role:next})});await load();showTab('accounts')}
             catch(error){alert(error.message);select.value=u.role;select.disabled=u.id===auth.user.id}
           };
           const actions=document.createElement('div');actions.className='da-admin-actions';
@@ -532,7 +571,19 @@
               remove.onclick=()=>accountAction(u,'delete');actions.append(remove);
             }
           }
-          const manage=document.createElement('details');manage.className='da-admin-manage';const manageTitle=document.createElement('summary');manageTitle.textContent='Hesap işlemleri';manage.append(manageTitle,actions);item.append(details,manage);list.append(item);
+          const open=document.createElement('button');open.type='button';open.className='da-admin-person';open.setAttribute('aria-label','@'+u.username+' hesabını aç');
+          const face=document.createElement('span');face.className='da-admin-person-avatar';face.textContent=((u.firstName||u.username||'?').slice(0,1)+(u.lastName||'').slice(0,1)).toLocaleUpperCase('tr');
+          const line=document.createElement('div');line.className='da-admin-person-name';const name=document.createElement('strong');name.textContent=[u.firstName,u.lastName].filter(Boolean).join(' ')||u.username;const handle=document.createElement('small');handle.textContent='@'+u.username;line.append(name,handle);
+          const role=document.createElement('span');role.className='da-admin-person-role';role.textContent=u.isFounder?'Kurucu':u.role==='admin'?'Yönetici':'Öğrenci';
+          const arrow=document.createElement('span');arrow.className='da-admin-arrow';arrow.textContent='›';
+          open.append(face,line,role,arrow);item.append(open);list.append(item);
+          open.onclick=()=>{
+            detailHost.replaceChildren();
+            const head=document.createElement('div');head.className='da-admin-detail-head';const avatar=face.cloneNode(true);head.append(avatar,details);
+            const stats=document.createElement('section');stats.className='da-admin-detail-section';const h=document.createElement('h2');h.textContent='Çalışma bilgileri';stats.append(h,summary,historyBtn,activity);
+            const manage=document.createElement('section');manage.className='da-admin-detail-section';const mh=document.createElement('h2');mh.textContent='Hesap işlemleri';manage.append(mh,actions);
+            detailHost.append(head,stats,manage);showTab('detail');
+          };
         }
         filter();
         if(data.total>users.length){const caption=document.createElement('p');caption.textContent='İlk '+users.length+' hesap görüntüleniyor.';list.append(caption)}
