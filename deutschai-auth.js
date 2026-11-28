@@ -78,6 +78,39 @@
   }
   const style=document.createElement('style');
   style.textContent = [
+    'body #da-felcan-float:not(.da-dock-hidden){display:grid!important;place-items:center;left:max(14px,env(safe-area-inset-left));right:auto;bottom:max(16px,env(safe-area-inset-bottom));width:50px;height:50px;padding:0;border-radius:18px;animation:none}',
+    'body #da-felcan-float.da-dock-hidden{display:none!important}',
+    '#da-felcan-float .da-felcan-text{display:none}',
+    'body #da-felcan-float .da-felcan-orb{transform:scale(.56)}',
+    '#da-felcan-float[data-voice="speaking"] .da-felcan-orb,#da-felcan-float[data-voice="connecting"] .da-felcan-orb{animation:none}',
+    'body #da-felcan-float[data-voice="speaking"]{border-color:#e4c4ff;box-shadow:0 0 20px #ac79ee90}',
+    '#da-felcan-welcome,.da-admin-action-dialog{max-width:calc(100vw - 32px);border:1px solid #aa94ed70;border-radius:26px;padding:28px;background:linear-gradient(150deg,#292346,#15182e);color:#f8f5ff;box-shadow:0 26px 80px #080917a8;font:15px/1.5 system-ui}',
+    '#da-felcan-welcome{width:min(390px,calc(100vw - 32px));text-align:center;padding:40px 24px 26px}',
+    '#da-felcan-welcome::backdrop,.da-admin-action-dialog::backdrop{background:#070a1bb0;backdrop-filter:blur(5px)}',
+    'body #da-felcan-welcome .da-felcan-orb{margin:16px auto 30px;transform:scale(1.42)}',
+    '#da-felcan-welcome h2{font-size:30px;margin:0 0 6px;line-height:1.2}',
+    '#da-felcan-welcome .da-welcome-status{color:#ddd1f8;margin:0 0 12px;min-height:22px}',
+    '#da-felcan-welcome .da-welcome-greet,.da-admin-action-dialog button{border:1px solid #c6abff65;background:#654bd0;color:white;border-radius:12px;padding:10px 15px;font:700 14px system-ui;cursor:pointer}',
+    '#da-felcan-welcome .da-welcome-greet{width:100%;min-height:46px}',
+    '#da-felcan-welcome .da-welcome-greet:disabled,.da-admin-action-dialog button:disabled{opacity:.65;cursor:wait}',
+    '#da-felcan-welcome .da-welcome-dismiss{position:absolute;right:14px;top:12px;width:38px;height:38px;border:0;border-radius:12px;background:#ffffff10;color:#f8f5ff;font-size:24px;cursor:pointer}',
+    '#da-felcan-welcome[data-voice="speaking"] .da-toy-smile{animation:da-felcan-mouth .21s linear infinite alternate}',
+    '#da-auth-screen .da-admin-toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:8px}',
+    '#da-auth-screen .da-admin-toolbar label{grid-column:1/-1;margin:0}',
+    '#da-auth-screen .da-admin-toolbar input,.da-admin-action-dialog input{min-width:0;width:100%;padding:10px;border:1px solid #a891db7a;border-radius:10px;background:#101327;color:#fff;font:inherit}',
+    '#da-auth-screen .da-admin-user{align-items:flex-start;background:#222644;border-color:#b3a0ef3f}',
+    '#da-auth-screen .da-admin-user[hidden]{display:none}',
+    '#da-auth-screen .da-admin-actions,.da-admin-action-dialog .da-admin-actions{display:flex;flex-wrap:wrap;gap:7px;align-items:center}',
+    '#da-auth-screen .da-admin-actions{justify-content:flex-end}',
+    '#da-auth-screen .da-admin-actions button{padding:8px 10px;white-space:nowrap}',
+    '#da-auth-screen .da-admin-danger,.da-admin-action-dialog .da-admin-danger{background:#78374b;color:#fff1f5;border-color:#ff9fb16e}',
+    '.da-admin-action-dialog{width:min(440px,calc(100vw - 32px))}',
+    '.da-admin-action-dialog h2{margin:0;font-size:21px}',
+    '.da-admin-action-dialog label{display:grid;gap:6px}',
+    '.da-admin-action-dialog [role="alert"]{color:#ffa8b7}',
+    '@media(max-width:999px){body #da-felcan-float:not(.da-dock-hidden){bottom:calc(86px + env(safe-area-inset-bottom))}}',
+    '@media(max-width:650px){#da-auth-screen .da-admin-user{flex-direction:column}#da-auth-screen .da-admin-actions{justify-content:flex-start}}',
+    '@media(prefers-reduced-motion:reduce){#da-felcan-welcome .da-toy-smile{animation:none!important}}',
     '#da-auth-screen{position:fixed;inset:0;z-index:2147483600;display:grid;place-items:center;padding:18px;background:radial-gradient(circle at 15% 10%,#4e3895,#130d2c 56%,#080b19);color:#f4f1ff;font:15px system-ui}',
     '#da-auth-screen[hidden]{display:none}',
     '#da-auth-screen .da-card{width:min(420px,100%);max-height:95dvh;overflow:auto;padding:26px;border:1px solid #af9cef65;border-radius:25px;background:#251d4cdd;box-shadow:0 20px 65px #0008;backdrop-filter:blur(23px)}',
@@ -125,7 +158,7 @@
     '#da-auth-screen .da-login-secure{margin:20px 0 0!important;text-align:center;font-size:11px!important}',
     '@media(max-width:780px){#da-auth-screen{padding:10px;align-items:flex-start}#da-auth-screen .da-login-shell{grid-template-columns:1fr;min-height:unset;border-radius:23px}#da-auth-screen .da-login-hero{padding:22px 23px 17px;border-right:0;border-bottom:1px solid #e2cbff25}#da-auth-screen .da-login-hero h1{font-size:33px}#da-auth-screen .da-hero-mascot{display:none}#da-auth-screen .da-login-stats{margin:16px 0 0}#da-auth-screen .da-brand-pill{display:none}#da-auth-screen .da-login-card{padding:24px 23px 30px}#da-auth-screen .da-hero-content{padding:20px 0 0}#da-auth-screen .da-login-hero p{font-size:13px}#da-auth-screen .da-login-stats b{font-size:17px}}',
     '@media(max-width:370px){#da-auth-screen .da-name-row{grid-template-columns:1fr}#da-auth-screen .da-login-stats>div{padding:9px 7px}#da-auth-screen .da-login-stats span{font-size:9px}}',
-    '#da-auth-screen .da-admin-card{width:min(850px,100%);max-height:calc(100dvh - 32px);padding:clamp(16px,3vw,30px);background:linear-gradient(130deg,#29234fea,#16182fec);overflow:auto}',
+    '#da-auth-screen .da-admin-card{width:min(1040px,100%);max-height:calc(100dvh - 32px);padding:clamp(16px,3vw,30px);background:#17192f;border-color:#bcaaff45;overflow:auto}',
     '#da-auth-screen .da-admin-top{display:flex;justify-content:space-between;align-items:start;gap:12px}',
     '#da-auth-screen .da-admin-top button{white-space:nowrap}',
     '#da-auth-screen .da-admin-stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:15px 0}',
@@ -154,8 +187,8 @@
     '#da-account-action{position:fixed;top:97px;right:12px;z-index:98;font-size:12px}',
     '#da-felcan-float{position:fixed;right:22px;bottom:24px;z-index:990;display:flex;align-items:center;gap:10px;cursor:pointer;border:1px solid #d9c6ff77;border-radius:24px;padding:7px 16px 7px 8px;background:linear-gradient(135deg,#6550a9b8,#242148e3);color:#fff;backdrop-filter:blur(26px) saturate(150%);box-shadow:0 16px 45px #160d4570,inset 0 1px #ffffff50;font:700 13px system-ui;animation:da-felcan-fly 5s ease-in-out infinite}',
     '#da-felcan-float:hover{border-color:#e2ceff;box-shadow:0 18px 48px #6c43b766;animation-play-state:paused}',
-    '#da-felcan-float .da-felcan-orb{width:44px;height:44px;display:grid;place-items:center;position:relative;overflow:hidden;border:1px solid #fffa;border-radius:17px;background:radial-gradient(circle at 22% 13%,#f0d8ffbb,transparent 55%),linear-gradient(130deg,#a889ef,#5449ac 75%);box-shadow:inset 0 2px 8px #ffffff65,0 0 16px #986ae655;font-size:19px;color:white}',
-    '#da-felcan-float .da-felcan-orb::after{content:"";position:absolute;top:8px;left:7px;right:7px;height:8px;border-radius:100%;background:#ffffff60;filter:blur(4px)}',
+    ':is(#da-felcan-float,#da-felcan-welcome) .da-felcan-orb{width:44px;height:44px;display:grid;place-items:center;position:relative;overflow:hidden;border:1px solid #fffa;border-radius:17px;background:radial-gradient(circle at 22% 13%,#f0d8ffbb,transparent 55%),linear-gradient(130deg,#a889ef,#5449ac 75%);box-shadow:inset 0 2px 8px #ffffff65,0 0 16px #986ae655;font-size:19px;color:white}',
+    ':is(#da-felcan-float,#da-felcan-welcome) .da-felcan-orb::after{content:"";position:absolute;top:8px;left:7px;right:7px;height:8px;border-radius:100%;background:#ffffff60;filter:blur(4px)}',
     '#da-felcan-float .da-felcan-sub{display:block;font-size:10px;font-weight:500;color:#ded5fa;margin-top:2px}',
     '#da-felcan-window{position:fixed;right:20px;bottom:96px;z-index:991;width:min(415px,calc(100vw - 24px));height:min(610px,calc(100dvh - 116px));min-height:320px;overflow:hidden;border:1px solid #e2cfff60;border-radius:26px;background:linear-gradient(150deg,#282348f5,#11152cf8);backdrop-filter:blur(30px);box-shadow:0 25px 90px #09071dbb,inset 0 1px #fff4;display:flex;flex-direction:column;animation:da-felcan-appear .3s ease both}',
     '#da-felcan-window[hidden]{display:none}',
@@ -165,19 +198,19 @@
     '#da-felcan-window .da-felcan-close{border:1px solid #cfbaff66;border-radius:11px;background:#7661b655;color:#fff;font:600 12px system-ui;padding:9px 11px;cursor:pointer}',
     '#da-felcan-window iframe{flex:1;width:100%;min-height:0;border:0;background:transparent}',
     '#da-felcan-window .da-explain{border:1px solid #c5a6ff77;background:#6844b886;color:white;border-radius:11px;padding:8px 9px;cursor:pointer;font:600 11px system-ui}',
-    '#da-felcan-float .da-felcan-orb{width:57px;height:63px;border-radius:46% 46% 40% 40%;overflow:visible;position:relative;background:radial-gradient(circle at 28% 9%,#f5e2ff,#ae8bf0 46%,#6552b4);box-shadow:inset 4px 5px 9px #fff9,inset -5px -7px 15px #482d9466,0 0 18px #9365df88}',
-    '#da-felcan-float .da-felcan-orb::before{content:"";position:absolute;width:18px;height:26px;background:#a485de;top:-10px;left:5px;border-radius:100% 5% 90% 20%;transform:rotate(-20deg);box-shadow:36px 13px 0 -2px #a485de}',
-    '#da-felcan-float .da-felcan-orb::after{display:none}',
-    '#da-felcan-float .da-toy-eyes{position:absolute;top:19px;left:12px;font:900 15px system-ui;white-space:pre;color:#302054;letter-spacing:6px}',
-    '#da-felcan-float .da-toy-smile{position:absolute;top:32px;left:24px;color:#39235c;font-size:18px;line-height:1}',
-    '#da-felcan-float .da-toy-feet{position:absolute;bottom:-6px;left:10px;background:#6645a0;width:14px;height:11px;border-radius:7px;box-shadow:26px 0 #6645a0}',
-    '#da-felcan-float .da-toy-spark{position:absolute;right:-10px;top:1px;color:#ffde8f;font-size:17px;filter:drop-shadow(0 0 6px #cba3ff)}',
+    ':is(#da-felcan-float,#da-felcan-welcome) .da-felcan-orb{width:57px;height:63px;border-radius:46% 46% 40% 40%;overflow:visible;position:relative;background:radial-gradient(circle at 28% 9%,#f5e2ff,#ae8bf0 46%,#6552b4);box-shadow:inset 4px 5px 9px #fff9,inset -5px -7px 15px #482d9466,0 0 18px #9365df88}',
+    ':is(#da-felcan-float,#da-felcan-welcome) .da-felcan-orb::before{content:"";position:absolute;width:18px;height:26px;background:#a485de;top:-10px;left:5px;border-radius:100% 5% 90% 20%;transform:rotate(-20deg);box-shadow:36px 13px 0 -2px #a485de}',
+    ':is(#da-felcan-float,#da-felcan-welcome) .da-felcan-orb::after{display:none}',
+    ':is(#da-felcan-float,#da-felcan-welcome) .da-toy-eyes{position:absolute;top:19px;left:12px;font:900 15px system-ui;white-space:pre;color:#302054;letter-spacing:6px}',
+    ':is(#da-felcan-float,#da-felcan-welcome) .da-toy-smile{position:absolute;top:32px;left:24px;color:#39235c;font-size:18px;line-height:1}',
+    ':is(#da-felcan-float,#da-felcan-welcome) .da-toy-feet{position:absolute;bottom:-6px;left:10px;background:#6645a0;width:14px;height:11px;border-radius:7px;box-shadow:26px 0 #6645a0}',
+    ':is(#da-felcan-float,#da-felcan-welcome) .da-toy-spark{position:absolute;right:-10px;top:1px;color:#ffde8f;font-size:17px;filter:drop-shadow(0 0 6px #cba3ff)}',
     '#da-felcan-window[hidden]{display:none!important}',
 
     '#da-felcan-runtime{position:fixed!important;left:-10px!important;bottom:-10px!important;width:2px!important;height:2px!important;opacity:0!important;overflow:hidden!important;pointer-events:none!important;z-index:-1!important}',
     '#da-felcan-runtime iframe{width:2px;height:2px;border:0;display:block}',
-    '#da-felcan-float .da-felcan-orb{transform-origin:50% 82%;transition:filter .2s,transform .2s}',
-    '#da-felcan-float .da-toy-smile{transform-origin:center 40%;transition:transform .15s}',
+    ':is(#da-felcan-float,#da-felcan-welcome) .da-felcan-orb{transform-origin:50% 82%;transition:filter .2s,transform .2s}',
+    ':is(#da-felcan-float,#da-felcan-welcome) .da-toy-smile{transform-origin:center 40%;transition:transform .15s}',
     '#da-felcan-float[data-voice="connecting"] .da-felcan-orb{animation:da-felcan-thinking .65s ease-in-out infinite alternate}',
     '#da-felcan-float[data-voice="listening"] .da-felcan-orb::before{animation:da-felcan-ears .35s ease-in-out infinite alternate}',
     '#da-felcan-float[data-voice="listening"] .da-felcan-orb{filter:drop-shadow(0 0 7px #bc8cff88)}',
@@ -243,15 +276,60 @@
   }
   async function logout() {
     try {await request('/auth/logout',{method:'POST'});} catch {}
+    if(auth?.user?.id)sessionStorage.removeItem('da:welcomed:'+auth.user.id);
     auth=null;del(authKey);sessionStorage.removeItem('da-hydrated');location.reload();
   }
   function admin() {
+    if(auth?.user.role!=='admin')return;
     const e=overlay();
     e.innerHTML='<div class="da-card da-admin-card"><div class="da-admin-top"><div><h1>Yönetici Paneli</h1><p>DeutschAI hesapları, roller ve Gemini yönetimi</p></div><button type="button" id="da-admin-close">✕ Kapat</button></div>'
       +'<div class="da-admin-stat-grid"><div><b id="da-users-count">—</b><small>Toplam kayıtlı hesap</small></div><div><b id="da-admins-count">—</b><small>Yöneticiler</small></div><div><b id="da-members-count">—</b><small>Öğrenciler</small></div></div>'
-      +'<section class="da-admin-section"><h2>Üyeler ve yetkiler</h2><p>Şifreler güvenlik nedeniyle görüntülenemez; sistemde tek yönlü özet olarak saklanır. Rol değişikliğinde ilgili oturumlar kapatılır.</p><div class="da-admin-users" id="da-admin-users" aria-live="polite">Üyeler yükleniyor…</div><button type="button" id="da-reload-users">Listeyi yenile</button></section>'
+      +'<section class="da-admin-section"><h2>Hesap yönetimi</h2><div class="da-admin-toolbar"><label for="da-user-search">Hesap ara</label><input id="da-user-search" type="search" placeholder="Ad, kullanıcı adı veya e-posta"><button type="button" id="da-reload-users">Yenile</button></div><p id="da-admin-account-status" role="status"></p><div class="da-admin-users" id="da-admin-users" aria-live="polite">Üyeler yükleniyor…</div></section>'
       +'<section class="da-admin-section"><h2>Gemini API anahtarı</h2><p>Ortak anahtarı yalnızca yöneticiler değiştirebilir. Mevcut anahtar tarayıcıya geri gönderilmez.</p><form id="da-admin-form"><label>Yeni Gemini API anahtarı<input name="apiKey" type="password" autocomplete="off" required></label><p class="da-error" role="alert"></p><button type="submit">Anahtarı Kaydet</button></form></section></div>';
     const list=e.querySelector('#da-admin-users');
+    const search=e.querySelector('#da-user-search');
+    const accountStatus=e.querySelector('#da-admin-account-status');
+    const filter=()=>{
+      const query=search.value.trim().toLocaleLowerCase('tr-TR');
+      for(const item of list.querySelectorAll('.da-admin-user'))item.hidden=!item.dataset.search.includes(query);
+    };
+    search.oninput=filter;
+    function accountAction(user,kind){
+      const deleting=kind==='delete';
+      const dialog=document.createElement('dialog');dialog.className='da-admin-action-dialog';
+      dialog.innerHTML='<form><h2></h2><p></p><label><span></span><input required></label><p role="alert"></p><div class="da-admin-actions"><button type="button">Vazgeç</button><button type="submit"></button></div></form>';
+      const form=dialog.querySelector('form');
+      const input=form.querySelector('input');
+      const status=form.querySelector('[role="alert"]');
+      const submit=form.querySelector('[type="submit"]');
+      form.querySelector('h2').textContent=deleting?'@'+user.username+' hesabını sil':'@'+user.username+' için yeni parola';
+      form.querySelector('h2').id='da-admin-action-title';
+      dialog.setAttribute('aria-labelledby','da-admin-action-title');
+      form.querySelector('p').textContent=deleting?'Hesap, ilerleme ve çalışma geçmişi kalıcı olarak silinir.':'Yeni parola belirlenir ve açık oturumlar kapanır.';
+      form.querySelector('label span').textContent=deleting?'Onaylamak için @ işareti olmadan '+user.username+' yaz':'Yeni parola (10–128 karakter)';
+      input.type=deleting?'text':'password';
+      input.autocomplete=deleting?'off':'new-password';
+      if(!deleting){input.minLength=10;input.maxLength=128}
+      submit.textContent=deleting?'Hesabı kalıcı sil':'Parolayı kaydet';
+      if(deleting)submit.className='da-admin-danger';
+      form.querySelector('[type="button"]').onclick=()=>dialog.close();
+      dialog.addEventListener('close',()=>dialog.remove(),{once:true});
+      form.onsubmit=async event=>{
+        event.preventDefault();
+        if(deleting&&input.value!==user.username){status.textContent='Kullanıcı adı eşleşmiyor.';return}
+        submit.disabled=true;
+        status.textContent='';
+        try{
+          const payload=deleting?{userId:user.id,confirmUsername:input.value}:{userId:user.id,password:input.value};
+          await request(deleting?'/admin/users':'/admin/users/password',{method:deleting?'DELETE':'PUT',body:JSON.stringify(payload)});
+          dialog.close();
+          await load();
+          accountStatus.textContent=deleting?'Hesap silindi.':'Parola değişti ve açık oturumlar kapatıldı.';
+        }catch(error){status.textContent=error.message;submit.disabled=false}
+      };
+      document.body.append(dialog);
+      dialog.showModal();
+    }
     const minutes=seconds=>{const n=Math.max(0,Number(seconds)||0);return Math.floor(n/3600)+' sa '+Math.floor(n%3600/60)+' dk'};
 
     e.querySelector('#da-admin-close').onclick=()=>e.hidden=true;
@@ -260,6 +338,7 @@
       try{
         const data=await request('/admin/users');
         const users=Array.isArray(data.users)?data.users:[];
+        accountStatus.textContent=data.accountManagement?'':'Silme ve parola sıfırlama için sunucu güncellemesi bekleniyor.';
         e.querySelector('#da-users-count').textContent=String(data.total??users.length);
         e.querySelector('#da-admins-count').textContent=String(users.filter(u=>u.role==='admin').length);
         e.querySelector('#da-members-count').textContent=String(users.filter(u=>u.role!=='admin').length);
@@ -267,6 +346,7 @@
         if(!users.length)list.textContent='Henüz kayıtlı hesap yok.';
         for(const u of users){
           const item=document.createElement('article');item.className='da-admin-user';
+          item.dataset.search=[u.firstName,u.lastName,u.username,u.email,u.id].join(' ').toLocaleLowerCase('tr-TR');
           const details=document.createElement('div');details.className='da-admin-user-info';
           const title=document.createElement('strong');title.textContent=(u.firstName||'')+' '+(u.lastName||'')+' · @'+u.username;
           const meta=document.createElement('small');meta.textContent=(u.email||'')+' · '+(u.createdAt?new Date(u.createdAt*1000).toLocaleDateString('tr-TR'):'Tarih yok');
@@ -316,8 +396,21 @@
             try{await request('/admin/users/role',{method:'PUT',body:JSON.stringify({userId:u.id,role:next})});await load()}
             catch(error){alert(error.message);select.value=u.role;select.disabled=u.id===auth.user.id}
           };
-          item.append(details,select);list.append(item);
+          const actions=document.createElement('div');actions.className='da-admin-actions';
+          actions.append(select);
+          if(data.accountManagement){
+            if(u.role==='user'){
+              const reset=document.createElement('button');reset.type='button';reset.textContent='Parolayı sıfırla';
+              reset.onclick=()=>accountAction(u,'password');actions.append(reset);
+            }
+            if(u.id!==auth.user.id){
+              const remove=document.createElement('button');remove.type='button';remove.textContent='Hesabı sil';remove.className='da-admin-danger';
+              remove.onclick=()=>accountAction(u,'delete');actions.append(remove);
+            }
+          }
+          item.append(details,actions);list.append(item);
         }
+        filter();
         if(data.total>users.length){const caption=document.createElement('p');caption.textContent='İlk '+users.length+' hesap görüntüleniyor.';list.append(caption)}
       }catch(error){list.textContent='Liste alınamadı: '+error.message+' — Backend güncellemesinin yayımlandığından emin ol.'}
     };
@@ -361,28 +454,40 @@
   // Felcan speaks as a small animated character; a same-origin, visually-hidden
   // iframe keeps the Live connection alive while the learner navigates lessons.
   let lastFelcanContext='', felcanReady=false, felcanRequested=false, felcanState='idle';
-  let felcanFocusedQuestion=-1;
-  function felcanScreenContext(){
-    const root=document.getElementById('view');if(!root)return null;
-    const title=root.querySelector('.top h1')?.textContent?.trim()||'DeutschAI';
-    const nodes=[...root.querySelectorAll('.question, #da-personal-practice .da-question')];
-    const questions=nodes.slice(0,40).map((node,i)=>{
-      const prompt=node.querySelector('p b, b')?.textContent?.trim()||'';
-      const passage=node.querySelector('.study-prompt')?.textContent?.trim()||'';
-      const options=[...node.querySelectorAll('.option, .da-opts button')].map(x=>x.textContent.trim()).slice(0,8);
-      const feedback=node.querySelector('.feedback, .da-feedback')?.textContent?.trim()||'';
-      return {number:i+1,prompt:prompt.slice(0,280),passage:passage.slice(0,380),options,answered:node.dataset.done==='1',feedback:feedback.slice(0,220)};
+  let felcanFocusedQuestion=null;
+  const felcanQuestionSelector='.question, .da-question, .adaptive-question, .placement-question';
+  function felcanScreenContext(questionNumber){
+    const root=document.getElementById('view');
+    if(!root)return null;
+    const practiceItems=window.deutschaiPracticeItems?.();
+    const practiceRoot=practiceItems?root.querySelector('#questions'):null;
+    const nodes=[...(practiceRoot||root).querySelectorAll(felcanQuestionSelector)].filter(node=>node.getClientRects().length);
+    const total=practiceRoot?practiceItems.length:nodes.length;
+    const height=window.innerHeight;
+    const visible=nodes.map((node,index)=>({number:index+1,rect:node.getBoundingClientRect()}))
+      .filter(({rect})=>rect.bottom>0&&rect.top<height);
+    const chosen=nodes.indexOf(felcanFocusedQuestion)+1;
+    const selected=visible.some(item=>item.number===chosen)?chosen:0;
+    const centered=visible.find(({rect})=>rect.top<=height/2&&rect.bottom>=height/2)?.number||visible[0]?.number||0;
+    const requested=Number.isInteger(questionNumber)&&questionNumber>0?questionNumber:0;
+    const numbers=requested?(requested<=total?[requested]:[]):[...new Set([selected,centered,...visible.slice(0,6).map(item=>item.number)].filter(Boolean))];
+    if(!requested&&!numbers.length&&total===1)numbers.push(1);
+    const questions=numbers.map(number=>{
+      const node=nodes[number-1];
+      const placement=node?.classList.contains('placement-question')?node.closest('.placement-card'):null;
+      const saved=practiceRoot?practiceItems[number-1]:null;
+      const prompt=saved?.prompt|| (placement?node.textContent.trim():'')||node?.querySelector('p b, b, legend, .da-question-title, .placement-prompt')?.textContent?.trim()||'';
+      const passage=saved?.passage||(placement||node)?.querySelector('.study-prompt, .adaptive-question > .muted, .placement-passage')?.textContent?.trim()||'';
+      const options=saved?.options||[...((placement||node)?.querySelectorAll('.option, .da-opts button, .adaptive-option, .placement-option, label:has(input[type="radio"])')||[])].map(option=>option.textContent.trim());
+      return {number,prompt,passage,options,feedback:node?.querySelector('.feedback, .da-feedback, .adaptive-feedback')?.textContent?.trim()||''};
     });
-    const focused=nodes.findIndex(node=>node.contains(document.activeElement));
-    const selected=focused>=0?focused+1:felcanFocusedQuestion>0&&felcanFocusedQuestion<=questions.length?felcanFocusedQuestion:0;
     return {
-      title,page:document.querySelector('#nav [aria-current="page"]')?.dataset.page||'home',
-      level:(document.querySelector('.study-next .badge')?.textContent||'').slice(0,20),
-      selectedQuestion:selected,
-      questionCount:nodes.length,
-      questions,
-      grammar:root.querySelector('details[open]')?.textContent?.slice(0,1100)||'',
-      lesson:root.querySelector('.classroom-lead')?.textContent?.slice(0,350)||''
+      title:root.querySelector('.top h1, h1, .placement-card h2')?.textContent?.trim()||'DeutschAI',
+      page:document.querySelector('#nav [aria-current="page"]')?.dataset.page||'home',
+      selectedQuestion:selected,centeredQuestion:centered,visibleQuestions:visible.map(item=>item.number),
+      questionCount:total,questions,
+      grammar:root.querySelector('details[open]')?.textContent?.trim().slice(0,1800)||'',
+      lesson:root.querySelector('.classroom-lead, .placement-card')?.textContent?.trim().slice(0,800)||''
     };
   }
   function felcanFrame(){
@@ -399,6 +504,14 @@
   }
   function felcanVisual(state,message){
     felcanState=state;
+    const dialog=document.getElementById('da-felcan-welcome');
+    if(dialog){
+      dialog.dataset.voice=state;
+      const greet=dialog.querySelector('.da-welcome-greet');
+      greet.disabled=['connecting','speaking'].includes(state);
+      greet.textContent=state==='audio-blocked'?'Sesi aç':state==='error'||state==='listening'?'Tekrar dene':'Felcan’a selam ver';
+      dialog.querySelector('.da-welcome-status').textContent=message||'';
+    }
     const mobile=document.querySelector('#nav [data-page="live"]');
     if(mobile){
       mobile.dataset.voice=state;
@@ -426,9 +539,11 @@
     iframe.allow='microphone; autoplay';
     iframe.tabIndex=-1;
     iframe.setAttribute('aria-hidden','true');
-    iframe.src='./felkan.html?compact=1&v=gemini-voice-only-1';
+    iframe.src='./felkan.html?compact=1&v=welcome-admin-1';
     iframe.addEventListener('load',()=>{
       felcanReady=true;
+      const greet=document.querySelector('#da-felcan-welcome .da-welcome-greet');
+      if(greet)greet.disabled=false;
       sendFelcanContext(true);
       if(felcanRequested){
         felcanRequested=false;
@@ -466,18 +581,35 @@
     window.addEventListener('blur',ping);
   }
   function felcanWelcome(){
-    if(!auth?.user||felcanState!=='idle')return;
-    felcanVisual('connecting','Felcan bağlanıyor…');
-    if(felcanReady)startFelcanVoice();
-    else felcanRequested=true;
-  }
-  function unlockFelcanOnInteraction(event){
-    if(!event.isTrusted||!felcanReady)return;
-    const voice=felcanFrame()?.contentWindow?.FelcanVoiceControl;
-    if(!voice?.unlockAudio)return;
-    voice.unlockAudio();
-    document.removeEventListener('pointerup',unlockFelcanOnInteraction,true);
-    document.removeEventListener('keydown',unlockFelcanOnInteraction,true);
+    if(!auth?.user||felcanState!=='idle'||sessionStorage.getItem('da:welcomed:'+auth.user.id))return;
+    const welcomeKey='da:welcomed:'+auth.user.id;
+    const dialog=document.createElement('dialog');
+    dialog.id='da-felcan-welcome';
+    dialog.setAttribute('aria-labelledby','da-felcan-welcome-title');
+    dialog.innerHTML='<button class="da-welcome-dismiss" type="button" aria-label="Felcan’ı küçült">×</button><h2 id="da-felcan-welcome-title">Felcan</h2><p class="da-welcome-status" role="status"></p><button class="da-welcome-greet" type="button">Felcan’a selam ver</button>';
+    const dock=document.getElementById('da-felcan-float');
+    const avatar=dock.querySelector('.da-felcan-orb').cloneNode(true);
+    dialog.prepend(avatar);
+    const greet=dialog.querySelector('.da-welcome-greet');
+    greet.disabled=!felcanReady;
+    greet.onclick=()=>{
+      try{
+        const voice=felcanFrame()?.contentWindow?.FelcanVoiceControl;
+        if(!voice?.greet)throw Error('Felcan hazırlanıyor. Biraz sonra tekrar dene.');
+        voice.greet();
+      }catch(error){felcanVisual('error',error.message)}
+    };
+    dialog.querySelector('.da-welcome-dismiss').onclick=()=>dialog.close();
+    dialog.addEventListener('close',()=>{
+      sessionStorage.setItem(welcomeKey,'1');
+      dialog.remove();
+      dock.classList.remove('da-dock-hidden');
+      dock.focus({preventScroll:true});
+    },{once:true});
+    document.body.append(dialog);
+    dock.classList.add('da-dock-hidden');
+    dialog.showModal();
+    greet.focus();
   }
 
   function floatingFelcan(){
@@ -489,22 +621,26 @@
     button.setAttribute('aria-pressed','false');
     button.innerHTML='<span class="da-felcan-orb" aria-hidden="true"><span class="da-toy-eyes">● ●</span><span class="da-toy-smile">ᴗ</span><span class="da-toy-feet"></span><span class="da-toy-spark">✦</span></span><span class="da-felcan-text">Felcan<span class="da-felcan-sub">Konuşmak için dokun</span></span>';
     button.onclick=startFelcanVoice;
-    document.getElementById('view')?.addEventListener('click',e=>{const q=e.target.closest('.question, #da-personal-practice .da-question');if(!q)return;felcanFocusedQuestion=[...document.querySelectorAll('#view .question, #view #da-personal-practice .da-question')].indexOf(q)+1;sendFelcanContext(true)},true);
+    document.getElementById('view')?.addEventListener('click',event=>{
+      const question=event.target.closest(felcanQuestionSelector);
+      if(question)felcanFocusedQuestion=question;
+    },true);
     document.body.append(button);
     ensureFelcanRuntime();
-    document.addEventListener('pointerup',unlockFelcanOnInteraction,true);
-    document.addEventListener('keydown',unlockFelcanOnInteraction,true);
     if(document.getElementById('deutschai-intro')){
       document.addEventListener('deutschai:intro-finished',()=>{
         if(button.isConnected)felcanWelcome();
       },{once:true});
     }else felcanWelcome();
-    setInterval(()=>{if(felcanReady)sendFelcanContext()},1400);
   }
   window.deutschaiStore=store;
-  window.DeutschAI={api:request,store,get user(){return auth?.user||null;},get ready(){return !!origin && !!auth;},logout,showAdmin:admin,openFelkan:felkan};
+  window.DeutschAI={api:request,store,get user(){return auth?.user||null;},get ready(){return !!origin && !!auth;},logout,showAdmin:admin,openFelkan:felkan,getStudyContext:number=>auth?felcanScreenContext(number):null};
   window.addEventListener('message',event=>{
     if(event.origin!==location.origin)return;
+    if(event.data?.type==='deutschai:greeting-played' && event.source===felcanFrame()?.contentWindow){
+      document.getElementById('da-felcan-welcome')?.close();
+      return;
+    }
     if(event.data?.type==='deutschai:voice-state' && event.source===felcanFrame()?.contentWindow){
       felcanVisual(event.data.state||'idle',String(event.data.message||'').slice(0,90));
       return;
