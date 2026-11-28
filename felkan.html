@@ -4,7 +4,7 @@
 <script>if(new URLSearchParams(location.search).get('compact')==='1')document.documentElement.classList.add('compact-felcan');</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Edit · DeutschAI Almanca Öğretmeni</title><script src="./api-config.js"></script><script src="./felkan-bridge.js?v=remember-username-1"></script>
+<title>Edit · DilAtölyesi Almanca Öğretmeni</title><script src="./api-config.js"></script><script src="./felkan-bridge.js?v=remember-username-1"></script>
 <style>
 :root{--card:#1b1338;--opt:#130d2b;--txt:#e8eaf0;--mut:#9aa3b5;--blue:#4c8dff;--pad:56px}
 *{box-sizing:border-box}
@@ -211,7 +211,7 @@ textarea.wr{width:100%;min-height:240px;background:#0f0a26;border:1px solid #333
 #debug{position:fixed;z-index:90;top:52px;right:10px;width:min(480px,92vw);max-height:60vh;overflow:auto;display:none;background:rgba(5,10,25,.95);border:1px solid #2c3f73;border-radius:12px;padding:10px;font:12px/1.5 Consolas,monospace;color:#a9c1ff;white-space:pre-wrap}
 #debug.open{display:block}
 
-/* DeutschAI Liquid Glass · Edit voice experience */
+/* DilAtölyesi Liquid Glass · Edit voice experience */
 :root{
  --card:rgba(26,31,65,.76);
  --opt:rgba(44,42,86,.5);
@@ -376,7 +376,7 @@ body::after{
 }
 
 
-/* Compact companion, embedded in the DeutschAI floating glass window */
+/* Compact companion, embedded in the DilAtölyesi floating glass window */
 html.compact-felcan,html.compact-felcan body{
  width:100%;height:100%;min-height:0;overflow:hidden;background:transparent;
 }
@@ -450,7 +450,7 @@ html.compact-felcan #startBtn{bottom:24px}
 
 <div class="modal" id="settings"><div class="mbox">
   <h2>Ayarlar</h2>
-  <input type="hidden" id="sKey"><div class="hint">Gemini anahtarı yalnızca DeutschAI yöneticisi tarafından güvenli sunucuda tanımlanır.</div>
+  <input type="hidden" id="sKey"><div class="hint">Gemini anahtarı yalnızca DilAtölyesi yöneticisi tarafından güvenli sunucuda tanımlanır.</div>
   <label>Adın</label><input type="text" id="sName">
   <label>Model</label>
   <input type="text" id="sModel" list="models">
@@ -673,7 +673,7 @@ function ulSample(k,n){let l=UL[k].slice();if(n&&n<l.length){for(let i=l.length-
 
 const rpScFields={type:'OBJECT',properties:{id:{type:'STRING'},emo:{type:'STRING',description:'1-3 emoji sahne görseli'},title:{type:'STRING',description:'Türkçe kısa başlık'},place:{type:'STRING',description:'Mekan (Almanca ad + isteğe bağlı Türkçe)'},situation_tr:{type:'STRING'},npc_name:{type:'STRING'},npc_role:{type:'STRING'},user_role:{type:'STRING',description:'Kullanıcının rolü (Türkçe)'},goal_tr:{type:'STRING'},phrases:{type:'ARRAY',items:{type:'STRING'},description:'4-6 faydalı Almanca kalıp'}}};
 const DECLS=[
- {name:'read_current_study',description:'Açık DeutschAI sayfasını o anda okur. Belirli bir soru numarası söylendiyse number ver; ekran dışındaki sorular da bulunur. Bu soru gibi bir ifadede numara vermeden çağır.',parameters:{type:'OBJECT',properties:{number:{type:'INTEGER'}}}},
+ {name:'read_current_study',description:'Açık DilAtölyesi sayfasını o anda okur. Belirli bir soru numarası söylendiyse number ver; ekran dışındaki sorular da bulunur. Bu soru gibi bir ifadede numara vermeden çağır.',parameters:{type:'OBJECT',properties:{number:{type:'INTEGER'}}}},
  {name:'set_layout',description:'Edit amblemini ekranda istenen konuma taşır. center seçilirse tüm paneller kapanır ve amblem ortada büyür.',
   parameters:{type:'OBJECT',properties:{avatar_position:POSPROP},required:['avatar_position']}},
  {name:'show_quiz',description:'Çoktan seçmeli test paneli açar. Okuma metni sorularında passage kullan. Soruları sen sıfırdan üret.',
@@ -690,8 +690,8 @@ const DECLS=[
   parameters:common({title:{type:'STRING'},task_tr:{type:'STRING'},useful_phrases:{type:'ARRAY',items:{type:'STRING'}},min_words:{type:'INTEGER'}},['title','task_tr'])},
  {name:'show_text',description:'Serbest metin paneli açar (açıklama, düzeltme, özet, okuma metni vb.). Diğer türlere uymayan her şey için kullan.',
   parameters:common({title:{type:'STRING'},body:{type:'STRING'}},['title','body'])},
- {name:'open_app_section',description:'Kullanıcının onayıyla DeutschAI uygulamasının gerçek gramer, kelime, ders, pratik veya ilerleme sayfasını açar.',parameters:{type:'OBJECT',properties:{page:{type:'STRING',enum:['home','lessons','grammar','words','practice','writing','exam','placement','progress']}},required:['page']}},
- {name:'generate_app_questions',description:'DeutschAI gerçek öğrenme uygulamasında istenen bölümün sayfasını açıp Gemini ile yeni sorular hazırlar. Dersler, seviye tespiti, kelimeler, gramer, pratik, deneme sınavı, yazma ve ilerleme bölümlerini destekler. Kullanıcı bölümün içindeki mevcut soruları yenilemeni ya da test oluşturmanı istediğinde bunu çağır.',parameters:{type:'OBJECT',properties:{page:{type:'STRING',enum:['lessons','placement','words','grammar','practice','exam','writing','progress']}},required:['page']}},
+ {name:'open_app_section',description:'Kullanıcının onayıyla DilAtölyesi uygulamasının gerçek gramer, kelime, ders, pratik veya ilerleme sayfasını açar.',parameters:{type:'OBJECT',properties:{page:{type:'STRING',enum:['home','lessons','grammar','words','practice','writing','exam','placement','progress']}},required:['page']}},
+ {name:'generate_app_questions',description:'DilAtölyesi gerçek öğrenme uygulamasında istenen bölümün sayfasını açıp Gemini ile yeni sorular hazırlar. Dersler, seviye tespiti, kelimeler, gramer, pratik, deneme sınavı, yazma ve ilerleme bölümlerini destekler. Kullanıcı bölümün içindeki mevcut soruları yenilemeni ya da test oluşturmanı istediğinde bunu çağır.',parameters:{type:'OBJECT',properties:{page:{type:'STRING',enum:['lessons','placement','words','grammar','practice','exam','writing','progress']}},required:['page']}},
  {name:'show_schedule',description:'Bugünün ders programı panelini açar (varsayılan: sol).',parameters:common({})},
  {name:'show_progress',description:'İlerleme durumu panelini açar: seviye, bugünkü ders sayısı, günlük hedef, çalışma süresi, değerlendirmeler (varsayılan: sağ).',parameters:common({})},
  {name:'update_progress',description:'Seviye, günlük hedef, çalışılan süre veya değerlendirme notunu günceller ve kalıcı kaydeder. Panel açık olmasa da çalışır.',
@@ -751,14 +751,14 @@ const DECLS=[
  {name:'close_panel',description:'Bir paneli veya hepsini kapatır. Hiç panel kalmazsa amblem ortaya döner.',
   parameters:{type:'OBJECT',properties:{slot:{type:'STRING',enum:['left','center','right','all'],description:'Kapatılacak panel; verilmezse hepsi'}}}}
 ];
-function systemPrompt(){return `Sen Edit'sin: ${cfg.name} için DeutschAI genel Almanca öğretmeni ve sesli asistansın. Goethe sınavı sadece kullanıcı istediğinde özel bir çalışma modudur. DEUTSCHAI DERS DURUMU: ${JSON.stringify(window.FelkanBridge?.appContext()||{})}
+function systemPrompt(){return `Sen Edit'sin: ${cfg.name} için DilAtölyesi genel Almanca öğretmeni ve sesli asistansın. Goethe sınavı sadece kullanıcı istediğinde özel bir çalışma modudur. DİLATÖLYESİ DERS DURUMU: ${JSON.stringify(window.FelkanBridge?.appContext()||{})}
 MEVCUT DURUM (uygulama verisi): ${JSON.stringify(stateSummary())}
 GENEL KURALLAR:
 - Türkçe konuş, Almanca örnekler ver. Cevapların sesli okunur: kısa, sıcak ve doğal ol (genelde 1-3 cümle).
-- Kullanıcının seviyesini, yanlışlarını ve günün çalışma planını göz önünde bulundur. "Bugün gramer çalışman var, açayım mı?" diye sor; kullanıcı kabul ettiğinde open_app_section fonksiyonuyla gerçek DeutschAI sayfasını aç. Zorlandığı konulardan kişiye özel kelimeler, gramer örnekleri ve sorular hazırla. Goethe odaklı çalışma yalnızca kullanıcı isterse yapılsın.
+- Kullanıcının seviyesini, yanlışlarını ve günün çalışma planını göz önünde bulundur. "Bugün gramer çalışman var, açayım mı?" diye sor; kullanıcı kabul ettiğinde open_app_section fonksiyonuyla gerçek DilAtölyesi sayfasını aç. Zorlandığı konulardan kişiye özel kelimeler, gramer örnekleri ve sorular hazırla. Goethe odaklı çalışma yalnızca kullanıcı isterse yapılsın.
 - SES VE ÜSLUP: İstanbul Türkçesiyle, gündelik, akıcı ve enerjik konuş. Rahat bir öğretmen gibi kısa cümleler kur, doğal vurgu ve orta tempo kullan. Yazı dilinden, uzun girişlerden ve uzatılmış ünlemlerden kaçın. Almanca örnekleri Almanca telaffuz et. Örneğin: “Hadi şıklara birlikte bakalım. Burada fiil nerede duruyor?”
 - TÜM BÖLÜMLER: Ana menüde Dersler, Seviye Tespiti, Kelimeler, Gramer, Pratik, Deneme Sınavı, Yazma & Konuşma ve İlerleme gerçek sayfaları var. Kullanıcı yalnızca sayfayı aç derse open_app_section, o sayfada Gemini soruları hazırlamanı/yenilemeni isterse generate_app_questions çağır. Kendi iframe içindeki show_* panelini gerçek uygulama yerine kullanma.
-- ANA UYGULAMA: Gerçek DeutschAI sayfalarını açman istendiğinde kendi show_grammar, show_quiz gibi araçların yerine open_app_section kullan. Özellikle "grameri aç", "dersleri aç", "sorulara geç" dendiğinde gerçek ana site sayfasını aç. İşlem başarısızsa açıldı deme.
+- ANA UYGULAMA: Gerçek DilAtölyesi sayfalarını açman istendiğinde kendi show_grammar, show_quiz gibi araçların yerine open_app_section kullan. Özellikle "grameri aç", "dersleri aç", "sorulara geç" dendiğinde gerçek ana site sayfasını aç. İşlem başarısızsa açıldı deme.
 - EKRAN VE SORULAR: Bir soru veya açık ders hakkında konuşmadan önce read_current_study çağır. “5. soru” için number:5 ver; görünür olmasına gerek yok. “Bu soru” için araçtan gelen seçili soruyu, yoksa ekran ortasındaki soruyu kullan. Hangi soru olduğu belirsizse numarasını sor. Soru metni ve şıklarla kısa, somut ipucu ver. Resmî sınav modunda sınav kuralları geçerlidir.
 - Ekranı sen yönetirsin. Ekranla ilgili HER isteği ilgili fonksiyonu çağırarak yap; fonksiyonu çağırmadan "açtım" deme. Fonksiyon success:true dönerse bir cümleyle onayla (örn. "Tamam, sola geçtim, testi açtım"). success:false dönerse nedenini söyle ve bir kez daha dene.
 - PANELLER: Ekranda sol, orta ve sağ olmak üzere en fazla 3 panel AYNI ANDA açık olabilir. Her show_* fonksiyonunda slot ile yerini seç (left/center/right). Slot verilmezse ders programı solda, ilerleme sağda, diğer her şey ortada açılır. Kullanıcı "sola test koy" derse slot=left ver. Dolu bir slota yeni panel açarsan eskisi yerine geçer. Diğer panelleri kapatma, sadece istenirse kapat (close_panel, slot veya all).
@@ -850,7 +850,7 @@ function describeFelcanScreen(context){
    return line.slice(0,650);
  });
  const header=[
-   'Gerçek DeutschAI sayfası: '+String(context.title||context.page||''),
+   'Gerçek DilAtölyesi sayfası: '+String(context.title||context.page||''),
    'Sayfa kodu: '+String(context.page||''),
    'Sayfada '+(context.questionCount||questions.length)+' soru var.',
    context.selectedQuestion?'Öğrencinin seçtiği soru: '+context.selectedQuestion+'. soru':'',
@@ -882,7 +882,7 @@ window.addEventListener('message',event=>{
     const explain=event.data.type==='deutschai:explain';
     if(explain)felcanPendingExplain=true;
     if(S.setupDone&&S.ws?.readyState===1&&(!felcanGreetingPending||explain)){
-      notify('[Uygulama] Kullanıcının şu an gördüğü DeutschAI ekranı:\n'+describeFelcanScreen(felcanScreen)+(explain?'\nKullanıcı bu soruyu anlamadığını söylüyor. Türkçe ve basitçe kuralı anlat; doğru şıkkı hemen söylemeden ipucu ver.':'\nKullanıcı sorarsa bu bilgileri kullan.'));
+      notify('[Uygulama] Kullanıcının şu an gördüğü DilAtölyesi ekranı:\n'+describeFelcanScreen(felcanScreen)+(explain?'\nKullanıcı bu soruyu anlamadığını söylüyor. Türkçe ve basitçe kuralı anlat; doğru şıkkı hemen söylemeden ipucu ver.':'\nKullanıcı sorarsa bu bilgileri kullan.'));
       if(explain)felcanPendingExplain=false;
     }else if(explain){
       setStatus('idle','Açıklamak için konuşmayı başlat');
@@ -976,7 +976,7 @@ async function onMsg(ev,model){
     $('#welcomeTitle').textContent='Hoş geldin, '+cfg.name+'.';
     if(!S.greeted){
       if(!DATA.plan)makePlan({});
-      const ctx='Merhaba! Sen Edit, bu öğrencinin kişisel Almanca öğretmenisin. ŞİMDİ, herhangi bir soru veya ses beklemeden Türkçe olarak yüksek sesle kısa bir selam ver; öğrenciye ismiyle '+cfg.name+' diye hitap et. Bugün kaldığı yerden çalışmaya devam etmeyi öner. En fazla 2-3 cümle söyle. Bu metni tekrar etme, doğal bir selamlama oluştur. '+resumeContext()+(felcanScreen?' Ekrandaki mevcut DeutschAI çalışma bağlamı: '+describeFelcanScreen(felcanScreen):'');
+      const ctx='Merhaba! Sen Edit, bu öğrencinin kişisel Almanca öğretmenisin. ŞİMDİ, herhangi bir soru veya ses beklemeden Türkçe olarak yüksek sesle kısa bir selam ver; öğrenciye ismiyle '+cfg.name+' diye hitap et. Bugün kaldığı yerden çalışmaya devam etmeyi öner. En fazla 2-3 cümle söyle. Bu metni tekrar etme, doğal bir selamlama oluştur. '+resumeContext()+(felcanScreen?' Ekrandaki mevcut DilAtölyesi çalışma bağlamı: '+describeFelcanScreen(felcanScreen):'');
       felcanPendingExplain=false;
       if(requestSpokenGreeting(ctx,model)){
         S.greeted=true;
@@ -1043,12 +1043,12 @@ async function runTool(name,a){
   if(name==='read_current_study'){
     const number=Number(a.number)||undefined;
     const context=window.parent!==window?window.parent.DeutschAI?.getStudyContext(number):null;
-    if(!context)return {success:false,error:'Açık DeutschAI çalışma sayfasına erişilemedi.'};
+    if(!context)return {success:false,error:'Açık DilAtölyesi çalışma sayfasına erişilemedi.'};
     if(number&&!context.questions.length)return {success:false,error:'Bu bölümde '+number+'. soru yok.',questionCount:context.questionCount};
     return {success:true,...context};
   }
   if(name==='open_app_section')return {success:window.FelkanBridge.navigate(a.page),page:a.page};
-  if(name==='generate_app_questions')return {success:window.FelkanBridge.generate(a.page),page:a.page,message:'Yeni Gemini çalışması gerçek DeutschAI sayfasında hazırlanıyor'};
+  if(name==='generate_app_questions')return {success:window.FelkanBridge.generate(a.page),page:a.page,message:'Yeni Gemini çalışması gerçek DilAtölyesi sayfasında hazırlanıyor'};
   if(name==='set_layout'){const p=POS.includes(a.avatar_position)?a.avatar_position:'center';let closed=false;
     if(p==='center'&&anyOpen()){closeAll();closed=true}setPos(p);return {success:true,avatar_position:S.pos,panels_closed:closed}}
   if(name==='close_panel'){if(SLOTS.includes(a.slot))closeSlot(a.slot);else{closeAll();setPos('center')}
@@ -2127,7 +2127,7 @@ $('#cmdSend').onclick=sendCmd;$('#cmdInput').addEventListener('keydown',e=>{if(e
 $('#bDebug').onclick=()=>{const d=$('#debug');d.classList.toggle('open');if(d.classList.contains('open')){d.textContent=LOGS.slice(-60).join('\n')||'(henüz kayıt yok)'}};
 
 $('#welcomeTitle').textContent='Hoş geldin, '+cfg.name+'.';
-if(!window.FelkanBridge?.user)setTimeout(()=>setStatus('error','DeutschAI hesabınla giriş yapmalısın'),400);
+if(!window.FelkanBridge?.user)setTimeout(()=>setStatus('error','DilAtölyesi hesabınla giriş yapmalısın'),400);
 window.felkanDebug={GE,GM,RP,rpAdd,resumeContext,makePlan,S,cfg,DATA:()=>DATA,PT,log,setPos,runTool,closeAll,ptShowResult,ptStats};
 })();
 </script>

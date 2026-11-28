@@ -1,4 +1,4 @@
-/* DeutschAI account UI and local-first, account-scoped cloud state. */
+/* DilAtölyesi account UI and local-first, account-scoped cloud state. */
 (() => {
   'use strict';
   const origin = String(window.DEUTSCHAI_API_URL || '').replace(/\/$/, '');
@@ -48,7 +48,7 @@
     try {
       await request('/state', {method:'PUT',body:JSON.stringify({bucket:bucket(key),data:{raw}})});
     } catch (error) {
-      console.warn('DeutschAI bulut kayıt hatası:',key,error);
+      console.warn('DilAtölyesi bulut kayıt hatası:',key,error);
     }
   }
   const store = {
@@ -248,16 +248,16 @@
   function show(mode='login',message='') {
     const screen=overlay();
     if (!origin) {
-      screen.innerHTML='<div class="da-card"><h1>DeutschAI</h1><p>Hesap sunucusu henüz yapılandırılmadı.</p></div>';
+      screen.innerHTML='<div class="da-card"><h1>DilAtölyesi</h1><p>Hesap sunucusu henüz yapılandırılmadı.</p></div>';
       return;
     }
     screen.innerHTML='<div class="da-login-shell">'
-      +'<section class="da-login-hero"><div class="da-login-brand"><span class="da-brand-mark">✦</span><strong>DeutschAI</strong><span class="da-brand-pill">ALMANCA ÖĞRENMENİN YENİ YOLU</span></div>'
+      +'<section class="da-login-hero"><div class="da-login-brand"><span class="da-brand-mark">✦</span><strong>DilAtölyesi</strong><span class="da-brand-pill">ALMANCA ÖĞRENMENİN YENİ YOLU</span></div>'
       +'<div class="da-hero-content"><div class="da-login-kicker">✦ KİŞİSEL YAPAY ZEKÂ ÖĞRETMENİN</div><h1>Almanca öğrenmek <em>seninle</em> başlar.</h1><p>Edit seni tanır, hedeflerini öğrenir ve günlük derslerini ilerlemene göre şekillendirir. Her gün küçük bir adım, her gün gerçek gelişim.</p>'
       +'<div class="da-hero-mascot" aria-hidden="true"><span class="da-hero-ears"></span><span class="da-hero-face">● &nbsp; ●<span>ᴗ</span></span><span class="da-hero-feet"></span><span class="da-hero-star">✧</span></div>'
       +'<div class="da-login-stats"><div><b>7 gün</b><span>Kişisel haftalık plan</span></div><div><b>4 beceri</b><span>Okuma · Yazma · Dinleme · Konuşma</span></div><div><b>AI</b><span>Edit ile öğrenme</span></div></div></div>'
       +'<p class="da-hero-note">Kendi hızında öğren. Kaldığın yerden devam et.</p></section>'
-      +'<section class="da-card da-login-card"><div class="da-form-kicker">DEUTSCHAI HESABIN</div><h2>'+(mode==='register'?'Yolculuğuna başla':'Yeniden hoş geldin!')+'</h2><p>'+(mode==='register'?'Hesabını oluştur; Edit ilk programını birlikte hazırlasın.':'Almanca yolculuğuna kaldığın yerden devam et.')+'</p>'
+      +'<section class="da-card da-login-card"><div class="da-form-kicker">DİLATÖLYESİ HESABIN</div><h2>'+(mode==='register'?'Yolculuğuna başla':'Yeniden hoş geldin!')+'</h2><p>'+(mode==='register'?'Hesabını oluştur; Edit ilk programını birlikte hazırlasın.':'Almanca yolculuğuna kaldığın yerden devam et.')+'</p>'
       +'<div class="da-tabs" role="group" aria-label="Hesap işlemi"><button type="button" id="da-login-tab" aria-pressed="'+(mode==='login')+'">Giriş Yap</button><button type="button" id="da-signup-tab" aria-pressed="'+(mode==='register')+'">Kayıt Ol</button></div>'
       +'<form id="da-auth-form" autocomplete="off"><label>Kullanıcı adı<input name="username" autocomplete="username" minlength="3" maxlength="32" required placeholder="Kullanıcı adın"></label>'
       +(mode==='register' ? '<div class="da-name-row"><label>Adın<input name="firstName" autocomplete="given-name" maxlength="80" required placeholder="Adın"></label><label>Soyadın<input name="lastName" autocomplete="family-name" maxlength="80" required placeholder="Soyadın"></label></div><label>E-posta<input name="email" type="email" autocomplete="email" required placeholder="ornek@eposta.com"></label>' : '')
@@ -292,7 +292,7 @@
   function admin() {
     if(auth?.user.role!=='admin')return;
     const e=overlay();
-    e.innerHTML='<div class="da-card da-admin-card"><div class="da-admin-top"><div><h1>Yönetici Paneli</h1><p>DeutschAI hesapları, roller ve Gemini yönetimi</p></div><button type="button" id="da-admin-close">✕ Kapat</button></div>'
+    e.innerHTML='<div class="da-card da-admin-card"><div class="da-admin-top"><div><h1>Yönetici Paneli</h1><p>DilAtölyesi hesapları, roller ve Gemini yönetimi</p></div><button type="button" id="da-admin-close">✕ Kapat</button></div>'
       +'<div class="da-admin-stat-grid"><div><b id="da-users-count">—</b><small>Toplam kayıtlı hesap</small></div><div><b id="da-admins-count">—</b><small>Yöneticiler</small></div><div><b id="da-members-count">—</b><small>Öğrenciler</small></div></div>'
       +'<section class="da-admin-section"><h2>Hesap yönetimi</h2><div class="da-admin-toolbar"><label for="da-user-search">Hesap ara</label><input id="da-user-search" type="search" placeholder="Ad, kullanıcı adı veya e-posta"><button type="button" id="da-reload-users">Yenile</button></div><p id="da-admin-account-status" role="status"></p><div class="da-admin-users" id="da-admin-users" aria-live="polite">Üyeler yükleniyor…</div></section>'
       +'<section class="da-admin-section"><h2>Gemini API anahtarı</h2><p>Ortak anahtarı yalnızca yöneticiler değiştirebilir. Mevcut anahtar tarayıcıya geri gönderilmez.</p><form id="da-admin-form"><label>Yeni Gemini API anahtarı<input name="apiKey" type="password" autocomplete="off" required></label><p class="da-error" role="alert"></p><button type="submit">Anahtarı Kaydet</button></form></section></div>';
@@ -492,7 +492,7 @@
       return {number,prompt,passage,options,feedback:node?.querySelector('.feedback, .da-feedback, .adaptive-feedback')?.textContent?.trim()||''};
     });
     return {
-      title:root.querySelector('.top h1, h1, .placement-card h2')?.textContent?.trim()||'DeutschAI',
+      title:root.querySelector('.top h1, h1, .placement-card h2')?.textContent?.trim()||'DilAtölyesi',
       page:document.querySelector('#nav [aria-current="page"]')?.dataset.page||'home',
       selectedQuestion:selected,centeredQuestion:centered,visibleQuestions:visible.map(item=>item.number),
       questionCount:total,questions,
@@ -541,7 +541,7 @@
     iframe.allow='microphone; autoplay';
     iframe.tabIndex=-1;
     iframe.setAttribute('aria-hidden','true');
-    iframe.src='./felkan.html?compact=1&v=fast-study-1';
+    iframe.src='./felkan.html?compact=1&v=dilatolyesi-1';
     iframe.addEventListener('load',()=>{
       felcanReady=true;
       sendFelcanContext(true);

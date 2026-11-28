@@ -1,7 +1,7 @@
 {
-  "name": "DeutschAI · Almanca Öğren",
-  "short_name": "DeutschAI",
-  "description": "Türkçe anlatımlı Almanca öğrenme platformu",
+  "name": "DilAtölyesi",
+  "short_name": "DilAtölyesi",
+  "description": "Edit ile dil öğrenme ve konuşma pratiği",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
