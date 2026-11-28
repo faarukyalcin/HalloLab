@@ -844,6 +844,11 @@
       account();
       floatingFelcan();
       startStudyAttendance();
+      // Reset once after successful startup, including state hydration reloads.
+      if(document.querySelector('#nav [aria-current="page"]')?.dataset.page==='home'){
+        window.deutschaiResetStudyScroll?.();
+        requestAnimationFrame(()=>{if(document.querySelector('#nav [aria-current="page"]')?.dataset.page==='home')window.deutschaiResetStudyScroll?.()});
+      }
     } catch(error) {
       auth=null;
       if(error.status===401)clearSession();
