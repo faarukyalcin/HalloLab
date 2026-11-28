@@ -375,7 +375,7 @@
     iframe.allow='microphone; autoplay';
     iframe.tabIndex=-1;
     iframe.setAttribute('aria-hidden','true');
-    iframe.src='./felkan.html?compact=1&v=toy-voice-1';
+    iframe.src='./felkan.html?compact=1&v=all-sections-female-1';
     iframe.addEventListener('load',()=>{
       felcanReady=true;
       sendFelcanContext(true);
@@ -454,6 +454,12 @@
     if(event.origin!==location.origin)return;
     if(event.data?.type==='deutschai:voice-state' && event.source===felcanFrame()?.contentWindow){
       felcanVisual(event.data.state||'idle',String(event.data.message||'').slice(0,90));
+      return;
+    }
+    if(event.data?.type==='deutschai:generate'){
+      const page=String(event.data.page||'');
+      if(event.source===felcanFrame()?.contentWindow&&typeof window.deutschaiRegenerateSection==='function')
+        window.deutschaiRegenerateSection(page);
       return;
     }
     if(event.data?.type!=='deutschai:navigate')return;
