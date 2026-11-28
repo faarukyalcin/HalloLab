@@ -555,7 +555,7 @@ body #mobile-more-menu .mobile-more-sheet,body .study-popup,body .study-appearan
 body #da-auth-screen :is(.da-profile-card,.da-admin-card){background:linear-gradient(145deg,color-mix(in srgb,var(--accent-soft) 12%,var(--paper)),var(--paper))!important;color:var(--ink)!important;border-color:var(--line)!important}
 body #da-auth-screen :is(.da-profile-card,.da-admin-card) :is(input,select,textarea,button){background:color-mix(in srgb,var(--paper) 85%,var(--mint))!important;color:var(--ink)!important;border-color:var(--line)!important}
 body #da-auth-screen :is(.da-profile-card,.da-admin-card) :is(p,label,small){color:var(--muted)!important}
-</style><script src="./api-config.js"></script><script src="./deutschai-auth.js?v=welcome-tour-1"></script></head><body><div class="scene-ribbons" aria-hidden="true"></div><div class="app study-app"><header class="study-header"><div class="study-head"><div class="study-brand"><div class="study-mark"><svg class="deutschai-book-mark" viewBox="0 0 48 48" aria-hidden="true" fill="none">
+</style><script src="./api-config.js"></script><script src="./deutschai-auth.js?v=engine-2"></script></head><body><div class="scene-ribbons" aria-hidden="true"></div><div class="app study-app"><header class="study-header"><div class="study-head"><div class="study-brand"><div class="study-mark"><svg class="deutschai-book-mark" viewBox="0 0 48 48" aria-hidden="true" fill="none">
   <path d="M12 11h13c8 0 14 5.5 14 13s-6 13-14 13H12z" stroke="#fcfaff" stroke-width="3.1" stroke-linejoin="round"/>
   <path d="M12 18c4-1 8.2.2 12 3.2 3.5-2.8 7.3-4.1 11-3.4M12 27c4-1 8.2.2 12 3.2 4.2-3.3 8.5-4.6 13-3.1M24 21.2v9" stroke="#ded0ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
   <path d="M14.5 41h5" stroke="#f28a9c" stroke-width="2.2" stroke-linecap="round"/>
@@ -1210,7 +1210,7 @@ function finishExam(button){
 
 render();
 requestAnimationFrame(()=>requestAnimationFrame(()=>window.deutschaiDesktop?.notifyStartupReady?.()));
-</script><script src="./learning-engine.js?v=mastery-1"></script><script src="./gemini-web.js?v=fresh-questions-3"></script><script>(() => {
+</script><script src="./learning-engine.js?v=engine-2"></script><script src="./curriculum-engine.js?v=engine-2"></script><script src="./gemini-web.js?v=fresh-questions-3"></script><script>(() => {
   const desk = window.deutschaiDesktop || window.deutschaiWeb;
   if (!desk) {console.error('Edit öğrenme bağlantısı yüklenemedi.');return;}
   const profileKey = 'deutschai-ai-profile-v1';
@@ -1253,7 +1253,7 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>window.deutschaiDesktop?.not
     const wrong = (state.wrongWords || []).slice(-30).map(i=>DATA.vocabulary[i]).filter(Boolean).map(w=>({de:w.de,tr:w.tr}));
     const learned = Object.keys(state.learned || {}).slice(-40).map(i=>DATA.vocabulary[+i]).filter(Boolean).map(w=>w.de);
     const attempts=(state.attempts||[]).slice(-40).map(a=>({ok:!!a.ok,exam:!!a.exam,word:!!a.word,skill:a.skill||null,level:a.level||state.level,planTask:!!a.planTask}));
-    return {...profile, mastery:window.deutschaiMasterySummary?.()?.priority||[], learningGoal:window.deutschaiGetLearningGoal?.()||null, level:placement?.level||profile.level||state.level||null, date:localDate(), placement, learnerProgress:{completedLessons:(state.completed||[]).length, learnedVocabulary:learned, aiLearnedVocabulary:JSON.parse(window.deutschaiStore.getItem('deutschai-ai-learned-vocab-v1')||'[]').slice(-40).map(x=>x.de), wrongVocabulary:wrong, grammarPerformance:state.grammarPerformance||{}, recentAnswers:attempts, levelProgress:state.levelProgress||null, dailyPlanProgress:state.dailyPlanProgress||null, dailyTestResults:(state.dailyTests||[]).slice(-20), goetheResults:(state.attempts||[]).filter(x=>x.exam).slice(-20), recentAIHistory:history.slice(-20),personalStudyResults:adaptiveData().results?.slice(-12)||[]}};
+    return {...profile, learningLanguage:'de', curriculumNext:window.deutschaiNextEducation?.()||null, mastery:window.deutschaiMasterySummary?.()?.priority||[], learningGoal:window.deutschaiGetLearningGoal?.()||null, level:placement?.level||profile.level||state.level||null, date:localDate(), placement, learnerProgress:{completedLessons:(state.completed||[]).length, learnedVocabulary:learned, aiLearnedVocabulary:JSON.parse(window.deutschaiStore.getItem('deutschai-ai-learned-vocab-v1')||'[]').slice(-40).map(x=>x.de), wrongVocabulary:wrong, grammarPerformance:state.grammarPerformance||{}, recentAnswers:attempts, levelProgress:state.levelProgress||null, dailyPlanProgress:state.dailyPlanProgress||null, dailyTestResults:(state.dailyTests||[]).slice(-20), goetheResults:(state.attempts||[]).filter(x=>x.exam).slice(-20), recentAIHistory:history.slice(-20),personalStudyResults:adaptiveData().results?.slice(-12)||[]}};
   }
   const placementLevelOrder=['A1','A2','B1','B2','C1','C2'];
   const placementSectionOrder=['speaking','writing','listening','reading','grammar','vocabulary'];
@@ -1323,11 +1323,32 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>window.deutschaiDesktop?.not
   }
   const learningEngine=window.DilLearningEngine?.create(window.deutschaiStore);
   window.deutschaiMasterySummary=()=>learningEngine?.summary()||{topics:[],priority:[],next:null,observations:0};
-  let reviewFocus=null;
+  let reviewFocus=null,engineFocus=null;
+  window.deutschaiNextEducation=()=>window.DilCurriculum?.decide({language:'de',level:placement?.level||profile.level||state.level||'A1',evidence:window.deutschaiMasterySummary().topics,goal:window.deutschaiGetLearningGoal?.()})||null;
+  window.deutschaiStartEducation=()=>{
+    if(adaptiveBusy)return false;
+    const d=window.deutschaiNextEducation();
+    if(!d?.nodeId)return false;
+    // Only grammar/reading MCQ lessons currently yield independent evidence.
+    // Other skills are presented as training, not certified competence.
+    engineFocus=d;plannedStudy=null;reviewFocus=null;
+    const route=d.skill==='grammar'?'lessons':d.route;
+    if(page!==route)setPage(route);else render();
+    if(!adaptiveBusy)void window.deutschaiGenerateAdaptiveContent(route,true);
+    return true;
+  };
+  function educationCard(){
+    const d=window.deutschaiNextEducation();if(!d?.nodeId)return '';
+    return '<section class="card mastery-card engine-next"><span class="badge">EDIT · KİŞİSEL EĞİTİM</span><h2>Bugünkü eğitimime başla</h2><p class="muted">'+esc(d.level)+' · '+esc(d.topic)+'</p><p>'+esc(d.reason)+'</p><button class="btn" onclick="window.deutschaiStartEducation()">Edit ile çalış →</button></section>';
+  }
+  function curriculumCard(){
+    const nodes=window.DilCurriculum?.packs?.de||[],m=window.deutschaiMasterySummary(),map=new Map(m.topics.filter(t=>t.nodeId).map(t=>[t.nodeId,t])),level=placement?.level||profile.level||state.level;
+    return '<section class="card mastery-card"><h2>Müfredat haritan</h2><p class="muted">Almanca '+esc(level)+' · başlangıç müfredatı. Yeterlilik yalnız gerçek cevaplarla işaretlenir.</p>'+nodes.filter(n=>n.level===level).map(n=>{const t=map.get(n.id);return '<div class="mastery-topic"><div><b>'+esc(n.topic)+'</b><small>'+esc(t?.status||'Henüz ölçülmedi')+' · '+n.requires.length+' ön koşul</small></div><strong>'+(t?t.accuracy+'%':'—')+'</strong></div>'}).join('')+'</section>';
+  }
   const lessonKinds=['lessons','grammar'];
   function recordLearning(kind,batch,q,index,ok,assisted=false){
     if(!batch||!q)return;
-    learningEngine?.record({id:batch.at+'|'+kind+'|'+index,topic:q.topic||batch.content?.topic||batch.content?.title||q.skill||kind,skill:q.skill||(lessonKinds.includes(kind)?'grammar':kind),level:placement?.level||profile.level||state.level,correct:!!ok,assisted});
+    learningEngine?.record({id:batch.at+'|'+kind+'|'+index,topic:batch.curriculum?.topic||q.topic||batch.content?.topic||batch.content?.title||q.skill||kind,skill:batch.curriculum?.skill||q.skill||(lessonKinds.includes(kind)?'grammar':kind),nodeId:batch.curriculum?.nodeId,level:batch.curriculum?.level||placement?.level||profile.level||state.level,correct:!!ok,assisted:assisted||['listening','writing','speaking','vocabulary'].includes(batch.curriculum?.skill)});
   }
   function masteryMarkup(){
     const m=window.deutschaiMasterySummary(),goal=window.deutschaiGetLearningGoal?.();
@@ -1406,7 +1427,7 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>window.deutschaiDesktop?.not
  const priorExamples=new Set((previous?.examples||[]).map(x=>normalize(x.de)));
  const priorTitle=normalize(previous?.title);
  const previousTopic=normalize(previous?.topic||previous?.title);
- const changeGrammarTopic=kind==='grammar'&&!automatic&&!reviewFocus&&plannedStudy?.route!==kind;
+ const selectedNode=engineFocus;const changeGrammarTopic=kind==='grammar'&&!automatic&&!reviewFocus&&!selectedNode&&plannedStudy?.route!==kind;
  const grammarTopics={A1:['Kişi zamirleri','Präsens düzenli fiiller','sein ve haben','Belirli ve belirsiz artikeller','Nominativ ve Akkusativ','nicht ve kein','Ayrılabilen fiiller','Modal fiiller','Soru cümleleri','Çoğul isimler'],A2:['Perfekt','Dativ','Wechselpräpositionen','Nebensätze mit weil','Komparativ und Superlativ','Reflexive Verben','Präteritum von Modalverben','Adjektivdeklination'],B1:['Relativsätze','Konjunktiv II','Passiv','Infinitiv mit zu','Temporale Nebensätze','Plusquamperfekt','Genitiv'],B2:['Partizipialattribute','Nominalisierung','Konjunktiv I','Passiversatzformen','Konnektoren','Verben mit Präpositionen'],C1:['Nominalstil','Modalpartikeln','Indirekte Rede','Komplexe Satzgefüge','Funktionsverbgefüge'],C2:['Stilistische Satzvariation','Modalität und Evidentialität','Komplexe Informationsstruktur','Register und Satzverknüpfung']};
  const rotation=grammarTopics[placement?.level||profile.level||state.level]||grammarTopics.A1;
  const lastIndex=rotation.findIndex(t=>normalize(t)===previousTopic||normalize(t)===normalize(previous?.grammarFocus));
@@ -1419,7 +1440,7 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>window.deutschaiDesktop?.not
   const goal=window.deutschaiGetLearningGoal?.();
   const instruction=requestText[kind]+' '+(kind==='words'?'':'questions:[{question,options (4 farklı metin),answer (0-3 tamsayı),explanation,skill,topic,hint}]. ')+
    'Seviye '+(placement?.level||profile.level||state.level)+'. '+(goal?'Hedef: '+String(goal.label).slice(0,100)+'; '+String(goal.details||'').slice(0,130)+'. ':'')+
-   (grammarFocus?'ZORUNLU YENİ GRAMER KONUSU: '+grammarFocus+'. Önceki konu: '+String(previous?.title||'').slice(0,100)+'. Konu anlatımını ve tüm örnekleri değiştir. topic alanı tam olarak '+grammarFocus+'. ':scheduled?'Görev: '+String(scheduled.topic+' '+scheduled.activity).slice(0,150)+'. ':reviewFocus?'Tekrar konusu: '+String(reviewFocus.topic).slice(0,100)+'. ':'Eksikler: '+topic.slice(0,160)+'. ')+
+   (selectedNode?'ZORUNLU MÜFREDAT KONUSU: '+selectedNode.topic+'. Düzey '+selectedNode.level+'. Beceri '+selectedNode.skill+'. topic alanını aynen '+selectedNode.topic+' yaz. '+(selectedNode.skill==='reading'?'Her soruda özgün Almanca okuma metni passage alanında bulunmalı. ':selectedNode.skill==='listening'?'Dinleme metni ve çalışma önerisi oluştur, metin sorusunu gerçek dinleme sınavı sayma. ':'')+' ':grammarFocus?'ZORUNLU YENİ GRAMER KONUSU: '+grammarFocus+'. Önceki konu: '+String(previous?.title||'').slice(0,100)+'. Konu anlatımını ve tüm örnekleri değiştir. topic alanı tam olarak '+grammarFocus+'. ':scheduled?'Görev: '+String(scheduled.topic+' '+scheduled.activity).slice(0,150)+'. ':reviewFocus?'Tekrar konusu: '+String(reviewFocus.topic).slice(0,100)+'. ':'Eksikler: '+topic.slice(0,160)+'. ')+
    'Yeni üretim '+variation+'. Aynı konu olabilir; fakat cümleler, soru kökleri ve seçenekler farklı olmalı. Şunları kopyalama: '+JSON.stringify(priorItems.map(x=>x.question||x.prompt||x.de||x.word)).slice(0,700)+'; son geçmiş: '+seen.slice(-10).join(' | ').slice(0,350)+'. '+(attempt?'Önceki üretim reddedildi; yeni örnekler oluştur.':'');
 
   try{content=await desk.geminiTutor({task:prompts[kind],profile:learnerSnapshot(),history:[],text:instruction});}catch(e){if(e?.status===429||/429|saatlik|kota/i.test(String(e?.message||e)))throw e;if(attempt===2)throw e;continue;}
@@ -1443,13 +1464,14 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>window.deutschaiDesktop?.not
  if(fresh.length<required)throw Error('Edit yeterli sayıda farklı ve geçerli içerik üretemedi. Önceki çalışma korundu.');
  if(kind==='words')content.vocabulary=fresh;else content.questions=fresh;
  if(grammarFocus)content.grammarFocus=grammarFocus;
+ if(selectedNode)content.topic=selectedNode.topic;
  const fingerprints=fresh.map(item=>adaptiveFingerprint(item,kind,content)).filter(Boolean);
- const latest=adaptiveData();latest.latest=latest.latest||{};latest.latest[kind]={date:localDate(),at:new Date().toISOString(),content,selected:{},lessonStep:0,goalRevision:window.deutschaiGetLearningGoal?.()?.updatedAt||null,planned:plannedStudy?.route===kind?{...plannedStudy}:null};latest.seen=latest.seen||{};latest.seen[kind]=[...seen,...fingerprints].slice(-80);window.deutschaiStore.setItem(adaptiveKey,JSON.stringify(latest));history.push({task:'adaptive-'+kind,level:profile.level,items:fingerprints.slice(0,12),at:new Date().toISOString()});saveHistory();
- }catch(error){adaptiveErrors[kind]=String(error?.message||error).slice(0,160);}finally{adaptiveBusy=false;reviewFocus=null;const host=document.querySelector('#adaptive-ai-root');if(host&&host.dataset.kind===kind)host.innerHTML=adaptiveMarkup(kind,adaptiveErrors[kind]&&kind==='grammar'?null:currentGeneratedStudy(kind));}};
+ const latest=adaptiveData();latest.latest=latest.latest||{};latest.latest[kind]={date:localDate(),at:new Date().toISOString(),content,selected:{},lessonStep:0,curriculum:selectedNode||null,goalRevision:window.deutschaiGetLearningGoal?.()?.updatedAt||null,planned:plannedStudy?.route===kind?{...plannedStudy}:null};latest.seen=latest.seen||{};latest.seen[kind]=[...seen,...fingerprints].slice(-80);window.deutschaiStore.setItem(adaptiveKey,JSON.stringify(latest));history.push({task:'adaptive-'+kind,level:profile.level,items:fingerprints.slice(0,12),at:new Date().toISOString()});saveHistory();
+ }catch(error){adaptiveErrors[kind]=String(error?.message||error).slice(0,160);}finally{adaptiveBusy=false;reviewFocus=null;engineFocus=null;const host=document.querySelector('#adaptive-ai-root');if(host&&host.dataset.kind===kind)host.innerHTML=adaptiveMarkup(kind,adaptiveErrors[kind]&&kind==='grammar'?null:currentGeneratedStudy(kind));}};
   const baseWordsAdaptive=words,basePracticeAdaptive=practice,baseProgressAdaptive=progress;
-  function exclusiveStudy(kind,title){if(plannedStudy&&plannedStudy.route!==kind)plannedStudy=null;shell(title,'<div id="adaptive-ai-root" data-kind="'+kind+'"></div>');const host=document.querySelector('#adaptive-ai-root');host.innerHTML=adaptiveMarkup(kind,adaptiveErrors[kind]&&kind==='grammar'?null:currentGeneratedStudy(kind));if(!plannedStudy&&!reviewFocus&&!currentGeneratedStudy(kind)&&!adaptiveAutoRequested.has(kind)&&!adaptiveBusy){adaptiveAutoRequested.add(kind);void window.deutschaiGenerateAdaptiveContent(kind,true);}}
+  function exclusiveStudy(kind,title){if(plannedStudy&&plannedStudy.route!==kind)plannedStudy=null;shell(title,'<div id="adaptive-ai-root" data-kind="'+kind+'"></div>');const host=document.querySelector('#adaptive-ai-root');host.innerHTML=adaptiveMarkup(kind,adaptiveErrors[kind]&&kind==='grammar'?null:currentGeneratedStudy(kind));if(!plannedStudy&&!reviewFocus&&!engineFocus&&!currentGeneratedStudy(kind)&&!adaptiveAutoRequested.has(kind)&&!adaptiveBusy){adaptiveAutoRequested.add(kind);void window.deutschaiGenerateAdaptiveContent(kind,true);}}
   lessons=function(){exclusiveStudy('lessons','Dersler');};
-  progress=function(){baseProgressAdaptive();const data=adaptiveData(),results=data.results||[],recent=results.slice(-10),weak={};for(const result of recent)for(const topic of result.weak||[])weak[topic]=(weak[topic]||0)+1;const focus=Object.entries(weak).sort((a,b)=>b[1]-a[1]).slice(0,5);const avg=recent.length?Math.round(recent.reduce((sum,r)=>sum+Number(r.score||0),0)/recent.length):null;const panel=document.createElement('section');panel.className='card';panel.innerHTML='<h2>Edit · Kişisel gelişim</h2><p>Seviye: '+esc(placement?.level||profile.level||state.level)+' · '+results.length+' kişisel çalışma</p><p>'+ (avg===null?'Henüz yeterli kişisel çalışma sonucu yok.':'Son çalışmaların ortalaması: %'+avg)+'</p><h3>Öncelikli tekrar konuların</h3>'+(focus.length?focus.map(([topic,count])=>'<div class="row"><span class="grow">'+esc(topic)+'</span><small>'+count+' çalışmada tekrar gerekli</small></div>').join(''):'<p>Yeni çalışmalar tamamlandıkça eksik konular burada görünecek.</p>')+'<button class="btn" onclick="setPage(&quot;lessons&quot;)">Kişisel dersime geç</button>';document.querySelector('#view').append(panel);document.querySelector('#view').insertAdjacentHTML('beforeend',masteryMarkup());};
+  progress=function(){baseProgressAdaptive();const data=adaptiveData(),results=data.results||[],recent=results.slice(-10),weak={};for(const result of recent)for(const topic of result.weak||[])weak[topic]=(weak[topic]||0)+1;const focus=Object.entries(weak).sort((a,b)=>b[1]-a[1]).slice(0,5);const avg=recent.length?Math.round(recent.reduce((sum,r)=>sum+Number(r.score||0),0)/recent.length):null;const panel=document.createElement('section');panel.className='card';panel.innerHTML='<h2>Edit · Kişisel gelişim</h2><p>Seviye: '+esc(placement?.level||profile.level||state.level)+' · '+results.length+' kişisel çalışma</p><p>'+ (avg===null?'Henüz yeterli kişisel çalışma sonucu yok.':'Son çalışmaların ortalaması: %'+avg)+'</p><h3>Öncelikli tekrar konuların</h3>'+(focus.length?focus.map(([topic,count])=>'<div class="row"><span class="grow">'+esc(topic)+'</span><small>'+count+' çalışmada tekrar gerekli</small></div>').join(''):'<p>Yeni çalışmalar tamamlandıkça eksik konular burada görünecek.</p>')+'<button class="btn" onclick="setPage(&quot;lessons&quot;)">Kişisel dersime geç</button>';document.querySelector('#view').append(panel);document.querySelector('#view').insertAdjacentHTML('beforeend',masteryMarkup()+curriculumCard());};
 
   window.deutschaiOpenPersonalStudy=kind=>{if(!adaptiveKinds.includes(kind))return false;if(page!==kind)setPage(kind);const host=document.querySelector('#adaptive-ai-root');if(!host||host.dataset.kind!==kind)return false;window.deutschaiGenerateAdaptiveContent(kind);return true;};
   words=function(){exclusiveStudy('words','Kelime kartları');};
@@ -1717,7 +1739,7 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>window.deutschaiDesktop?.not
   page = 'home';
   render = function () {
     applyTheme();
-    if (page === 'welcome') welcomePage(); else if (page === 'home') home();
+    if (page === 'welcome') welcomePage(); else if (page === 'home') {home();document.querySelector('#view')?.insertAdjacentHTML('afterbegin',educationCard());}
     else if (page === 'live') livePage();
     else if (page === 'placement') { if (liveActive || liveConnecting) liveRelease(); placementExamPage(); }
     else if (page === 'ai') { document.body.classList.remove('welcome-mode'); if (liveActive || liveConnecting) liveRelease(); teacherPage(); }
@@ -1725,7 +1747,7 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>window.deutschaiDesktop?.not
   };
   async function ensureDailyPlan(force = false) {
     if (!placement || !profile.onboardingComplete || (!force && dailyPack?.date === localDate() && dailyPack?.content?.source !== 'local-fallback')) return;
-    const text='Bugünün tarihi '+localDate()+'. Öğrencinin seviye, günlük süre, son cevap ve yanlışlarına göre kişisel Goethe programını hazırla. Okuma, yazma, konuşma ve gramer görevleri koy; toplam süre hedefini aşma.';
+    const text='Bugünün tarihi '+localDate()+'. Öğrencinin seviye, günlük süre, son cevap ve yanlışlarına göre kişisel hedefe uygun Almanca programını hazırla. Goethe yalnız öğrencinin hedefiyse kullanılmalı. Okuma, yazma, konuşma ve gramer görevleri koy; toplam süre hedefini aşma.';
     const answer=await requestDailyPlan(text);const schedule=Array.isArray(answer.schedule)?answer.schedule:[],target=Number(profile.dailyMinutes)||30,total=schedule.reduce((sum,item)=>sum+Math.max(0,Number(item.minutes)||0),0);
     if(total>target&&total>0){let used=0;schedule.forEach((item,index)=>{item.minutes=index===schedule.length-1?Math.max(0,target-used):Math.floor((Number(item.minutes)||0)*target/total);used+=item.minutes;});}
     dailyPack={date:localDate(),content:answer};window.deutschaiStore.setItem('deutschai-ai-daily-v1',JSON.stringify(dailyPack));livePlanSummary();
@@ -1741,4 +1763,4 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>window.deutschaiDesktop?.not
   };
   render();
 })();
-</script><script src="./learning-features.js"></script><script src="./deutschai-personalization.js?v=natural-goals-2"></script></body></html>
+</script><script src="./learning-features.js"></script><script src="./deutschai-personalization.js?v=engine-2"></script></body></html>
