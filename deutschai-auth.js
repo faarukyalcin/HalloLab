@@ -274,6 +274,30 @@
     #da-auth-screen .da-login-privacy p{text-align:left;font-size:11px;margin:9px 0 0}
     @media(max-width:780px){#da-auth-screen:has(.da-login-modern){padding:max(12px,env(safe-area-inset-top)) 14px max(12px,env(safe-area-inset-bottom));align-items:center}#da-auth-screen .da-login-modern{width:min(440px,100%);grid-template-columns:minmax(0,1fr);border-radius:28px;overflow:visible}#da-auth-screen .da-login-modern .da-login-hero{display:none}#da-auth-screen .da-login-modern .da-login-card{padding:23px 22px;border-radius:inherit;background:linear-gradient(150deg,#ffffff09,#10132955)}#da-auth-screen .da-login-mobile-brand{display:flex;align-items:center;gap:10px;margin-bottom:24px;font-size:19px}#da-auth-screen .da-login-mobile-brand small{margin-left:auto;font-size:10px;letter-spacing:.1em;color:#c8b9eb}#da-auth-screen .da-login-modern .da-tabs{margin-bottom:20px}#da-auth-screen .da-login-modern .da-login-intro{margin-bottom:15px}}
     @media(max-width:370px){#da-auth-screen .da-login-modern .da-login-card{padding:18px 15px}#da-auth-screen .da-login-modern .da-name-row{grid-template-columns:1fr 1fr;gap:7px}}
+    #da-auth-screen .da-welcome-stage{position:relative;isolation:isolate;display:grid;place-items:center;min-height:145px;margin:5px auto;max-width:300px;width:100%}
+    #da-auth-screen .da-welcome-stage::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse,#b179ff35,transparent 68%);z-index:-1}
+    #da-auth-screen .da-welcome-stage .da-hero-mascot{display:block;transform-origin:center;margin:14px 0 8px;width:102px;height:104px}
+    #da-auth-screen .da-welcome-stage .da-hero-ears{box-shadow:68px 26px 0 -6px #a788dc}
+    #da-auth-screen .da-welcome-stage .da-hero-feet{left:18px;box-shadow:40px 0 #7053af}
+    #da-auth-screen .da-welcome-bubble{position:absolute;display:grid;padding:7px 9px;border-radius:14px;border:1px solid #d0b1ff50;background:#42325e75;color:#eee0ff;font-size:11px;white-space:nowrap;backdrop-filter:blur(10px)}
+    #da-auth-screen .da-welcome-bubble span{grid-area:1/1;opacity:0;animation:da-welcome-phrases 12s infinite}
+    #da-auth-screen .da-welcome-bubble span:nth-child(2){animation-delay:4s}
+    #da-auth-screen .da-welcome-bubble span:nth-child(3){animation-delay:8s}
+    #da-auth-screen .da-bubble-left{left:0;top:28px}#da-auth-screen .da-bubble-right{right:0;bottom:25px}
+    @keyframes da-welcome-phrases{0%,30%{opacity:1}33%,100%{opacity:0}}
+    #da-auth-screen .da-login-modern .da-hero-content{display:flex;flex-direction:column;align-items:center;text-align:center;padding:10px 0}
+    #da-auth-screen .da-login-modern .da-hero-content h1{order:1;font-size:clamp(24px,3.5vw,38px);margin:6px 0}
+    #da-auth-screen .da-login-modern .da-hero-content p{order:2;margin:0;font-size:13px}
+    #da-auth-screen .da-welcome-features{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;font-size:11px;color:#d8c1ff;margin-top:12px}
+    #da-auth-screen .da-login-modern .da-login-switch button{display:block;width:100%;min-height:46px;border:1px solid #c5a5f34d;border-radius:14px;background:#ffffff06;color:#e0cdff}
+    #da-auth-screen .da-login-discover{font-size:12px;text-align:center;color:#d0b9fa;margin:2px 0 12px}
+    #da-auth-screen .da-login-discover summary{cursor:pointer;list-style:none;padding:6px}
+    #da-auth-screen .da-login-discover summary::after{content:" ›"}
+    #da-auth-screen .da-discover-list{display:grid;gap:8px;text-align:left;padding:10px;border:1px solid #ffffff19;border-radius:12px;background:#ffffff05}
+    #da-auth-screen .da-discover-list small{display:block;font-size:11px;color:#c9c1df;margin-top:3px}
+    @media(max-width:780px){#da-auth-screen:has(.da-login-modern){align-items:start;padding-top:max(14px,env(safe-area-inset-top))}#da-auth-screen .da-login-modern{border:0;background:none;box-shadow:none;gap:15px;backdrop-filter:none;-webkit-backdrop-filter:none}#da-auth-screen .da-login-modern .da-login-hero{display:flex;min-height:0;padding:4px 6px 0;border:0;background:none;overflow:visible}#da-auth-screen .da-login-modern .da-login-hero::after{display:none}#da-auth-screen .da-login-modern .da-brand-pill{display:block;border:0;padding:0;font-size:10px}#da-auth-screen .da-login-modern .da-hero-content{padding:0}#da-auth-screen .da-login-modern .da-hero-content h1{font-size:25px}#da-auth-screen .da-welcome-stage{min-height:128px}#da-auth-screen .da-login-modern .da-login-card{border:1px solid #c6b0ff45;box-shadow:inset 0 1px 0 #ffffff20,0 12px 40px #0003;padding:20px;border-radius:25px}#da-auth-screen .da-login-modern .da-login-intro{margin-bottom:12px}#da-auth-screen .da-login-modern .da-login-switch{margin:10px 0}#da-auth-screen .da-register-mode .da-hero-content,#da-auth-screen .da-register-mode .da-welcome-features{display:none}}
+    @media(prefers-reduced-motion:reduce){#da-auth-screen .da-welcome-bubble span{animation:none;opacity:0}#da-auth-screen .da-welcome-bubble span:first-child{opacity:1}#da-auth-screen .da-welcome-stage .da-hero-mascot{animation:none}}
+
   `;
   document.head.append(loginStyle);
   function overlay() {
@@ -288,19 +312,17 @@
       screen.innerHTML='<div class="da-card"><h1>DilAtölyesi</h1><p>Hesap sunucusu henüz yapılandırılmadı.</p></div>';
       return;
     }
-    screen.innerHTML='<div class="da-login-shell da-login-modern">'
+    screen.innerHTML='<div class="da-login-shell da-login-modern '+(mode==='register'?'da-register-mode':'da-welcome-mode')+'">'
       +'<section class="da-login-hero"><div class="da-login-brand"><span class="da-brand-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h6a3 3 0 0 1 3 3v14a5 5 0 0 0-4-2H5zm9 3a3 3 0 0 1 3-3h4v15h-3a5 5 0 0 0-4 2"/></svg></span><strong>DilAtölyesi</strong><span class="da-brand-pill">DE · TR</span></div>'
-      +'<div class="da-hero-content"><div class="da-login-kicker">KİŞİSEL ALMANCA ATÖLYEN</div><h1>Her gün bir adım.<br><em>Jeden Tag ein Schritt.</em></h1><p>Edit ile kendi seviyende, kendi hızında Almanca öğren.</p>'
-      +'<div class="da-hero-mascot" aria-hidden="true"><span class="da-hero-ears"></span><span class="da-hero-face">● &nbsp; ●<span>ᴗ</span></span><span class="da-hero-feet"></span><span class="da-hero-star">✧</span></div></div><p class="da-hero-note">Kişisel dersler · Konuşma pratiği · A1–C2</p></section>'
-      +'<section class="da-card da-login-card"><div class="da-login-mobile-brand"><span class="da-brand-mark" aria-hidden="true">✦</span><strong>DilAtölyesi</strong><small>DE · TR</small></div><div class="da-tabs" role="group" aria-label="Hesap işlemi"><button type="button" id="da-login-tab" aria-pressed="'+(mode==='login')+'">Giriş yap</button><button type="button" id="da-signup-tab" aria-pressed="'+(mode==='register')+'">Kayıt ol</button></div>'
+      +'<div class="da-hero-content"><h1>Almanca, artık daha kişisel.</h1><p>Edit ile konuş, öğren ve kendi hızında geliş.</p>'
+      +'<div class="da-welcome-stage" aria-hidden="true"><div class="da-welcome-bubble da-bubble-left"><span>Hallo!</span><span>Guten Tag!</span><span>Sehr gut!</span></div><div class="da-hero-mascot" aria-hidden="true"><span class="da-hero-ears"></span><span class="da-hero-face">● &nbsp; ●<span>ᴗ</span></span><span class="da-hero-feet"></span><span class="da-hero-star">✧</span></div><div class="da-welcome-bubble da-bubble-right"><span>Wie geht&#39;s?</span><span>Alles klar!</span><span>Bis bald!</span></div></div></div><div class="da-welcome-features"><span>✦ Yapay zekâ</span><span>◉ Canlı konuşma</span><span> A1–C2</span></div></section>'
+      +'<section class="da-card da-login-card">'
       +'<h2>'+(mode==='register'?'Hesabını oluştur':'Hoş geldin.')+'</h2><p class="da-login-intro">'+(mode==='register'?'Almanca öğrenmeye bugün başla.':'Kaldığın yerden devam et.')+'</p>'
       +'<form id="da-auth-form" autocomplete="on"><label>Kullanıcı adı<input name="username" autocomplete="username" autocapitalize="none" spellcheck="false" minlength="3" maxlength="32" required placeholder="Kullanıcı adın"></label>'
       +(mode==='register'?'<div class="da-name-row"><label>Ad<input name="firstName" autocomplete="given-name" maxlength="80" required placeholder="Adın"></label><label>Soyad<input name="lastName" autocomplete="family-name" maxlength="80" required placeholder="Soyadın"></label></div><label>E-posta<input name="email" type="email" autocomplete="email" autocapitalize="none" required placeholder="ornek@eposta.com"></label>':'')
       +'<label>Şifre<span class="da-password-wrap"><input name="password" type="password" minlength="'+(mode==='register'?'10':'1')+'" autocomplete="'+(mode==='register'?'new-password':'current-password')+'" required placeholder="'+(mode==='register'?'En az 10 karakter':'Şifren')+'"><button type="button" id="da-password-toggle" aria-label="Şifreyi göster" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/></svg></button></span></label>'
       +'<p class="da-error" role="alert">'+safe(message)+'</p><button class="da-login-submit" type="submit">'+(mode==='register'?'Hesap oluştur':'Giriş yap')+' <span aria-hidden="true">→</span></button></form>'
-      +'<p class="da-login-switch">'+(mode==='register'?'Zaten hesabın var mı? <button type="button" id="da-switch-mode">Giriş yap</button>':'Hesabın yok mu? <button type="button" id="da-switch-mode">Kayıt ol</button>')+'</p><details class="da-login-privacy"><summary>Hesap ve gizlilik</summary><p>Öğrenme ilerlemen hesabında saklanır. Görünen adın, fotoğrafın, seviyen ve rozetlerin giriş yapmış topluluk üyelerine görünür. Yöneticiler giriş günlerini ve yaklaşık aktif çalışma sürelerini görebilir. API anahtarı gerekmez.</p></details></section></div>';
-    screen.querySelector('#da-login-tab').onclick=()=>show('login');
-    screen.querySelector('#da-signup-tab').onclick=()=>show('register');
+      +'<p class="da-login-switch">'+(mode==='register'?'Zaten hesabın var mı? <button type="button" id="da-switch-mode">Giriş yap</button>':'<button type="button" id="da-switch-mode">Yeni hesap oluştur</button>')+'</p><details class="da-login-discover"><summary>DilAtölyesi&#39;ni keşfet</summary><div class="da-discover-list"><div><b>Edit ile öğren</b><small>Yapay zekâ destekli Almanca konuşma pratiği.</small></div><div><b>Kendi seviyende ilerle</b><small>Seviye tespiti, dersler, kelime ve gramer çalışmaları.</small></div><div><b>Gelişimini takip et</b><small>Kişisel program, rozetler ve öğrenci topluluğu.</small></div></div></details><details class="da-login-privacy"><summary>Hesap ve gizlilik</summary><p>Öğrenme ilerlemen hesabında saklanır. Görünen adın, fotoğrafın, seviyen ve rozetlerin giriş yapmış topluluk üyelerine görünür. Yöneticiler giriş günlerini ve yaklaşık aktif çalışma sürelerini görebilir. API anahtarı gerekmez.</p></details></section></div>';
     const form=screen.querySelector('#da-auth-form');
     screen.querySelector('#da-switch-mode').onclick=()=>show(mode==='login'?'register':'login');
     const reveal=screen.querySelector('#da-password-toggle');
