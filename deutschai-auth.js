@@ -86,6 +86,7 @@
     'body #da-felcan-float[data-voice="speaking"]{border-color:#e4c4ff;box-shadow:0 0 20px #ac79ee90}',
     '#da-felcan-welcome,.da-admin-action-dialog{max-width:calc(100vw - 32px);border:1px solid #aa94ed70;border-radius:26px;padding:28px;background:linear-gradient(150deg,#292346,#15182e);color:#f8f5ff;box-shadow:0 26px 80px #080917a8;font:15px/1.5 system-ui}',
     '#da-felcan-welcome{width:min(390px,calc(100vw - 32px));text-align:center;padding:40px 24px 26px}',
+    '@media(min-width:1000px){#da-felcan-welcome{margin:auto max(24px,env(safe-area-inset-right)) auto auto}}',
     '#da-felcan-welcome::backdrop,.da-admin-action-dialog::backdrop{background:#070a1bb0;backdrop-filter:blur(5px)}',
     'body #da-felcan-welcome .da-felcan-orb{margin:16px auto 30px;transform:scale(1.42)}',
     '#da-felcan-welcome h2{font-size:30px;margin:0 0 6px;line-height:1.2}',
