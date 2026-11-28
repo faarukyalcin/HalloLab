@@ -1,4 +1,4 @@
-/* Felkan: personalized welcome and 4-question German drills. */
+/* Felcan: weekly study program and personalized German drills. */
 (() => {
 'use strict';
 const active=()=>window.DeutschAI;
@@ -20,27 +20,11 @@ const weekStart=()=>{const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate
 const preferences=()=>read(SETTINGS);
 const existingPlan=()=>read(PLAN);
 const minutesDisplay=n=>n>=60?(n%60?n/60+' saat':n/60+' saat'):n+' dakika';
-function planSection(s){
- const plan=existingPlan(), today=plan?.days?.[weekdaysIndex()];
- const text=JSON.stringify(today||read('deutschai-ai-plan-v1')||{}).toLowerCase();
- if(/gramer|grammatik|grammar/.test(text))return 'grammar';
- if(/kelime|wort|vocabulary/.test(text))return 'words';
- return (s.wrongWords||[]).length>=3?'words':'grammar';
-}
-function greet(){
- const root=document.getElementById('view');
- if(!root||root.querySelector('#da-home-greeting'))return;
- const s=state(),target=planSection(s);
- const e=document.createElement('section');e.id='da-home-greeting';e.className='da-personal';
- const top=root.querySelector('.top');if(top)top.after(e);else root.prepend(e);
- renderWelcome(e,s,target);
-}
-function renderWelcome(host,s,target,edit=false){
+function renderProgram(host,s,edit=false){
  const p=preferences(), plan=existingPlan(), current=plan?.week===weekStart()&&Array.isArray(plan.days)?plan:null;
- const first=esc(active().user?.firstName||'arkadaşım');
  if(!p||edit){
   const duration=Number(p?.minutes||s.daily||20);
-  host.innerHTML='<h2>👋 Merhaba, '+first+'! Ben Felcan.</h2><p>Sana uygun bir çalışma programı hazırlayayım. Önce günde ne kadar zaman ayırabileceğini öğreneyim.</p>'
+  host.innerHTML='<h2>Program ayarları</h2>'
     +'<form class="da-plan-form"><label>Günde kaç dakika çalışabilirsin?<select name="minutes">'+[10,15,20,30,45,60,90,120,180,240].map(n=>'<option value="'+n+'" '+(duration===n?'selected':'')+'>'+minutesDisplay(n)+'</option>').join('')+'</select></label>'
     +'<label>Almanca öğrenme hedefin nedir?<select name="goal">'+Object.entries(goals).map(([k,v])=>'<option value="'+k+'" '+(p?.goal===k?'selected':'')+'>'+v+'</option>').join('')+'</select></label>'
     +'<label class="da-plan-wide">En çok neyi geliştirmek istiyorsun?<select name="focus">'+[['balanced','Her şeyden biraz'],['speaking','Konuşma'],['grammar','Gramer'],['vocabulary','Kelime'],['listening','Dinleme'],['writing','Yazma']].map(([k,v])=>'<option value="'+k+'" '+(p?.focus===k?'selected':'')+'>'+v+'</option>').join('')+'</select></label>'
@@ -55,18 +39,18 @@ function renderWelcome(host,s,target,edit=false){
     if(typeof window.deutschaiPrepareDailyPlan==='function')window.deutschaiPrepareDailyPlan(val.minutes).catch(()=>{});
     else {const old=state();old.daily=val.minutes;store().setItem('deutschai-online-v1',JSON.stringify(old));}
     await buildWeek(val,true);
-   }finally{renderWelcome(host,state(),target)}
+   }finally{renderProgram(host,state())}
   };
-  host.querySelector('.da-cancel')?.addEventListener('click',()=>renderWelcome(host,s,target));
+  host.querySelector('.da-cancel')?.addEventListener('click',()=>renderProgram(host,s));
   return;
  }
  const goal=goals[p.goal]||goals.general;
  const today=current?.days[weekdaysIndex()];
- host.innerHTML='<h2>👋 Hoş geldin, '+first+'! Ben Felcan.</h2>'
+ host.innerHTML='<h2>Haftalık çalışma planı</h2>'
   +'<p>Hedefin <b>'+esc(goal)+'</b> · Günlük <b>'+esc(minutesDisplay(p.minutes))+'</b> · Seviye <b>'+esc(s.level||'A1')+'</b>. '+(today?'Bugün '+esc(today.topic)+' çalışıyoruz.':'Bu haftaki programını birlikte hazırlayalım.')+'</p>'
   +'<div class="da-plan-actions"><button class="da-plan-toggle">'+(current?'Haftalık planımı göster':'Haftalık program oluştur')+'</button><button class="da-settings">Çalışma süremi / hedefimi değiştir</button><button class="da-talk">Felcan ile konuş</button></div>'
   +'<div class="da-week-slot" aria-live="polite"></div>';
- host.querySelector('.da-settings').onclick=()=>renderWelcome(host,s,target,true);
+ host.querySelector('.da-settings').onclick=()=>renderProgram(host,s,true);
  host.querySelector('.da-talk').onclick=()=>active().openFelkan();
  host.querySelector('.da-plan-toggle').onclick=()=>{const slot=host.querySelector('.da-week-slot');if(slot.childElementCount){slot.replaceChildren();return}if(current)drawWeek(host,current);else buildWeek(p,false,host)};
  if(current)drawWeek(host,current);
@@ -87,7 +71,7 @@ function fallbackWeek(p,s){
 }
 async function buildWeek(p,force=false,host=null){
  if(!p)return;
- const e=host||document.getElementById('da-home-greeting');if(!e)return;
+ const e=host||document.getElementById('da-study-program');if(!e)return;
  const slot=e.querySelector('.da-week-slot');
  if(slot)slot.innerHTML='<p>✨ Felcan, seviyeni ve önceki çalışmalarını inceleyerek haftalık planını hazırlıyor…</p>';
  const s=state(),level=s.level||'A1',minutes=p.minutes,week=weekStart();
@@ -109,7 +93,7 @@ async function buildWeek(p,force=false,host=null){
  const prev=existingPlan(),done=(!force&&prev?.week===week)?prev.done||{}:{};
  const plan={week,minutes,goal:p.goal,focus:p.focus,days,done,fallback};
  store().setItem(PLAN,JSON.stringify(plan));
- if(e.isConnected)renderWelcome(e,state(),planSection(state()));
+ if(e.isConnected)renderProgram(e,state());
 }
 
 const AI_SECTIONS={
@@ -175,7 +159,12 @@ async function generate(subject,host,force=false){
 function update(){
  if(!active()?.ready)return;
  const root=document.getElementById('view');if(!root)return;
- const page=section();if(page==='home'){greet();return}
+ const page=section();
+ if(page==='program'){
+  const host=root.querySelector('#da-study-program');
+  if(host&&!host.childElementCount)renderProgram(host,state());
+  return;
+ }
  if(!AI_SECTIONS[page]||root.querySelector('#da-personal-practice'))return;
  const el=document.createElement('section');el.className='da-personal';el.id='da-personal-practice';
  const top=root.querySelector('.top');if(top)top.after(el);else root.prepend(el);
