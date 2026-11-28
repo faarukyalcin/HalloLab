@@ -2227,7 +2227,7 @@ function toggleCompanionVoice(){
     connect();
   }
 }
-window.FelcanVoiceControl={toggle:toggleCompanionVoice,activate:activateVoice};
+window.FelcanVoiceControl={toggle:toggleCompanionVoice,activate:activateVoice,visualSample(){let level=0;if(S.speaking&&S.analyser&&S.playCtx?.state==='running'){const samples=new Uint8Array(S.analyser.fftSize);S.analyser.getByteTimeDomainData(samples);let sum=0;for(const v of samples){const x=(v-128)/128;sum+=x*x}level=Math.min(1,Math.sqrt(sum/samples.length)*9);}return {level,speaking:S.speaking||S.ttsBusy||Boolean(window.speechSynthesis?.speaking),state:avatar.dataset.state,tts:Boolean(window.speechSynthesis?.speaking||S.ttsBusy)};}};
 
 $('#bCenter').onclick=()=>{closeAll();setPos('center')};
 $('#bMute').onclick=()=>{S.muted=!S.muted;$('#bMute').classList.toggle('on',S.muted);if(S.stream)S.stream.getAudioTracks().forEach(t=>t.enabled=!S.muted);
