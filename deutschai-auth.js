@@ -426,7 +426,7 @@
     iframe.allow='microphone; autoplay';
     iframe.tabIndex=-1;
     iframe.setAttribute('aria-hidden','true');
-    iframe.src='./felkan.html?compact=1&v=entry-voice-menu-1';
+    iframe.src='./felkan.html?compact=1&v=intro-once-voice-1';
     iframe.addEventListener('load',()=>{
       felcanReady=true;
       sendFelcanContext(true);
@@ -466,7 +466,7 @@
     window.addEventListener('blur',ping);
   }
   function felcanWelcome(){
-    if(!auth?.user)return;
+    if(!auth?.user||felcanState!=='idle')return;
     felcanVisual('connecting','Felcan bağlanıyor…');
     if(felcanReady)startFelcanVoice();
     else felcanRequested=true;
@@ -488,13 +488,17 @@
     button.setAttribute('aria-label','Felcan ile sesli konuşmaya başla');
     button.setAttribute('aria-pressed','false');
     button.innerHTML='<span class="da-felcan-orb" aria-hidden="true"><span class="da-toy-eyes">● ●</span><span class="da-toy-smile">ᴗ</span><span class="da-toy-feet"></span><span class="da-toy-spark">✦</span></span><span class="da-felcan-text">Felcan<span class="da-felcan-sub">Konuşmak için dokun</span></span>';
-    button.onclick=()=>{try{window.speechSynthesis?.cancel()}catch{};startFelcanVoice()};
+    button.onclick=startFelcanVoice;
     document.getElementById('view')?.addEventListener('click',e=>{const q=e.target.closest('.question, #da-personal-practice .da-question');if(!q)return;felcanFocusedQuestion=[...document.querySelectorAll('#view .question, #view #da-personal-practice .da-question')].indexOf(q)+1;sendFelcanContext(true)},true);
     document.body.append(button);
     ensureFelcanRuntime();
     document.addEventListener('pointerup',unlockFelcanOnInteraction,true);
     document.addEventListener('keydown',unlockFelcanOnInteraction,true);
-    felcanWelcome();
+    if(document.getElementById('deutschai-intro')){
+      document.addEventListener('deutschai:intro-finished',()=>{
+        if(button.isConnected)felcanWelcome();
+      },{once:true});
+    }else felcanWelcome();
     setInterval(()=>{if(felcanReady)sendFelcanContext()},1400);
   }
   window.deutschaiStore=store;
