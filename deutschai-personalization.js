@@ -1,4 +1,4 @@
-/* Felcan: weekly study program and personalized German drills. */
+/* Edit: weekly study program and personalized German drills. */
 (() => {
 'use strict';
 const active=()=>window.DeutschAI;
@@ -28,12 +28,12 @@ function renderProgram(host,s,edit=false){
     +'<form class="da-plan-form"><label>Günde kaç dakika çalışabilirsin?<select name="minutes">'+[10,15,20,30,45,60,90,120,180,240].map(n=>'<option value="'+n+'" '+(duration===n?'selected':'')+'>'+minutesDisplay(n)+'</option>').join('')+'</select></label>'
     +'<label>Almanca öğrenme hedefin nedir?<select name="goal">'+Object.entries(goals).map(([k,v])=>'<option value="'+k+'" '+(p?.goal===k?'selected':'')+'>'+v+'</option>').join('')+'</select></label>'
     +'<label class="da-plan-wide">En çok neyi geliştirmek istiyorsun?<select name="focus">'+[['balanced','Her şeyden biraz'],['speaking','Konuşma'],['grammar','Gramer'],['vocabulary','Kelime'],['listening','Dinleme'],['writing','Yazma']].map(([k,v])=>'<option value="'+k+'" '+(p?.focus===k?'selected':'')+'>'+v+'</option>').join('')+'</select></label>'
-    +'<div class="da-plan-wide"><button type="submit">Felcan, programımı hazırla ✨</button> '+(p?'<button type="button" class="da-cancel">Vazgeç</button>':'')+'</div></form><p class="da-plan-muted" aria-live="polite">Bilgilerin yalnızca senin hesabında saklanır. Programını daha sonra değiştirebilirsin.</p>';
+    +'<div class="da-plan-wide"><button type="submit">Edit, programımı hazırla ✨</button> '+(p?'<button type="button" class="da-cancel">Vazgeç</button>':'')+'</div></form><p class="da-plan-muted" aria-live="polite">Bilgilerin yalnızca senin hesabında saklanır. Programını daha sonra değiştirebilirsin.</p>';
   host.querySelector('form').onsubmit=async event=>{
    event.preventDefault();
    const button=host.querySelector('button[type="submit"]'), form=event.currentTarget;
    const val={minutes:Number(form.elements.minutes.value),goal:form.elements.goal.value,focus:form.elements.focus.value};
-   button.disabled=true;button.textContent='Felcan programını hazırlıyor…';
+   button.disabled=true;button.textContent='Edit programını hazırlıyor…';
    store().setItem(SETTINGS,JSON.stringify(val));
    try{
     if(typeof window.deutschaiPrepareDailyPlan==='function')window.deutschaiPrepareDailyPlan(val.minutes).catch(()=>{});
@@ -48,7 +48,7 @@ function renderProgram(host,s,edit=false){
  const today=current?.days[weekdaysIndex()];
  host.innerHTML='<h2>Haftalık çalışma planı</h2>'
   +'<p>Hedefin <b>'+esc(goal)+'</b> · Günlük <b>'+esc(minutesDisplay(p.minutes))+'</b> · Seviye <b>'+esc(s.level||'A1')+'</b>. '+(today?'Bugün '+esc(today.topic)+' çalışıyoruz.':'Bu haftaki programını birlikte hazırlayalım.')+'</p>'
-  +'<div class="da-plan-actions"><button class="da-plan-toggle">'+(current?'Haftalık planımı göster':'Haftalık program oluştur')+'</button><button class="da-settings">Çalışma süremi / hedefimi değiştir</button><button class="da-talk">Felcan ile konuş</button></div>'
+  +'<div class="da-plan-actions"><button class="da-plan-toggle">'+(current?'Haftalık planımı göster':'Haftalık program oluştur')+'</button><button class="da-settings">Çalışma süremi / hedefimi değiştir</button><button class="da-talk">Edit ile konuş</button></div>'
   +'<div class="da-week-slot" aria-live="polite"></div>';
  host.querySelector('.da-settings').onclick=()=>renderProgram(host,s,true);
  host.querySelector('.da-talk').onclick=()=>active().openFelkan();
@@ -73,9 +73,9 @@ async function buildWeek(p,force=false,host=null){
  if(!p)return;
  const e=host||document.getElementById('da-study-program');if(!e)return;
  const slot=e.querySelector('.da-week-slot');
- if(slot)slot.innerHTML='<p>✨ Felcan, seviyeni ve önceki çalışmalarını inceleyerek haftalık planını hazırlıyor…</p>';
+ if(slot)slot.innerHTML='<p>✨ Edit, seviyeni ve önceki çalışmalarını inceleyerek haftalık planını hazırlıyor…</p>';
  const s=state(),level=s.level||'A1',minutes=p.minutes,week=weekStart();
- const task='Felcan adlı Almanca öğretmenisin. Türkçe yaz. '+level+' seviyesindeki öğrenci için bu haftaya özel 7 günlük GERÇEKÇİ program hazırla. Günlük süre '+minutes+' dakika (aşma). Hedef: '+(goals[p.goal]||goals.general)+'. Odak: '+p.focus+'. Tamamlanan ders sayısı '+(s.completed||[]).length+'. Zorlanılan kelimeler '+JSON.stringify((s.wrongWords||[]).slice(0,8))+'. Her güne farklı konu ve tam 2 kısa etkinlik koy. Kesinlikle SADECE geçerli, kısa JSON döndür: {"days":[{"topic":"konu","tasks":[{"activity":"kısa görev","minutes":10},{"activity":"kısa görev","minutes":10}]}]}. days tam 7 eleman, Pazartesi-Pazar sıralı. Her günün süre toplamı '+minutes+' olmalı. Markdown kullanma.';
+ const task='Edit adlı Almanca öğretmenisin. Türkçe yaz. '+level+' seviyesindeki öğrenci için bu haftaya özel 7 günlük GERÇEKÇİ program hazırla. Günlük süre '+minutes+' dakika (aşma). Hedef: '+(goals[p.goal]||goals.general)+'. Odak: '+p.focus+'. Tamamlanan ders sayısı '+(s.completed||[]).length+'. Zorlanılan kelimeler '+JSON.stringify((s.wrongWords||[]).slice(0,8))+'. Her güne farklı konu ve tam 2 kısa etkinlik koy. Kesinlikle SADECE geçerli, kısa JSON döndür: {"days":[{"topic":"konu","tasks":[{"activity":"kısa görev","minutes":10},{"activity":"kısa görev","minutes":10}]}]}. days tam 7 eleman, Pazartesi-Pazar sıralı. Her günün süre toplamı '+minutes+' olmalı. Markdown kullanma.';
  let days=null,fallback=false;
  try {
   const res=await active().api('/ai/generate',{method:'POST',body:JSON.stringify({task,profile:{level,daily:minutes}})});
@@ -87,7 +87,7 @@ async function buildWeek(p,force=false,host=null){
    const a=Math.max(5,Math.min(minutes-5,Math.round(Number(tasks[0].minutes)||minutes*.5)));
    return {topic:String(day.topic||'Almanca').slice(0,90),tasks:[{activity:String(tasks[0].activity||'Ders').slice(0,130),minutes:a},{activity:String(tasks[1].activity||'Alıştırma').slice(0,130),minutes:minutes-a}]};
   });
- }catch(error){console.warn('Felcan programı hazır planla değiştirildi:',error);fallback=true;days=fallbackWeek(p,s)}
+ }catch(error){console.warn('Edit programı hazır planla değiştirildi:',error);fallback=true;days=fallbackWeek(p,s)}
  // Do not overwrite a more recent user's choices if another request was submitted.
  if(JSON.stringify(preferences())!==JSON.stringify(p))return;
  const prev=existingPlan(),done=(!force&&prev?.week===week)?prev.done||{}:{};
@@ -108,7 +108,7 @@ const AI_SECTIONS={
 };
 function draw(host,lesson,subject){
  const conf=AI_SECTIONS[subject]||AI_SECTIONS.practice;
- host.innerHTML='<h2>✦ Felcan · '+esc(conf.title)+'</h2><p>'+esc(lesson.intro||'Sana özel hazırlanmış çalışmalar.')+'</p><div class="da-list"></div><div class="da-plan-actions"><button class="da-new">Yeni sorular hazırla</button><button class="da-talk-questions">Felcan ile sesli çalış</button></div>';
+ host.innerHTML='<h2>✦ Edit · '+esc(conf.title)+'</h2><p>'+esc(lesson.intro||'Sana özel hazırlanmış çalışmalar.')+'</p><div class="da-list"></div><div class="da-plan-actions"><button class="da-new">Yeni sorular hazırla</button><button class="da-talk-questions">Edit ile sesli çalış</button></div>';
  const dest=host.querySelector('.da-list');
  let shown=0;
  (Array.isArray(lesson.questions)?lesson.questions:[]).slice(0,conf.count).forEach((q,i)=>{
@@ -140,9 +140,9 @@ async function generate(subject,host,force=false){
  if(cached&&!force){draw(host,cached,subject);return}
  if(host.dataset.generating==='1')return;
  host.dataset.generating='1';
- host.innerHTML='<h2>✦ Felcan '+esc(conf.title)+' hazırlıyor…</h2><p>Gemini, seviyene ve ilerlemene uygun sorular üretiyor.</p>';
+ host.innerHTML='<h2>✦ Edit '+esc(conf.title)+' hazırlıyor…</h2><p>Gemini, seviyene ve ilerlemene uygun sorular üretiyor.</p>';
  const level=s.level||'A1';
- const task="Sen DeutschAI öğretmeni Felcan'sın. Türkçe açıkla. "+level+' düzeyine uygun '+conf.title+' bölümü hazırlıyorsun. '+conf.focus+' Tamamlanan ders sayısı '+(s.completed||[]).length+', yanlış kelimeler '+JSON.stringify((s.wrongWords||[]).slice(0,12))+'. Tam '+conf.count+' farklı 4 şıklı özgün soru üret. Cevap sırası dengeli olsun. Yalnızca geçerli JSON döndür, Markdown kullanma: {"intro":"Türkçe kısa öğretici açıklama","questions":[{"question":"özgün soru","options":["A","B","C","D"],"answer":0,"explanation":"Türkçe öğretici açıklama"}]}. answer 0-3 tamsayıdır.';
+ const task="Sen DeutschAI öğretmeni Edit'sin. Türkçe açıkla. "+level+' düzeyine uygun '+conf.title+' bölümü hazırlıyorsun. '+conf.focus+' Tamamlanan ders sayısı '+(s.completed||[]).length+', yanlış kelimeler '+JSON.stringify((s.wrongWords||[]).slice(0,12))+'. Tam '+conf.count+' farklı 4 şıklı özgün soru üret. Cevap sırası dengeli olsun. Yalnızca geçerli JSON döndür, Markdown kullanma: {"intro":"Türkçe kısa öğretici açıklama","questions":[{"question":"özgün soru","options":["A","B","C","D"],"answer":0,"explanation":"Türkçe öğretici açıklama"}]}. answer 0-3 tamsayıdır.';
  try{
   const res=await active().api('/ai/generate',{method:'POST',body:JSON.stringify({task,profile:{level,daily:s.daily||20}})});
   const raw=String(res.text||'').trim(),first=raw.indexOf('{'),last=raw.lastIndexOf('}');
@@ -152,7 +152,7 @@ async function generate(subject,host,force=false){
   if(host.isConnected&&section()===subject){store().setItem(cacheKey,JSON.stringify(json));draw(host,json,subject)}
  }catch(err){
   if(!host.isConnected)return;
-  host.innerHTML='<h2>Felcan bu çalışmayı hazırlayamadı</h2><p>'+esc(err.message)+'</p><button class="retry">Yeniden dene</button>';
+  host.innerHTML='<h2>Edit bu çalışmayı hazırlayamadı</h2><p>'+esc(err.message)+'</p><button class="retry">Yeniden dene</button>';
   host.querySelector('.retry').onclick=()=>generate(subject,host,true);
  }finally{delete host.dataset.generating}
 }
