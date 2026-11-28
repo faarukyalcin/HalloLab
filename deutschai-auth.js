@@ -456,6 +456,11 @@
     const style=document.createElement('style');
     style.textContent=`
       #da-account-action{display:flex;align-items:center;gap:7px}
+      .study-header .study-tools:has(#da-account-action){display:flex;align-items:center;gap:6px;flex-wrap:nowrap}
+      .study-header #da-account-action{position:relative!important;inset:auto!important;z-index:auto;flex:none;max-width:125px;min-width:0;padding:5px 8px;border-radius:14px;background:linear-gradient(145deg,#ffffff20,#ffffff08);border:1px solid #b8a9ed60;box-shadow:inset 0 1px 0 #ffffff30;color:var(--ink,#fff);font-size:12px;white-space:nowrap}
+      .study-header #da-account-action .da-profile-label{overflow:hidden;text-overflow:ellipsis;max-width:68px}
+      @media(max-width:600px){body .app.study-app>.study-header .study-brand{font-size:clamp(12px,3.6vw,17px);gap:7px}body .app.study-app>.study-header .study-mark{width:34px;height:34px} .study-header #da-account-action{max-width:100px;padding:4px 6px;gap:4px;min-height:40px}.study-header #da-account-action .da-profile-avatar{width:27px;height:27px}.study-header #da-account-action .da-profile-label{max-width:45px}body .app.study-app>.study-header .study-appearance>summary{width:36px;height:40px}}
+      @media(max-width:360px){.study-header #da-account-action .da-profile-label{max-width:34px}.study-header #da-account-action{padding:4px;gap:3px}}
       .da-profile-avatar{display:inline-grid;place-items:center;overflow:hidden;flex:none;border-radius:50%;background:linear-gradient(145deg,#83d8a9,#246e50);color:white;font-weight:800;width:32px;height:32px;border:1px solid #ffffff65}
       .da-profile-avatar img{width:100%;height:100%;object-fit:cover}
       #da-auth-screen .da-profile-card{width:min(470px,100%);padding:22px;background:linear-gradient(145deg,#285c47e8,#102d27f5);border:1px solid #b9fbd776;box-shadow:inset 0 1px 1px #ffffff55,0 24px 80px #0008;backdrop-filter:blur(30px) saturate(160%);color:#f1fff7}
@@ -468,8 +473,8 @@
       .da-profile-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.da-profile-card form{display:grid;gap:10px}.da-profile-card [hidden]{display:none!important}
     `;document.head.append(style);
     function avatar(photo,name){const s=document.createElement('span');s.className='da-profile-avatar';if(validPhoto(photo)){const img=document.createElement('img');img.src=photo;img.alt='';s.append(img)}else{s.textContent=(name||'?').trim().slice(0,2).toLocaleUpperCase('tr')}return s}
-    function refresh(){const p=read(key);b.replaceChildren(avatar(p.photo,auth.user.firstName),document.createTextNode((p.displayName||auth.user.firstName)+' ▾'))}
-    refresh();document.body.append(b);
+    function refresh(){const p=read(key);const label=document.createElement('span');label.className='da-profile-label';label.textContent=p.displayName||auth.user.firstName;b.setAttribute('aria-label',label.textContent+' · Profilim');b.replaceChildren(avatar(p.photo,auth.user.firstName),label,document.createTextNode('▾'))}
+    refresh();(document.querySelector('.study-header .study-tools')||document.body).append(b);
     b.onclick=()=>{
       const e=overlay(),p=read(key),learning=read('deutschai-ai-profile-v1'),placement=read('deutschai-ai-placement-v1'),progress=read('deutschai-online-v1');
       const level=levels.includes(placement.level)?placement.level:levels.includes(learning.level)?learning.level:'Belirlenmedi';
