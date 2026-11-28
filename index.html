@@ -553,7 +553,7 @@ body #mobile-more-menu .mobile-more-sheet,body .study-popup,body .study-appearan
 body #da-auth-screen :is(.da-profile-card,.da-admin-card){background:linear-gradient(145deg,color-mix(in srgb,var(--accent-soft) 12%,var(--paper)),var(--paper))!important;color:var(--ink)!important;border-color:var(--line)!important}
 body #da-auth-screen :is(.da-profile-card,.da-admin-card) :is(input,select,textarea,button){background:color-mix(in srgb,var(--paper) 85%,var(--mint))!important;color:var(--ink)!important;border-color:var(--line)!important}
 body #da-auth-screen :is(.da-profile-card,.da-admin-card) :is(p,label,small){color:var(--muted)!important}
-</style><script src="./api-config.js"></script><script src="./deutschai-auth.js?v=start-top-1"></script></head><body><div class="scene-ribbons" aria-hidden="true"></div><div class="app study-app"><header class="study-header"><div class="study-head"><div class="study-brand"><div class="study-mark"><svg class="deutschai-book-mark" viewBox="0 0 48 48" aria-hidden="true" fill="none">
+</style><script src="./api-config.js"></script><script src="./deutschai-auth.js?v=learning-goal-1"></script></head><body><div class="scene-ribbons" aria-hidden="true"></div><div class="app study-app"><header class="study-header"><div class="study-head"><div class="study-brand"><div class="study-mark"><svg class="deutschai-book-mark" viewBox="0 0 48 48" aria-hidden="true" fill="none">
   <path d="M12 11h13c8 0 14 5.5 14 13s-6 13-14 13H12z" stroke="#fcfaff" stroke-width="3.1" stroke-linejoin="round"/>
   <path d="M12 18c4-1 8.2.2 12 3.2 3.5-2.8 7.3-4.1 11-3.4M12 27c4-1 8.2.2 12 3.2 4.2-3.3 8.5-4.6 13-3.1M24 21.2v9" stroke="#ded0ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
   <path d="M14.5 41h5" stroke="#f28a9c" stroke-width="2.2" stroke-linecap="round"/>
@@ -1208,7 +1208,7 @@ function finishExam(button){
 
 render();
 requestAnimationFrame(()=>requestAnimationFrame(()=>window.deutschaiDesktop?.notifyStartupReady?.()));
-</script><script src="./gemini-web.js?v=edit-refresh-5"></script><script>(() => {
+</script><script src="./gemini-web.js?v=learning-goal-1"></script><script>(() => {
   const desk = window.deutschaiDesktop || window.deutschaiWeb;
   if (!desk) {console.error('Edit öğrenme bağlantısı yüklenemedi.');return;}
   const profileKey = 'deutschai-ai-profile-v1';
@@ -1240,11 +1240,18 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>window.deutschaiDesktop?.not
     saveProfile(); document.querySelector('#ai-profile-note').textContent = 'Profil kaydedildi. Yeni içerikler bu hedefe göre hazırlanacak.';
   };
   function safeJson(data) { return esc(JSON.stringify(data)); }
+  window.deutschaiApplyLearningGoal=goal=>{
+    state.daily=goal.dailyMinutes;save();
+    profile={...profile,dailyMinutes:goal.dailyMinutes,learningGoal:goal};saveProfile();
+    dailyPack=null;
+    adaptiveAutoRequested.clear();
+    if(page==='home'||page==='progress')render();
+  };
   function learnerSnapshot() {
     const wrong = (state.wrongWords || []).slice(-30).map(i=>DATA.vocabulary[i]).filter(Boolean).map(w=>({de:w.de,tr:w.tr}));
     const learned = Object.keys(state.learned || {}).slice(-40).map(i=>DATA.vocabulary[+i]).filter(Boolean).map(w=>w.de);
     const attempts=(state.attempts||[]).slice(-40).map(a=>({ok:!!a.ok,exam:!!a.exam,word:!!a.word,skill:a.skill||null,level:a.level||state.level,planTask:!!a.planTask}));
-    return {...profile, level:placement?.level||profile.level||null, date:localDate(), placement, learnerProgress:{completedLessons:(state.completed||[]).length, learnedVocabulary:learned, aiLearnedVocabulary:JSON.parse(window.deutschaiStore.getItem('deutschai-ai-learned-vocab-v1')||'[]').slice(-40).map(x=>x.de), wrongVocabulary:wrong, grammarPerformance:state.grammarPerformance||{}, recentAnswers:attempts, levelProgress:state.levelProgress||null, dailyPlanProgress:state.dailyPlanProgress||null, dailyTestResults:(state.dailyTests||[]).slice(-20), goetheResults:(state.attempts||[]).filter(x=>x.exam).slice(-20), recentAIHistory:history.slice(-20),personalStudyResults:adaptiveData().results?.slice(-12)||[]}};
+    return {...profile, learningGoal:window.deutschaiGetLearningGoal?.()||null, level:placement?.level||profile.level||state.level||null, date:localDate(), placement, learnerProgress:{completedLessons:(state.completed||[]).length, learnedVocabulary:learned, aiLearnedVocabulary:JSON.parse(window.deutschaiStore.getItem('deutschai-ai-learned-vocab-v1')||'[]').slice(-40).map(x=>x.de), wrongVocabulary:wrong, grammarPerformance:state.grammarPerformance||{}, recentAnswers:attempts, levelProgress:state.levelProgress||null, dailyPlanProgress:state.dailyPlanProgress||null, dailyTestResults:(state.dailyTests||[]).slice(-20), goetheResults:(state.attempts||[]).filter(x=>x.exam).slice(-20), recentAIHistory:history.slice(-20),personalStudyResults:adaptiveData().results?.slice(-12)||[]}};
   }
   const placementLevelOrder=['A1','A2','B1','B2','C1','C2'];
   const placementSectionOrder=['speaking','writing','listening','reading','grammar','vocabulary'];
@@ -1282,7 +1289,7 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>window.deutschaiDesktop?.not
   const adaptiveErrors={};
   let plannedStudy=null;
   window.deutschaiStartPlannedStudy=context=>{if(!context||!adaptiveKinds.includes(context.route)||adaptiveBusy)return false;plannedStudy={...context};if(page!==context.route)setPage(context.route);else render();const host=document.querySelector('#adaptive-ai-root');if(!host||host.dataset.kind!==context.route)return false;if(!adaptiveBusy)void window.deutschaiGenerateAdaptiveContent(context.route);return true;};
-  function currentGeneratedStudy(kind){const batch=adaptiveData().latest?.[kind];return batch?.content&&batch.content.source!=='local-fallback'?batch:null;}
+  function currentGeneratedStudy(kind){const batch=adaptiveData().latest?.[kind],goal=window.deutschaiGetLearningGoal?.();return batch?.content&&batch.content.source!=='local-fallback'&&(!goal||batch.goalRevision===goal.updatedAt)?batch:null;}
   let adaptiveBusy = false;
   function adaptiveData() {
     try { return JSON.parse(window.deutschaiStore.getItem(adaptiveKey) || '{"version":1,"latest":{},"seen":{},"results":[]}'); }
@@ -1359,7 +1366,7 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>window.deutschaiDesktop?.not
  for(let attempt=0;attempt<3;attempt++){
   const variation=crypto.randomUUID?.()||String(Date.now());
   const scheduled=plannedStudy?.route===kind?plannedStudy:null;
-  const instruction=requestText[kind]+(scheduled?' HAFTALIK PROGRAM GÖREVİ: '+JSON.stringify({topic:scheduled.topic,activity:scheduled.activity,minutes:scheduled.minutes})+'. Bu görevi aynen uygula, konu dışına çıkma.':'')+'\\nYENİ ÇALIŞMA KİMLİĞİ: '+variation+'. Önceki başlık: '+(previous?.title||'yok')+'. Önceki örnekler: '+JSON.stringify((previous?.examples||[]).map(x=>x.de)).slice(0,1200)+'. Önceki sorular/kelimeler: '+JSON.stringify(priorItems.map(x=>x.question||x.prompt||x.de||x.word)).slice(0,2400)+'. Yeni bir çalışma oluştur. Aynı beceriyi pekiştirmen gerekiyorsa farklı bağlam, farklı cümleler ve farklı başlık kullan. Eski örnek ve soruları kopyalama. Sorularda tam dört farklı metin seçeneği ve answer alanında 0-3 arasında tamsayı kullan. '+(attempt?'Önceki çıktı geçersiz veya tekrarlıydı; tamamen farklı örnekler hazırla.':'');
+  const instruction=requestText[kind]+(window.deutschaiGetLearningGoal?.()?' ÖĞRENME HEDEFİ: '+JSON.stringify(window.deutschaiGetLearningGoal())+'. Öğrencinin gerçek mevcut seviyesinden başlayarak hedefe yönelik öğret. Hedef sınav ise özgün sınav uyumlu çalışmalar hazırla.':'')+(scheduled?' HAFTALIK PROGRAM GÖREVİ: '+JSON.stringify({topic:scheduled.topic,activity:scheduled.activity,minutes:scheduled.minutes})+'. Bu görevi aynen uygula, konu dışına çıkma.':'')+'\\nYENİ ÇALIŞMA KİMLİĞİ: '+variation+'. Önceki başlık: '+(previous?.title||'yok')+'. Önceki örnekler: '+JSON.stringify((previous?.examples||[]).map(x=>x.de)).slice(0,1200)+'. Önceki sorular/kelimeler: '+JSON.stringify(priorItems.map(x=>x.question||x.prompt||x.de||x.word)).slice(0,2400)+'. Yeni bir çalışma oluştur. Aynı beceriyi pekiştirmen gerekiyorsa farklı bağlam, farklı cümleler ve farklı başlık kullan. Eski örnek ve soruları kopyalama. Sorularda tam dört farklı metin seçeneği ve answer alanında 0-3 arasında tamsayı kullan. '+(attempt?'Önceki çıktı geçersiz veya tekrarlıydı; tamamen farklı örnekler hazırla.':'');
   content=await desk.geminiTutor({task:prompts[kind],profile:learnerSnapshot(),history,text:instruction});
   if(!content||typeof content!=='object')continue;
   const raw=adaptiveItems(kind,content);
@@ -1381,7 +1388,7 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>window.deutschaiDesktop?.not
  if(fresh.length<required)throw Error('Edit yeterli sayıda farklı ve geçerli içerik üretemedi. Önceki çalışma korundu.');
  if(kind==='words')content.vocabulary=fresh;else content.questions=fresh;
  const fingerprints=fresh.map(item=>adaptiveFingerprint(item,kind,content)).filter(Boolean);
- const latest=adaptiveData();latest.latest=latest.latest||{};latest.latest[kind]={date:localDate(),at:new Date().toISOString(),content,selected:{},planned:plannedStudy?.route===kind?{...plannedStudy}:null};latest.seen=latest.seen||{};latest.seen[kind]=[...seen,...fingerprints].slice(-80);window.deutschaiStore.setItem(adaptiveKey,JSON.stringify(latest));history.push({task:'adaptive-'+kind,level:profile.level,items:fingerprints.slice(0,12),at:new Date().toISOString()});saveHistory();
+ const latest=adaptiveData();latest.latest=latest.latest||{};latest.latest[kind]={date:localDate(),at:new Date().toISOString(),content,selected:{},goalRevision:window.deutschaiGetLearningGoal?.()?.updatedAt||null,planned:plannedStudy?.route===kind?{...plannedStudy}:null};latest.seen=latest.seen||{};latest.seen[kind]=[...seen,...fingerprints].slice(-80);window.deutschaiStore.setItem(adaptiveKey,JSON.stringify(latest));history.push({task:'adaptive-'+kind,level:profile.level,items:fingerprints.slice(0,12),at:new Date().toISOString()});saveHistory();
  }catch(error){adaptiveErrors[kind]=String(error?.message||error).slice(0,160);}finally{adaptiveBusy=false;const host=document.querySelector('#adaptive-ai-root');if(host&&host.dataset.kind===kind)host.innerHTML=adaptiveMarkup(kind,currentGeneratedStudy(kind));}};
   const baseWordsAdaptive=words,basePracticeAdaptive=practice,baseProgressAdaptive=progress;
   function exclusiveStudy(kind,title){if(plannedStudy&&plannedStudy.route!==kind)plannedStudy=null;shell(title,'<div id="adaptive-ai-root" data-kind="'+kind+'"></div>');const host=document.querySelector('#adaptive-ai-root');host.innerHTML=adaptiveMarkup(kind,currentGeneratedStudy(kind));if(!plannedStudy&&!currentGeneratedStudy(kind)&&!adaptiveAutoRequested.has(kind)&&!adaptiveBusy){adaptiveAutoRequested.add(kind);void window.deutschaiGenerateAdaptiveContent(kind,true);}}
@@ -1678,4 +1685,4 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>window.deutschaiDesktop?.not
   };
   render();
 })();
-</script><script src="./learning-features.js"></script><script src="./deutschai-personalization.js?v=weekly-steps-1"></script></body></html>
+</script><script src="./learning-features.js"></script><script src="./deutschai-personalization.js?v=learning-goal-1"></script></body></html>
