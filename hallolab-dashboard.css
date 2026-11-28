@@ -529,7 +529,7 @@ body .study-app #view > :is(.top, .card, #adaptive-ai-root, .placement-exam, .le
     width: 44px; height: 44px; color: #f6f0ff; cursor: pointer; list-style: none;
   }
   .hl-phone-updates summary::-webkit-details-marker { display: none; }
-  .hl-phone-updates summary svg { width: 22px; height: 22px; }
+  .hl-phone-updates .hl-bell-icon { display: block; width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
   .hl-phone-updates summary i { position: absolute; top: 9px; right: 10px; width: 8px; height: 8px; border-radius: 50%; background: #fa3b55; box-shadow: 0 0 0 1px #171633; }
   .hl-phone-popover {
     position: absolute; top: calc(100% + 5px); right: 0; z-index: 3;
@@ -659,8 +659,8 @@ body .study-app #view > :is(.top, .card, #adaptive-ai-root, .placement-exam, .le
 }
 
 @media (max-width: 719px) and (max-height: 620px) {
-  .hl-dashboard { gap: 8px; }
-  .hl-banner { min-height: 116px; padding-block: 12px; }
+  .hl-dashboard { gap: 7px; }
+  .hl-banner { min-height: 108px; padding-block: 12px; }
   .hl-metrics { margin-top: -22px; }
   .hl-metrics > .hl-level { min-height: 59px; }
   .hl-shortcut { min-height: 72px; padding-block: 5px; gap: 3px; }
