@@ -740,14 +740,19 @@ function send(o){if(S.ws&&S.ws.readyState===1){S.ws.send(JSON.stringify(o));retu
 function notify(text){log('→ Felkan:',text.slice(0,160));return send({realtimeInput:{text}})}
 let felcanGreetingPending=false;
 let felcanGreetingTimer=null;
-function requestSpokenGreeting(text){
-  // Gemini Live requires a completed client turn to start generating audio.
-  // realtimeInput.text alone does not reliably trigger an immediate reply.
-  const ok=send({clientContent:{turns:[{role:'user',parts:[{text}]}],turnComplete:true}});
+function requestSpokenGreeting(text,model){
+  // Gemini 3.1 accepts live text through realtimeInput.
+  const message=model.startsWith('gemini-3.1-')
+    ? {realtimeInput:{text}}
+    : {clientContent:{turns:[{role:'user',parts:[{text}]}],turnComplete:true}};
+  const ok=send(message);
   if(!ok)return false;
   felcanGreetingPending=true;
   clearTimeout(felcanGreetingTimer);
-  felcanGreetingTimer=setTimeout(()=>{felcanGreetingPending=false},14000);
+  felcanGreetingTimer=setTimeout(()=>{
+    felcanGreetingPending=false;
+    if(S.setupDone&&!S.speaking)setStatus('listening','Selam yanıtı gecikti. Konuşabilirsin.');
+  },14000);
   setStatus('connecting','Felcan seni karşılıyor…');
   return true;
 }
@@ -820,13 +825,15 @@ async function connect(){
   const ws=new WebSocket(url);S.ws=ws;S.setupDone=false;
   const timer=setTimeout(()=>{if(!S.setupDone&&S.ws===ws){log('Kurulum zaman aşımı');ws.close(4000,'setup timeout')}},12000);
   ws.onopen=()=>{log('WS açıldı, kurulum gönderiliyor');ws.send(JSON.stringify(buildSetup(cand)))};
-  ws.onmessage=ev=>{S.q=S.q.then(()=>onMsg(ev)).catch(e=>log('Mesaj hatası',String(e)))};
+  ws.onmessage=ev=>{S.q=S.q.then(()=>{if(S.ws===ws)return onMsg(ev,cand.model)}).catch(e=>log('Mesaj hatası',String(e)))};
   ws.onerror=()=>log('WS hata olayı');
   ws.onclose=ev=>{clearTimeout(timer);if(S.ws!==ws)return;onClosed(ev)};
 }
 function onClosed(ev){
   log('Bağlantı kapandı',{code:ev.code,reason:ev.reason});stopPlayback();
   const wasUp=S.setupDone;S.setupDone=false;clearTimeout(S.stableTimer);
+  if(felcanGreetingPending)S.greeted=false;
+  felcanGreetingPending=false;clearTimeout(felcanGreetingTimer);
   if(S.userClosed){setStatus('idle','Başlatmak için dokun');$('#startBtn').textContent='Felkan ile çalışmaya başla';$('#startBtn').hidden=false;return}
   if(!wasUp){
     if(S.attempt<CANDS().length-1){S.attempt++;log('Alternatif kurulum deneniyor',CANDS()[S.attempt]);setStatus('connecting','Bağlanıyor… (yeni deneme)');setTimeout(connect,500);return}
@@ -835,7 +842,7 @@ function onClosed(ev){
   if(S.retries<3){S.retries++;setStatus('connecting','Yeniden bağlanıyor ('+S.retries+'/3)');setTimeout(connect,1200)}
   else{setStatus('error','Bağlantı koptu');$('#startBtn').textContent='Tekrar bağlan';$('#startBtn').hidden=false}
 }
-async function onMsg(ev){
+async function onMsg(ev,model){
   const txt=typeof ev.data==='string'?ev.data:await ev.data.text();
   const m=JSON.parse(txt);
   if(m.setupComplete){
@@ -846,7 +853,7 @@ async function onMsg(ev){
       if(!DATA.plan)makePlan({});
       const ctx='Merhaba! Sen Felcan, bu öğrencinin kişisel Almanca öğretmenisin. ŞİMDİ, herhangi bir soru veya ses beklemeden Türkçe olarak yüksek sesle kısa bir selam ver; öğrenciye ismiyle '+cfg.name+' diye hitap et. Bugün kaldığı yerden çalışmaya devam etmeyi öner. En fazla 2-3 cümle söyle. Bu metni tekrar etme, doğal bir selamlama oluştur. '+resumeContext()+(felcanScreen?' Ekrandaki mevcut DeutschAI çalışma bağlamı: '+describeFelcanScreen(felcanScreen):'');
       felcanPendingExplain=false;
-      if(requestSpokenGreeting(ctx)){
+      if(requestSpokenGreeting(ctx,model)){
         S.greeted=true;
         DATA.visits=(DATA.visits||0)+1;
         DATA.lastVisit=today();
