@@ -76,7 +76,7 @@ async function geminiFetch(env,path,payload){
 }
 function aiPrompt(profile,task,extra='') {
  const p=profile||{};
- return `Sen Felkan adlı Almanca öğretmenisin. Kullanıcıya Türkçe, kısa, açık ve cesaretlendirici biçimde destek ver. Genel Almanca, Goethe sınavı zorunlu değil. Seviye ${String(p.level||'A1').slice(0,5)}. Hedef ${Number(p.daily)||20} dk. Önceki ilerlemeyi dikkate al. ${extra}\nGörev: ${task}\nYalnızca ilgili Almanca öğrenme içeriği üret.`;
+ return `Sen Edit adlı Almanca öğretmenisin. Kullanıcıya Türkçe, kısa, açık ve cesaretlendirici biçimde destek ver. Genel Almanca, Goethe sınavı zorunlu değil. Seviye ${String(p.level||'A1').slice(0,5)}. Hedef ${Number(p.daily)||20} dk. Önceki ilerlemeyi dikkate al. ${extra}\nGörev: ${task}\nYalnızca ilgili Almanca öğrenme içeriği üret.`;
 }
 async function main(req,env){
  const url=new URL(req.url),route=url.pathname;
@@ -242,7 +242,7 @@ async function main(req,env){
   const voices=['Aoede','Puck','Charon','Kore','Fenrir','Leda','Orus','Zephyr'];
   const voiceName=voices.includes(x.voice)?x.voice:'Aoede';
   const result=await geminiFetch(env,'models/gemini-3.1-flash-tts-preview:generateContent',{
-   contents:[{parts:[{text:'Aşağıdaki cümleyi akıcı, rahat, enerjik Türkiye Türkçesiyle söyle. Yalnızca tırnak içindeki cümleyi oku: “Merhaba! Ben Felcan. Hazırsan Almanca çalışmaya başlayalım.”'}]}],
+   contents:[{parts:[{text:'Aşağıdaki cümleyi akıcı, rahat, enerjik Türkiye Türkçesiyle söyle. Yalnızca tırnak içindeki cümleyi oku: “Merhaba! Ben Edit. Hazırsan Almanca çalışmaya başlayalım.”'}]}],
    generationConfig:{responseModalities:['AUDIO'],speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName}}}}
   });
   if(result.error)return error(result.error,result.status);
