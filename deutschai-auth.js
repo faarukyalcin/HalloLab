@@ -239,6 +239,43 @@
     '@media(min-width:1000px){#da-account-action{top:70px;right:23px}}'
   ].join('');
   document.head.append(style);
+  const loginStyle=document.createElement('style');
+  loginStyle.textContent=`
+    #da-auth-screen:has(.da-login-modern){box-sizing:border-box;padding:clamp(12px,4vw,40px);background:radial-gradient(ellipse at 12% 12%,#6441a46b,transparent 56%),radial-gradient(ellipse at 88% 88%,#4550ad50,transparent 58%),#101226;align-items:center;justify-items:center}
+    #da-auth-screen .da-login-modern{box-sizing:border-box;min-height:0;max-width:960px;grid-template-columns:1fr minmax(360px,.9fr);border-radius:32px;border-color:#c6b0ff55;box-shadow:0 24px 90px #0007,inset 0 1px 0 #fff4;background:#24233f80;-webkit-backdrop-filter:blur(32px) saturate(155%);backdrop-filter:blur(32px) saturate(155%)}
+    #da-auth-screen .da-login-modern .da-login-hero{padding:32px;min-height:440px;background:radial-gradient(ellipse at 65% 50%,#ae7fff28,transparent 65%),linear-gradient(145deg,#ffffff0e,#ffffff02)}
+    #da-auth-screen .da-login-modern .da-brand-mark svg{width:24px;height:24px;fill:none;stroke:#fff;stroke-width:1.7;stroke-linejoin:round}
+    #da-auth-screen .da-login-modern .da-hero-content h1{font-size:clamp(30px,4vw,45px);line-height:1.18;letter-spacing:-.05em}
+    #da-auth-screen .da-login-modern .da-hero-content h1 em{display:block;font-size:.65em;letter-spacing:-.035em;margin-top:8px}
+    #da-auth-screen .da-login-modern .da-login-card{box-sizing:border-box;min-width:0;padding:32px;background:#15162c50}
+    #da-auth-screen .da-login-mobile-brand{display:none}
+    #da-auth-screen .da-login-modern .da-tabs{margin:0 0 24px;padding:4px;background:#090b1e55;border-radius:15px;border-color:#d4c0ff25}
+    #da-auth-screen .da-login-modern .da-tabs button{min-height:40px;border-radius:11px}
+    #da-auth-screen .da-login-modern .da-tabs button[aria-pressed="true"]{background:linear-gradient(145deg,#b391f34d,#7960c238);border:1px solid #d2b7ff44;box-shadow:inset 0 1px 0 #ffffff33}
+    #da-auth-screen .da-login-modern h2{margin:0;font-size:clamp(28px,6vw,36px);letter-spacing:-.045em}
+    #da-auth-screen .da-login-modern .da-login-intro{margin:5px 0 22px;color:#c9c1df}
+    #da-auth-screen .da-login-modern label{margin:12px 0;gap:7px}
+    #da-auth-screen .da-login-modern input{box-sizing:border-box;min-width:0;min-height:49px;border-radius:14px;background:#080b204d;border-color:#c0a8f33a;color:#fff}
+    #da-auth-screen .da-login-modern input::placeholder{color:#aaa4c1}
+    #da-auth-screen .da-login-modern .da-password-wrap{display:block;position:relative}
+    #da-auth-screen .da-login-modern .da-password-wrap input{padding-right:52px}
+    #da-auth-screen .da-login-modern #da-password-toggle{position:absolute;right:5px;top:5px;width:40px;height:40px;display:grid;place-items:center;padding:0;border:0;background:none;color:#c8b8ed;box-shadow:none}
+    #da-auth-screen .da-login-modern #da-password-toggle svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.7}
+    #da-auth-screen .da-login-modern #da-password-toggle[aria-pressed="true"]{color:white;background:#b696ff24}
+    #da-auth-screen .da-login-modern .da-error:empty{display:none}
+    #da-auth-screen .da-login-modern .da-error:not(:empty){padding:10px;border-radius:10px;background:#ec668519;color:#ffbdca;margin:10px 0}
+    #da-auth-screen .da-login-modern .da-login-submit{display:flex;justify-content:center;align-items:center;gap:12px;min-height:50px;margin-top:19px;border-radius:15px;background:linear-gradient(145deg,#a27cf1,#7450c8);box-shadow:inset 0 1px 0 #ffffff50,0 7px 22px #7954cb50}
+    #da-auth-screen .da-login-modern .da-login-submit:disabled{opacity:.65;cursor:wait}
+    #da-auth-screen .da-login-modern .da-login-switch{text-align:center;margin:19px 0 12px}
+    #da-auth-screen .da-login-modern .da-login-switch button{padding:4px;border:0;background:none;color:#d4bfff;font-size:13px}
+    #da-auth-screen .da-login-privacy{text-align:center;color:#bdb4d8;font-size:11px}
+    #da-auth-screen .da-login-privacy summary{cursor:pointer;list-style:none}
+    #da-auth-screen .da-login-privacy summary::before{content:"ⓘ ";color:#cbb3ff}
+    #da-auth-screen .da-login-privacy p{text-align:left;font-size:11px;margin:9px 0 0}
+    @media(max-width:780px){#da-auth-screen:has(.da-login-modern){padding:max(12px,env(safe-area-inset-top)) 14px max(12px,env(safe-area-inset-bottom));align-items:center}#da-auth-screen .da-login-modern{width:min(440px,100%);grid-template-columns:minmax(0,1fr);border-radius:28px;overflow:visible}#da-auth-screen .da-login-modern .da-login-hero{display:none}#da-auth-screen .da-login-modern .da-login-card{padding:23px 22px;border-radius:inherit;background:linear-gradient(150deg,#ffffff09,#10132955)}#da-auth-screen .da-login-mobile-brand{display:flex;align-items:center;gap:10px;margin-bottom:24px;font-size:19px}#da-auth-screen .da-login-mobile-brand small{margin-left:auto;font-size:10px;letter-spacing:.1em;color:#c8b9eb}#da-auth-screen .da-login-modern .da-tabs{margin-bottom:20px}#da-auth-screen .da-login-modern .da-login-intro{margin-bottom:15px}}
+    @media(max-width:370px){#da-auth-screen .da-login-modern .da-login-card{padding:18px 15px}#da-auth-screen .da-login-modern .da-name-row{grid-template-columns:1fr 1fr;gap:7px}}
+  `;
+  document.head.append(loginStyle);
   function overlay() {
     let node=document.getElementById('da-auth-screen');
     if(!node){node=document.createElement('div');node.id='da-auth-screen';document.body.append(node);}
@@ -251,38 +288,38 @@
       screen.innerHTML='<div class="da-card"><h1>DilAtölyesi</h1><p>Hesap sunucusu henüz yapılandırılmadı.</p></div>';
       return;
     }
-    screen.innerHTML='<div class="da-login-shell">'
-      +'<section class="da-login-hero"><div class="da-login-brand"><span class="da-brand-mark">✦</span><strong>DilAtölyesi</strong><span class="da-brand-pill">ALMANCA ÖĞRENMENİN YENİ YOLU</span></div>'
-      +'<div class="da-hero-content"><div class="da-login-kicker">✦ KİŞİSEL YAPAY ZEKÂ ÖĞRETMENİN</div><h1>Almanca öğrenmek <em>seninle</em> başlar.</h1><p>Edit seni tanır, hedeflerini öğrenir ve günlük derslerini ilerlemene göre şekillendirir. Her gün küçük bir adım, her gün gerçek gelişim.</p>'
-      +'<div class="da-hero-mascot" aria-hidden="true"><span class="da-hero-ears"></span><span class="da-hero-face">● &nbsp; ●<span>ᴗ</span></span><span class="da-hero-feet"></span><span class="da-hero-star">✧</span></div>'
-      +'<div class="da-login-stats"><div><b>7 gün</b><span>Kişisel haftalık plan</span></div><div><b>4 beceri</b><span>Okuma · Yazma · Dinleme · Konuşma</span></div><div><b>AI</b><span>Edit ile öğrenme</span></div></div></div>'
-      +'<p class="da-hero-note">Kendi hızında öğren. Kaldığın yerden devam et.</p></section>'
-      +'<section class="da-card da-login-card"><div class="da-form-kicker">DİLATÖLYESİ HESABIN</div><h2>'+(mode==='register'?'Yolculuğuna başla':'Yeniden hoş geldin!')+'</h2><p>'+(mode==='register'?'Hesabını oluştur; Edit ilk programını birlikte hazırlasın.':'Almanca yolculuğuna kaldığın yerden devam et.')+'</p>'
-      +'<div class="da-tabs" role="group" aria-label="Hesap işlemi"><button type="button" id="da-login-tab" aria-pressed="'+(mode==='login')+'">Giriş Yap</button><button type="button" id="da-signup-tab" aria-pressed="'+(mode==='register')+'">Kayıt Ol</button></div>'
-      +'<form id="da-auth-form" autocomplete="off"><label>Kullanıcı adı<input name="username" autocomplete="username" minlength="3" maxlength="32" required placeholder="Kullanıcı adın"></label>'
-      +(mode==='register' ? '<div class="da-name-row"><label>Adın<input name="firstName" autocomplete="given-name" maxlength="80" required placeholder="Adın"></label><label>Soyadın<input name="lastName" autocomplete="family-name" maxlength="80" required placeholder="Soyadın"></label></div><label>E-posta<input name="email" type="email" autocomplete="email" required placeholder="ornek@eposta.com"></label>' : '')
-      +'<label>Şifre<input name="password" type="password" minlength="'+(mode==='register'?'10':'1')+'" autocomplete="new-password" required placeholder="Şifren"></label>'
-      +'<p class="da-error" role="alert">'+safe(message)+'</p><button class="da-login-submit" type="submit">'+(mode==='register'?'Hesap Oluştur ✦':'Öğrenmeye Devam Et ✦')+'</button></form>'
-      +'<p class="da-login-secure">🔒 İlerlemen hesabına özel saklanır. Yöneticiler giriş günlerini ve yaklaşık aktif çalışma sürelerini görebilir. API anahtarı istenmez.</p></section></div>';
+    screen.innerHTML='<div class="da-login-shell da-login-modern">'
+      +'<section class="da-login-hero"><div class="da-login-brand"><span class="da-brand-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h6a3 3 0 0 1 3 3v14a5 5 0 0 0-4-2H5zm9 3a3 3 0 0 1 3-3h4v15h-3a5 5 0 0 0-4 2"/></svg></span><strong>DilAtölyesi</strong><span class="da-brand-pill">DE · TR</span></div>'
+      +'<div class="da-hero-content"><div class="da-login-kicker">KİŞİSEL ALMANCA ATÖLYEN</div><h1>Her gün bir adım.<br><em>Jeden Tag ein Schritt.</em></h1><p>Edit ile kendi seviyende, kendi hızında Almanca öğren.</p>'
+      +'<div class="da-hero-mascot" aria-hidden="true"><span class="da-hero-ears"></span><span class="da-hero-face">● &nbsp; ●<span>ᴗ</span></span><span class="da-hero-feet"></span><span class="da-hero-star">✧</span></div></div><p class="da-hero-note">Kişisel dersler · Konuşma pratiği · A1–C2</p></section>'
+      +'<section class="da-card da-login-card"><div class="da-login-mobile-brand"><span class="da-brand-mark" aria-hidden="true">✦</span><strong>DilAtölyesi</strong><small>DE · TR</small></div><div class="da-tabs" role="group" aria-label="Hesap işlemi"><button type="button" id="da-login-tab" aria-pressed="'+(mode==='login')+'">Giriş yap</button><button type="button" id="da-signup-tab" aria-pressed="'+(mode==='register')+'">Kayıt ol</button></div>'
+      +'<h2>'+(mode==='register'?'Hesabını oluştur':'Hoş geldin.')+'</h2><p class="da-login-intro">'+(mode==='register'?'Almanca öğrenmeye bugün başla.':'Kaldığın yerden devam et.')+'</p>'
+      +'<form id="da-auth-form" autocomplete="on"><label>Kullanıcı adı<input name="username" autocomplete="username" autocapitalize="none" spellcheck="false" minlength="3" maxlength="32" required placeholder="Kullanıcı adın"></label>'
+      +(mode==='register'?'<div class="da-name-row"><label>Ad<input name="firstName" autocomplete="given-name" maxlength="80" required placeholder="Adın"></label><label>Soyad<input name="lastName" autocomplete="family-name" maxlength="80" required placeholder="Soyadın"></label></div><label>E-posta<input name="email" type="email" autocomplete="email" autocapitalize="none" required placeholder="ornek@eposta.com"></label>':'')
+      +'<label>Şifre<span class="da-password-wrap"><input name="password" type="password" minlength="'+(mode==='register'?'10':'1')+'" autocomplete="'+(mode==='register'?'new-password':'current-password')+'" required placeholder="'+(mode==='register'?'En az 10 karakter':'Şifren')+'"><button type="button" id="da-password-toggle" aria-label="Şifreyi göster" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/></svg></button></span></label>'
+      +'<p class="da-error" role="alert">'+safe(message)+'</p><button class="da-login-submit" type="submit">'+(mode==='register'?'Hesap oluştur':'Giriş yap')+' <span aria-hidden="true">→</span></button></form>'
+      +'<p class="da-login-switch">'+(mode==='register'?'Zaten hesabın var mı? <button type="button" id="da-switch-mode">Giriş yap</button>':'Hesabın yok mu? <button type="button" id="da-switch-mode">Kayıt ol</button>')+'</p><details class="da-login-privacy"><summary>Hesap ve gizlilik</summary><p>Öğrenme ilerlemen hesabında saklanır. Görünen adın, fotoğrafın, seviyen ve rozetlerin giriş yapmış topluluk üyelerine görünür. Yöneticiler giriş günlerini ve yaklaşık aktif çalışma sürelerini görebilir. API anahtarı gerekmez.</p></details></section></div>';
     screen.querySelector('#da-login-tab').onclick=()=>show('login');
     screen.querySelector('#da-signup-tab').onclick=()=>show('register');
     const form=screen.querySelector('#da-auth-form');
+    screen.querySelector('#da-switch-mode').onclick=()=>show(mode==='login'?'register':'login');
+    const reveal=screen.querySelector('#da-password-toggle');
+    reveal.onclick=()=>{const field=form.elements.password,shown=field.type==='password';field.type=shown?'text':'password';reveal.setAttribute('aria-pressed',String(shown));reveal.setAttribute('aria-label',shown?'Şifreyi gizle':'Şifreyi göster')};
     if(mode==='login'){
       const username=get(usernameKey)||'';
       form.elements.username.value=username;
-      if(username)form.elements.password.focus();
+      // Keep the keyboard closed until the learner taps a field.
     }
     form.onsubmit=async event=>{
       event.preventDefault();
-      const submit=screen.querySelector('[type=submit]');submit.disabled=true;
+      const submit=screen.querySelector('[type=submit]');if(submit.disabled)return;submit.disabled=true;const original=submit.innerHTML;submit.textContent=mode==='login'?'Giriş yapılıyor…':'Hesap oluşturuluyor…';form.setAttribute('aria-busy','true');screen.querySelector('.da-error').textContent='';
       const fields=Object.fromEntries(new FormData(form));
-      form.elements.password.value='';
       try {
         auth=await request('/auth/'+(mode==='login'?'login':'register'),{method:'POST',body:JSON.stringify(fields)});
         rememberUsername(auth?.user?.username);
         saveSession();sessionStorage.removeItem('da-hydrated');
         location.reload();
-      } catch(e) {screen.querySelector('.da-error').textContent=e.message;submit.disabled=false;}
+      } catch(e) {screen.querySelector('.da-error').textContent=e.message;submit.disabled=false;submit.innerHTML=original;form.removeAttribute('aria-busy');}
     };
   }
   async function logout() {
