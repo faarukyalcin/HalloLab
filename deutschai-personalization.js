@@ -174,6 +174,7 @@ function update(){
   if(host&&!host.childElementCount)renderProgram(host,state());
   return;
  }
+ if(['placement','lessons','grammar','exam','words','practice','progress'].includes(page))return; // Single canonical study surface; no duplicate AI blocks.
  if(!AI_SECTIONS[page]||root.querySelector('#da-personal-practice'))return;
  const el=document.createElement('section');el.className='da-personal';el.id='da-personal-practice';
  const top=root.querySelector('.top');if(top)top.after(el);else root.prepend(el);
@@ -181,6 +182,8 @@ function update(){
 }
 window.deutschaiRegenerateSection=(page)=>{
  const chosen=String(page||section());
+ if(['lessons','grammar','exam','words','practice'].includes(chosen))return window.deutschaiOpenPersonalStudy?.(chosen)===true;
+ if(['placement','progress'].includes(chosen))return false;
  if(!AI_SECTIONS[chosen])return false;
  if(section()!==chosen){
    if(typeof window.setPage!=='function')return false;
