@@ -819,9 +819,11 @@
     const surface=activeOverlay?.querySelector('.da-community-card')?'community':activeOverlay?.querySelector('.da-admin-card')?'admin':activeOverlay?.querySelector('.da-profile-card')?'profile':null;
     const pageCode=document.querySelector('#nav [aria-current="page"]')?.dataset.page||'home';
     // Only read learner-facing study content. Never send account forms, admin records, secrets or community member data to the model.
+    const currentLesson=!surface&&['lessons','grammar'].includes(pageCode)?root.querySelector('.lesson-flow'):null;
+    const lessonDetails=currentLesson?{stage:Number(currentLesson.dataset.lessonStep)||0,text:[...currentLesson.querySelectorAll('h3,p,.example,.adaptive-example')].filter(n=>n.getClientRects().length).map(n=>n.textContent.trim().slice(0,500)).filter(Boolean).join('\n').slice(0,3200)}:null;
     const studyText=!surface&&pageCode!=='placement'&&pageCode!=='exam'?[...root.querySelectorAll('h1,h2,h3,.lesson p,.lesson li,.example,.study-prompt,.adaptive-passage,.adaptive-word-card span,.adaptive-word-card small')].filter(n=>n.getClientRects().length).slice(0,35).map(n=>n.textContent.trim().slice(0,240)).filter(Boolean).join('\n').slice(0,3600):'';
     return {
-      surface:surface||pageCode,sections:editRoutes,learning:editLearningSummary(),studyText,
+      surface:surface||pageCode,sections:editRoutes,learning:editLearningSummary(),studyText,lessonDetails,
       title:root.querySelector('.top h1, h1, .placement-card h2')?.textContent?.trim()||'DilAtölyesi',
       page:document.querySelector('#nav [aria-current="page"]')?.dataset.page||'home',
       selectedQuestion:selected,centeredQuestion:centered,visibleQuestions:visible.map(item=>item.number),
@@ -871,33 +873,36 @@
     iframe.allow='microphone; autoplay';
     iframe.tabIndex=-1;
     iframe.setAttribute('aria-hidden','true');
-    iframe.src='./felkan.html?compact=1&v=engine-2';
+    iframe.src='./felkan.html?compact=1&v=context-voice-1';
     iframe.addEventListener('load',()=>{
       felcanReady=true;
       sendFelcanContext(true);
       if(felcanRequested){
         felcanRequested=false;
-        startFelcanVoice();
+        startFelcanVoice(pendingVoiceIntent);
       }
     });
     runtime.append(iframe);
     document.body.append(runtime);
     return runtime;
   }
-  function startFelcanVoice(){
+  let pendingVoiceIntent='auto';
+  function startFelcanVoice(intent='auto'){
+    if(typeof intent!=='string')intent='auto';
     if(!auth)return show();
     ensureFelcanRuntime();
-    if(!felcanReady){felcanRequested=true;felcanVisual('connecting','Hazırlanıyor…');return}
+    if(!felcanReady){pendingVoiceIntent=intent;felcanRequested=true;felcanVisual('connecting','Hazırlanıyor…');return}
     try{
       const voice=felcanFrame()?.contentWindow?.FelcanVoiceControl;
       if(!voice?.toggle){felcanVisual('error','Bağlantıyı yeniden dene');return}
-      voice.toggle();
+      const context=felcanScreenContext();
+      if(voice.activate)voice.activate(context,intent);else voice.toggle();
     }catch(error){
       console.warn('Edit ses bağlantısı:',error);
       felcanVisual('error','Ses başlatılamadı');
     }
   }
-  function felkan(){startFelcanVoice()}
+  function felkan(intent='auto'){startFelcanVoice(intent)}
 
   let activityTicker=null;
   function startStudyAttendance(){
