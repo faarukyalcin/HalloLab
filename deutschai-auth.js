@@ -465,10 +465,11 @@
           const name=m.displayName||m.username;
           if(typeof m.photo==='string'&&m.photo.length<60000&&/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(m.photo)){const img=document.createElement('img');img.src=m.photo;img.alt='';avatar.append(img)}else avatar.textContent=String(name||'?').slice(0,2).toLocaleUpperCase('tr');
           const body=document.createElement('div');body.style.minWidth='0';const title=document.createElement('strong');title.textContent=name;const meta=document.createElement('small');meta.textContent='@'+m.username+(m.visible?' · '+(m.level||'Seviye belirlenmedi'):' · Gizli profil');body.append(title,meta);
+          if(m.role==='founder'||m.role==='admin'){const roles=document.createElement('div');roles.className='da-community-badges';const chip=document.createElement('span');chip.textContent=m.role==='founder'?'👑 Kurucu':'🛡️ Yönetici';roles.append(chip);body.append(roles)}
           if(m.visible){const info=document.createElement('small');info.textContent=String(m.lessons||0)+' tamamlanan ders';body.append(info);const badges=document.createElement('div');badges.className='da-community-badges';for(const badge of m.badges||[]){const chip=document.createElement('span');chip.textContent='🏅 '+badge;badges.append(chip)}body.append(badges)}
           card.append(avatar,body);list.append(card);
         }
-        if(!list.childElementCount)list.textContent='Henüz öğrenci yok.';
+        if(!list.childElementCount)list.textContent='Henüz topluluk üyesi yok.';
         offset=data.nextOffset;more.hidden=offset==null;
       }catch(err){if(list.isConnected)list.textContent='Topluluk yüklenemedi: '+err.message}
       finally{more.disabled=false}
