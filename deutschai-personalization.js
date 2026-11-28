@@ -8,6 +8,7 @@ const read=k=>{try{return JSON.parse(store().getItem(k)||'null')}catch{return nu
 const state=()=>read('deutschai-online-v1')||{};
 const section=()=>document.querySelector('#nav [aria-current="page"]')?.dataset.page||'home';
 let inflight=false;
+const questionRequests=new Map();
 const style=document.createElement('style');
 style.textContent='.da-personal{margin:17px 0;padding:19px;border:1px solid #ae95ee6b;border-radius:22px;background:linear-gradient(135deg,#6650ae2c,#171a4050)}.da-personal h2{margin:0 0 8px;font-size:20px}.da-personal p{line-height:1.55}.da-personal button{cursor:pointer;border:1px solid #ad95ef8a;border-radius:12px;padding:10px 12px;background:#6747b8;color:#fff}.da-personal .da-question{padding:13px;margin:12px 0;border:1px solid #ad95ef42;border-radius:14px}.da-personal .da-opts{display:grid;gap:7px;margin:10px 0}.da-personal .da-opts button{text-align:left;background:#34265c}.da-personal .da-opts button.correct{background:#16634c}.da-personal .da-opts button.wrong{background:#873f56}.da-personal .da-plan-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}.da-personal label{display:grid;gap:5px;font-size:13px;color:#ded7fa}.da-personal select,.da-personal input{width:100%;min-width:0;padding:11px;border:1px solid #8e7bd0;border-radius:12px;background:#21193e;color:#fff;font:inherit}.da-personal .da-plan-days{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:9px;margin:12px 0}.da-personal .da-plan-day{padding:12px;border:1px solid #a98ce85a;border-radius:14px;background:#22193b9e}.da-personal .da-plan-day.today{border-color:#b4a1ff}.da-personal .da-plan-day h3{margin:0 0 8px;font-size:14px}.da-personal .da-plan-task{display:flex;align-items:flex-start;gap:6px;margin:7px 0;font-size:13px;line-height:1.4}.da-personal .da-plan-task input{width:auto;margin-top:3px;accent-color:#a38aff}.da-personal .da-plan-task.done span{text-decoration:line-through;opacity:.6}.da-personal .da-plan-actions{display:flex;flex-wrap:wrap;gap:8px}.da-personal .da-plan-muted{font-size:13px;color:#bcb2db}.da-personal .da-plan-wide{grid-column:1/-1}@media(max-width:540px){.da-personal .da-plan-form{grid-template-columns:1fr}}';
 document.head.append(style);
@@ -144,12 +145,20 @@ async function generate(subject,host,force=false){
  const level=s.level||'A1';
  const task="Sen DeutschAI öğretmeni Edit'sin. Türkçe açıkla. "+level+' düzeyine uygun '+conf.title+' bölümü hazırlıyorsun. '+conf.focus+' Tamamlanan ders sayısı '+(s.completed||[]).length+', yanlış kelimeler '+JSON.stringify((s.wrongWords||[]).slice(0,12))+'. Tam '+conf.count+' farklı 4 şıklı özgün soru üret. Cevap sırası dengeli olsun. Yalnızca geçerli JSON döndür, Markdown kullanma: {"intro":"Türkçe kısa öğretici açıklama","questions":[{"question":"özgün soru","options":["A","B","C","D"],"answer":0,"explanation":"Türkçe öğretici açıklama"}]}. answer 0-3 tamsayıdır.';
  try{
-  const res=await active().api('/ai/generate',{method:'POST',body:JSON.stringify({task,profile:{level,daily:s.daily||20}})});
-  const raw=String(res.text||'').trim(),first=raw.indexOf('{'),last=raw.lastIndexOf('}');
-  if(first<0||last<first)throw Error('Gemini JSON sorusu göndermedi');
-  const json=JSON.parse(raw.slice(first,last+1));
-  if(!Array.isArray(json.questions)||json.questions.length<Math.min(4,conf.count))throw Error('Yeterli soru oluşturulamadı');
-  if(host.isConnected&&section()===subject){store().setItem(cacheKey,JSON.stringify(json));draw(host,json,subject)}
+  let pending=questionRequests.get(cacheKey);
+  if(!pending){
+    pending=active().api('/ai/generate',{method:'POST',body:JSON.stringify({task,profile:{level,daily:s.daily||20}})}).then(res=>{
+      const raw=String(res.text||'').trim(),first=raw.indexOf('{'),last=raw.lastIndexOf('}');
+      if(first<0||last<first)throw Error('Gemini JSON sorusu göndermedi');
+      const json=JSON.parse(raw.slice(first,last+1));
+      if(!Array.isArray(json.questions)||json.questions.length<Math.min(4,conf.count))throw Error('Yeterli soru oluşturulamadı');
+      store().setItem(cacheKey,JSON.stringify(json));
+      return json;
+    }).finally(()=>questionRequests.delete(cacheKey));
+    questionRequests.set(cacheKey,pending);
+  }
+  const json=await pending;
+  if(host.isConnected&&section()===subject)draw(host,json,subject);
  }catch(err){
   if(!host.isConnected)return;
   host.innerHTML='<h2>Edit bu çalışmayı hazırlayamadı</h2><p>'+esc(err.message)+'</p><button class="retry">Yeniden dene</button>';

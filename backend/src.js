@@ -56,11 +56,13 @@ async function loginUser(env,u) {
 }
 async function throttle(env,key,max=8,window=900) {
  const k=await sha(key), stamp=now();
- const row=await env.DB.prepare('SELECT count,reset_at FROM login_attempts WHERE key=?').bind(k).first();
- if(row&&row.reset_at>stamp&&row.count>=max)return false;
- if(!row||row.reset_at<=stamp)await env.DB.prepare('INSERT INTO login_attempts(key,count,reset_at) VALUES(?,1,?) ON CONFLICT(key) DO UPDATE SET count=1,reset_at=excluded.reset_at').bind(k,stamp+window).run();
- else await env.DB.prepare('UPDATE login_attempts SET count=count+1 WHERE key=?').bind(k).run();
- return true;
+ const change=await env.DB.prepare(`INSERT INTO login_attempts(key,count,reset_at) VALUES(?,1,?)
+  ON CONFLICT(key) DO UPDATE SET
+   count=CASE WHEN login_attempts.reset_at<=? THEN 1 ELSE login_attempts.count+1 END,
+   reset_at=CASE WHEN login_attempts.reset_at<=? THEN excluded.reset_at ELSE login_attempts.reset_at END
+  WHERE login_attempts.reset_at<=? OR login_attempts.count<?`)
+  .bind(k,stamp+window,stamp,stamp,stamp,max).run();
+ return Number(change.meta?.changes)>0;
 }
 async function encryptionKey(env){
  if(!env.ENCRYPTION_SECRET)throw Error('ENCRYPTION_SECRET eksik');
@@ -94,7 +96,7 @@ async function main(req,env){
  }
  if(route==='/auth/login'&&req.method==='POST'){
   const x=await body(req),username=String(x.username||'').trim(),p=String(x.password||'');
-  if(!(await throttle(env,'login:'+req.headers.get('CF-Connecting-IP')+':'+username,8,900)))return error('Çok fazla deneme. Sonra tekrar deneyin.',429);
+  if(!(await throttle(env,'login:'+req.headers.get('CF-Connecting-IP')+':'+username.toLowerCase(),8,900)))return error('Çok fazla deneme. Sonra tekrar deneyin.',429);
   const u=await env.DB.prepare('SELECT * FROM users WHERE username=? COLLATE NOCASE').bind(username).first();
   if(!u||!p||await passwordHash(p,u.password_salt,env)!==u.password_hash)return error('Kullanıcı adı veya şifre yanlış',401);
   return loginUser(env,u);
@@ -140,9 +142,9 @@ async function main(req,env){
   if(!(await throttle(env,'bootstrap:'+req.headers.get('CF-Connecting-IP'),5,3600)))return error('Yönetici kurulum denemesi sınırlandı',429);
   const x=await body(req);
   if(!env.ADMIN_BOOTSTRAP_SECRET||x.bootstrapSecret!==env.ADMIN_BOOTSTRAP_SECRET)return error('Yetkisiz',403);
-  const previous=await env.DB.prepare("SELECT id FROM users WHERE role='admin' LIMIT 1").first();
-  if(previous)return error('Yönetici zaten oluşturulmuş',409);
-  await env.DB.prepare("UPDATE users SET role='admin' WHERE id=?").bind(user.id).run();return answer({ok:true});
+  const changed=await env.DB.prepare("UPDATE users SET role='admin' WHERE id=? AND NOT EXISTS (SELECT 1 FROM users WHERE role='admin')").bind(user.id).run();
+  if(!changed.meta?.changes)return error('Yönetici zaten oluşturulmuş',409);
+  return answer({ok:true});
  }
  if(route.startsWith('/admin/')){
   if(user.role!=='admin')return error('Yönetici yetkisi gerekli',403);
@@ -179,15 +181,12 @@ async function main(req,env){
    const target=await env.DB.prepare('SELECT id,role FROM users WHERE id=?').bind(id).first();
    if(!target)return error('Hesap bulunamadı',404);
    if(target.id===user.id&&role!=='admin')return error('Kendi yönetici yetkini kaldıramazsın',403);
-   if(target.role==='admin'&&role==='user'){
-    // Atomic guard prevents two concurrent demotions leaving zero admins.
-    const changed=await env.DB.prepare("UPDATE users SET role='user' WHERE id=? AND (SELECT COUNT(*) FROM users WHERE role='admin')>1").bind(id).run();
-    if(!changed.meta?.changes)return error('Son yönetici kaldırılamaz',409);
-   }else{
-    await env.DB.prepare('UPDATE users SET role=? WHERE id=?').bind(role,id).run();
-   }
-   // Revoke sessions when privileges are removed or changed.
-   await env.DB.prepare('DELETE FROM sessions WHERE user_id=?').bind(id).run();
+   const [changed]=await env.DB.batch([
+    env.DB.prepare(`UPDATE users SET role=? WHERE id=?
+     AND (?<>'user' OR role<>'admin' OR (SELECT COUNT(*) FROM users WHERE role='admin')>1)`).bind(role,id,role),
+    env.DB.prepare('DELETE FROM sessions WHERE user_id=? AND EXISTS (SELECT 1 FROM users WHERE id=? AND role=?)').bind(id,id,role)
+   ]);
+   if(!changed.meta?.changes)return error('Rol değiştirilemedi veya son yönetici korunuyor',409);
    return answer({ok:true,role});
   }
   if(route==='/admin/users'&&req.method==='DELETE'){

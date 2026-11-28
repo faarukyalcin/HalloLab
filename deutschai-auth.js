@@ -35,7 +35,7 @@
       }
     });
     const value = await response.json().catch(() => ({}));
-    if (!response.ok) throw Error(value.error || 'Sunucu hatası');
+    if (!response.ok) throw Object.assign(Error(value.error || 'Sunucu hatası'),{status:response.status});
     return value;
   }
   function bucket(key) {
@@ -71,13 +71,15 @@
       return origin ? Object.keys(localStorage).filter(k=>k.startsWith(prefix())).length : localStorage.length;
     }
   };
-  async function hydrate() {
-    if (!auth) return false;
-    const data=await request('/state');
-    const match = Object.keys(localStorage).filter(k => k.startsWith(prefix())).map(k => k.slice(prefix().length));
+  function hydrate(data) {
+    if (!auth||!data) return false;
+    const match = new Map(Object.keys(localStorage).filter(k=>k.startsWith(prefix())).map(k=>{
+      const key=k.slice(prefix().length);
+      return [bucket(key),key];
+    }));
     let changed=false;
     for (const [id,entry] of Object.entries(data.buckets || {})) {
-      const key=match.find(k=>bucket(k)===id) || id;
+      const key=match.get(id)||id;
       const value=entry?.data?.raw;
       if (typeof value === 'string' && get(prefix()+key)!==value) {
         put(prefix()+key,value);
@@ -539,7 +541,7 @@
     iframe.allow='microphone; autoplay';
     iframe.tabIndex=-1;
     iframe.setAttribute('aria-hidden','true');
-    iframe.src='./felkan.html?compact=1&v=remember-username-1';
+    iframe.src='./felkan.html?compact=1&v=fast-study-1';
     iframe.addEventListener('load',()=>{
       felcanReady=true;
       sendFelcanContext(true);
@@ -593,19 +595,27 @@
       if(question)felcanFocusedQuestion=question;
     },true);
     document.body.append(button);
-    ensureFelcanRuntime();
+    button.addEventListener('pointerenter',ensureFelcanRuntime,{once:true});
+    button.addEventListener('focus',ensureFelcanRuntime,{once:true});
+    const warmMobileVoice=event=>{
+      if(event.target.closest('[data-page="live"]'))ensureFelcanRuntime();
+    };
+    const nav=document.getElementById('nav');
+    nav?.addEventListener('pointerover',warmMobileVoice,{passive:true});
+    nav?.addEventListener('focusin',warmMobileVoice);
   }
   window.deutschaiStore=store;
   window.DeutschAI={api:request,store,get user(){return auth?.user||null;},get ready(){return !!origin && !!auth;},logout,showAdmin:admin,openFelkan:felkan,getStudyContext:number=>auth?felcanScreenContext(number):null};
   window.addEventListener('message',event=>{
-    if(event.origin!==location.origin)return;
-    if(event.data?.type==='deutschai:voice-state' && event.source===felcanFrame()?.contentWindow){
+    const frame=felcanFrame();
+    if(event.origin!==location.origin||!frame||event.source!==frame.contentWindow)return;
+    if(event.data?.type==='deutschai:voice-state'){
       felcanVisual(event.data.state||'idle',String(event.data.message||'').slice(0,90));
       return;
     }
     if(event.data?.type==='deutschai:generate'){
       const page=String(event.data.page||'');
-      if(event.source===felcanFrame()?.contentWindow&&typeof window.deutschaiRegenerateSection==='function')
+      if(typeof window.deutschaiRegenerateSection==='function')
         window.deutschaiRegenerateSection(page);
       return;
     }
@@ -620,15 +630,23 @@
     if(!origin)return; // Avoid locking the existing GitHub Pages site before backend activation.
     if(!auth){show();return;}
     try{
-      const me=await request('/auth/me');
+      const hydratingReload=sessionStorage.getItem('da-hydrated')==='1';
+      sessionStorage.removeItem('da-hydrated');
+      const [me,cloudState]=await Promise.all([
+        request('/auth/me'),
+        hydratingReload?null:request('/state').catch(error=>{console.warn('Çalışma durumu yüklenemedi:',error.message);return null})
+      ]);
       auth.user=me.user;saveSession();
-      const changed=await hydrate();
-      if(changed && !sessionStorage.getItem('da-hydrated')){
+      if(hydrate(cloudState)){
         sessionStorage.setItem('da-hydrated','1');location.reload();return;
       }
       account();
       floatingFelcan();
       startStudyAttendance();
-    } catch(error) {auth=null;sessionStorage.removeItem(authKey);show('login',error.message);}
+    } catch(error) {
+      auth=null;
+      if(error.status===401)sessionStorage.removeItem(authKey);
+      show('login',error.message);
+    }
   });
 })();
