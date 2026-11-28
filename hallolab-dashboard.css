@@ -238,3 +238,69 @@ body #da-auth-screen .da-profile-v2.da-profile-c1 .da-profile-head { margin-bloc
 body #da-auth-screen .da-profile-v2.da-profile-c1 .da-profile-menu { margin-block: 8px; }
 body #da-auth-screen .da-profile-v2.da-profile-c1 .da-profile-menu button { padding-block: 8px; min-height: 40px; }
 body #da-auth-screen .da-profile-v2.da-profile-c1 #da-profile-form { gap: 8px; }
+
+/* Grow the dashboard with the viewport while keeping the original card gaps. */
+@media (min-width: 720px) and (min-height: 700px) {
+  .hl-dashboard {
+    --hl-metric-height: 94px;
+    grid-template-rows: auto minmax(175px, 1fr) minmax(var(--hl-metric-height), .48fr) minmax(min-content, 1.38fr);
+    min-height: calc(100svh - 36px);
+    padding-bottom: 0;
+    align-content: stretch;
+  }
+
+  .hl-study, .hl-extra { align-content: stretch; }
+  .hl-study { grid-template-rows: minmax(min-content, 1fr) minmax(min-content, 1fr); }
+  .hl-extra { grid-template-rows: minmax(min-content, 1.25fr) minmax(min-content, .9fr); }
+
+  .hl-banner h1 { font-size: clamp(2rem, calc(1.05rem + 1.1vw + 1svh), 4.25rem); }
+  .hl-banner p { font-size: clamp(1rem, calc(.8rem + .55svh), 1.5rem); }
+  .hl-banner { padding: clamp(18px, 3.6svh, 50px); }
+
+  .hl-dashboard h2 { font-size: clamp(1.07rem, calc(.7rem + .6svh), 1.55rem); }
+  .hl-metric { gap: clamp(4px, .7svh, 10px); }
+  .hl-metric strong, .hl-level-info strong { font-size: clamp(.94rem, calc(.65rem + .55svh), 1.4rem); }
+  .hl-ring { width: clamp(60px, 8.2svh, 98px); }
+  .hl-ring b { font-size: clamp(1.1rem, 2.3svh, 1.8rem); }
+  .hl-emoji { font-size: clamp(1.4rem, 3svh, 2.25rem); }
+  .hl-icon svg { width: clamp(1.65rem, 3.3svh, 2.6rem); height: auto; }
+
+  .hl-recommendation, .hl-links, .hl-tasks { align-self: stretch; }
+  .hl-recommendation { display: grid; grid-template-rows: auto 1fr; gap: 10px; padding: clamp(12px, 1.8svh, 24px); }
+  .hl-recommendation .hl-tag { justify-self: start; margin-bottom: 0; }
+  .hl-lesson-row { gap: clamp(10px, 1.6svh, 22px); }
+  .hl-lesson-row > .hl-icon { width: clamp(50px, 7.8svh, 88px); height: auto; aspect-ratio: 1; }
+  .hl-play { width: clamp(44px, 6.2svh, 70px); height: auto; aspect-ratio: 1; }
+
+  .hl-links { display: grid; grid-template-rows: auto 1fr; }
+  .hl-shortcut { font-size: clamp(.81rem, calc(.65rem + .28svh), 1rem) !important; }
+  .hl-ai { display: grid; align-items: center; background-size: min(40%, 245px) auto, auto, auto; }
+  .hl-ai > div { display: grid; gap: 4px; }
+  .hl-ai :is(p, blockquote), .hl-lesson-row p { font-size: clamp(.85rem, calc(.7rem + .28svh), 1.05rem); }
+  .hl-tasks { padding: clamp(12px, 1.9svh, 26px); }
+  .hl-tasks ul { margin-top: clamp(4px, 1svh, 14px); }
+  .hl-tasks li button, .hl-task-empty { min-height: clamp(34px, 4.1svh, 56px); }
+}
+
+@media (min-width: 1000px) and (min-height: 700px) {
+  html body .app.study-app:has(.hl-dashboard) > .study-header { align-self: stretch; }
+  .study-app:has(.hl-dashboard) #nav { gap: clamp(1px, .7svh - 4px, 6px); }
+  .study-app:has(.hl-dashboard) #nav > button { min-height: clamp(36px, 4.75svh, 60px); }
+}
+
+@media (min-width: 720px) and (max-width: 999px) and (min-height: 700px) {
+  .hl-dashboard {
+    --hl-metric-height: 108px;
+    grid-template-rows: minmax(168px, 1fr) minmax(var(--hl-metric-height), .48fr) minmax(min-content, 1.38fr);
+    min-height: max(0px, calc(100svh - 160px - env(safe-area-inset-bottom)));
+  }
+  .hl-banner h1 { font-size: clamp(1.9rem, calc(1.05rem + 1.1vw + 1svh), 3.2rem); }
+}
+
+@media (max-width: 719px) and (min-height: 1000px) {
+  .hl-dashboard {
+    min-height: max(0px, calc(100svh - 160px - env(safe-area-inset-bottom)));
+    grid-template-rows: minmax(154px, 1.3fr) auto auto auto minmax(134px, 1fr) auto;
+    align-content: stretch;
+  }
+}
