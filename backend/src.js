@@ -264,7 +264,7 @@ async function main(req,env){
 }
 export default {async fetch(req,env){
  const origin=req.headers.get('Origin')||'';
- const allowed=origin===env.SITE_ORIGIN || origin==='http://localhost:5173';
+ const allowed=origin===env.SITE_ORIGIN || origin==='https://dilatolyesi.pages.dev' || origin==='http://localhost:5173';
  const headers={'Access-Control-Allow-Origin':allowed?origin:'null','Vary':'Origin','Access-Control-Allow-Headers':'Authorization, Content-Type','Access-Control-Allow-Methods':'GET,POST,PUT,DELETE,OPTIONS','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'};
  if(req.method==='OPTIONS')return new Response(null,{status:allowed?204:403,headers});
  if(origin&&!allowed)return error('Bu kaynağa erişim engellendi',403);
