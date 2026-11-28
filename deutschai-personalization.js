@@ -181,6 +181,20 @@ function update(){
  const top=root.querySelector('.top');if(top)top.after(el);else root.prepend(el);
  generate(page,el);
 }
+window.deutschaiRegenerateSection=(page)=>{
+ const chosen=String(page||section());
+ if(!AI_SECTIONS[chosen])return false;
+ if(section()!==chosen){
+   if(typeof window.setPage!=='function')return false;
+   window.setPage(chosen);
+ }
+ setTimeout(()=>{
+   update();
+   const host=document.querySelector('#da-personal-practice');
+   if(host)generate(chosen,host,true);
+ },120);
+ return true;
+};
 document.addEventListener('DOMContentLoaded',()=>{
  const root=document.getElementById('view');
  if(root)new MutationObserver(()=>queueMicrotask(update)).observe(root,{childList:true});
