@@ -116,17 +116,17 @@ body .app.study-app > .study-header .study-brand { font-weight: 800; }
 body .app.study-app > .study-header .study-mark { border-radius: 50%; background: linear-gradient(#111 33%, #dd2d37 33% 66%, #ffcb32 66%) !important; border: 0 !important; box-shadow: none !important; }
 body .app.study-app > .study-header .study-mark svg { visibility: hidden; }
 @media (min-width: 1000px) {
-  html body .app.study-app:has(.hl-dashboard) { grid-template-columns: clamp(186px, 18vw, 300px) minmax(0, 1fr) !important; gap: clamp(12px, 1.25vw, 24px) !important; box-sizing: border-box; width: 100%; max-width: none; margin-inline: 0; padding: 12px clamp(12px, .75vw, 24px) !important; }
-  html body .app.study-app .main#view:has(.hl-dashboard) { grid-column: 2; grid-row: 1; margin-left: 0 !important; width: 100% !important; max-width: none !important; min-width: 0; padding: 6px 0 !important; overflow: visible; }
-  html body .app.study-app:has(.hl-dashboard) > .study-header { grid-column: 1; grid-row: 1; width: auto !important; top: 12px !important; height: auto; min-height: 0; max-height: calc(100dvh - 24px); align-self: start; padding: 14px 12px 12px; }
+  html body .app.study-app { grid-template-columns: clamp(186px, 18vw, 300px) minmax(0, 1fr) !important; gap: clamp(12px, 1.25vw, 24px) !important; box-sizing: border-box; width: 100%; max-width: none; margin-inline: 0; padding: 12px clamp(12px, .75vw, 24px) !important; }
+  html body .app.study-app .main#view { grid-column: 2; grid-row: 1; margin-left: 0 !important; width: 100% !important; max-width: none !important; min-width: 0; padding: 6px 0 !important; overflow: visible; }
+  html body .app.study-app > .study-header { grid-column: 1; grid-row: 1; width: auto !important; top: 12px !important; height: calc(100dvh - 24px); min-height: 0; max-height: calc(100dvh - 24px); align-self: start; padding: 14px 12px 12px; }
   .study-brand-text small { display: block; }
-  .study-app:has(.hl-dashboard) .study-head { padding: 4px 6px 13px; }
-  .study-app:has(.hl-dashboard) .study-head .study-brand { width: 100%; min-width: 0; }
-  .study-app:has(.hl-dashboard) .study-brand .study-mark { flex: none; }
-  .study-app:has(.hl-dashboard) .study-brand-text small { white-space: normal; line-height: 1.25; }
-  .study-app:has(.hl-dashboard) #nav { gap: 1px; }
-  .study-app:has(.hl-dashboard) #nav > button { min-height: 36px; padding-block: 4px; }
-  .study-app:has(.hl-dashboard) #nav .study-nav-heading { padding-block: 7px 1px; }
+  .study-app .study-head { padding: 4px 6px 13px; }
+  .study-app .study-head .study-brand { width: 100%; min-width: 0; }
+  .study-app .study-brand .study-mark { flex: none; }
+  .study-app .study-brand-text small { white-space: normal; line-height: 1.25; }
+  .study-app #nav { gap: 1px; }
+  .study-app #nav > button { min-height: 36px; padding-block: 4px; }
+  .study-app #nav .study-nav-heading { padding-block: 7px 1px; }
   body .app.study-app > .study-header .study-rail-caption { display: none; }
   body .app.study-app > .study-header .study-nav { background: transparent !important; box-shadow: none !important; }
   body .app.study-app > .study-header .study-nav > button:not([aria-current="page"]):not([data-current]):not([aria-expanded="true"]) { background: transparent !important; border-color: transparent !important; box-shadow: none !important; }
@@ -135,7 +135,7 @@ body .app.study-app > .study-header .study-mark svg { visibility: hidden; }
 }
 @media (max-width: 999px) {
   html body:has(.study-app) { background: linear-gradient(155deg, #14132e, #080a21 55%, #07091c) !important; }
-  html body .app.study-app:has(.hl-dashboard) > .study-header {
+  html body .app.study-app > .study-header {
     width: calc(100% - 20px);
     top: 6px;
     min-height: 54px;
@@ -143,8 +143,8 @@ body .app.study-app > .study-header .study-mark svg { visibility: hidden; }
     padding: 4px 10px;
     border-radius: 17px !important;
   }
-  body .study-app:has(.hl-dashboard) .study-header .study-mark { width: 31px; height: 31px; }
-  html body .app.study-app:has(.hl-dashboard) #view.main { padding-top: 8px; }
+  body .study-app .study-header .study-mark { width: 31px; height: 31px; }
+  html body .app.study-app #view.main { padding-top: 8px; }
   body .study-app:has(.hl-dashboard) .study-header .hl-search-toggle {
     display: grid; place-items: center; flex: none;
     width: 42px; height: 44px; padding: 0;
@@ -209,7 +209,7 @@ body .app.study-app > .study-header .study-mark svg { visibility: hidden; }
   .hl-banner { padding-inline: 10px; }
   .hl-actions { gap: 5px; }
   .hl-ai { padding-left: 33%; }
-  html body .app.study-app:has(.hl-dashboard) > .study-header { padding-inline: 7px; }
+  html body .app.study-app > .study-header { padding-inline: 7px; }
   body .study-app:has(.hl-dashboard) .study-header .hl-search-toggle { width: 36px; }
 }
 
@@ -283,9 +283,8 @@ body #da-auth-screen .da-profile-v2.da-profile-c1 #da-profile-form { gap: 8px; }
 
 @media (min-width: 1000px) and (min-height: 700px) {
   .hl-dashboard { height: calc(100svh - 36px); min-height: min-content; }
-  html body .app.study-app:has(.hl-dashboard) > .study-header { align-self: stretch; }
-  .study-app:has(.hl-dashboard) #nav { gap: clamp(1px, .7svh - 4px, 6px); }
-  .study-app:has(.hl-dashboard) #nav > button { min-height: clamp(36px, 4.75svh, 60px); }
+  .study-app #nav { gap: clamp(1px, .7svh - 4px, 6px); }
+  .study-app #nav > button { min-height: clamp(36px, 4.75svh, 60px); }
 }
 
 @media (min-width: 720px) and (max-width: 999px) and (min-height: 700px) {
@@ -310,13 +309,13 @@ body #da-auth-screen .da-profile-v2.da-profile-c1 #da-profile-form { gap: 8px; }
 .hl-shortcut .hl-icon svg { width: 30px; height: 30px; }
 
 @media (min-width: 1000px) {
-  .study-app:has(.hl-dashboard) #nav .study-icon { width: 22px; height: 22px; flex: none; }
-  .study-app:has(.hl-dashboard) #nav .study-icon svg { stroke-width: 1.9; }
+  .study-app #nav .study-icon { width: 22px; height: 22px; flex: none; }
+  .study-app #nav .study-icon svg { stroke-width: 1.9; }
   .hl-shortcut .hl-icon svg { width: clamp(34px, 3vw, 46px); height: auto; }
 }
 
 @media (min-width: 1600px) {
-  html body .app.study-app:has(.hl-dashboard) {
+  html body .app.study-app {
     --hl-ui-unit: min(1vw, 2svh);
     --hl-ui-text: clamp(1rem, calc(var(--hl-ui-unit) * .96), 1.6rem);
     --hl-ui-small: clamp(.87rem, calc(var(--hl-ui-unit) * .82), 1.35rem);
@@ -332,42 +331,43 @@ body #da-auth-screen .da-profile-v2.da-profile-c1 #da-profile-form { gap: 8px; }
   .hl-link-grid { gap: clamp(9px, .55vw, 15px); }
   .hl-dashboard .hl-panel, .hl-dashboard .hl-banner { border-radius: clamp(18px, 1.2vw, 34px); }
 
-  html body .app.study-app:has(.hl-dashboard) > .study-header {
+  html body .app.study-app > .study-header {
     top: var(--hl-frame-inset) !important;
+    height: calc(100dvh - 2 * var(--hl-frame-inset));
     max-height: calc(100dvh - 2 * var(--hl-frame-inset));
     padding: clamp(14px, 1vw, 26px);
     border-radius: clamp(26px, 1.65vw, 44px);
   }
-  .study-app:has(.hl-dashboard) .study-head { padding: 8px 6px clamp(16px, 1.1vw, 30px); }
-  .study-app:has(.hl-dashboard) .study-brand { font-size: clamp(1.4rem, calc(var(--hl-ui-unit) * 1.3), 2.2rem); gap: clamp(12px, .82vw, 22px); }
-  .study-app:has(.hl-dashboard) .study-brand .study-mark { width: clamp(44px, calc(var(--hl-ui-unit) * 2.6), 70px); height: auto; aspect-ratio: 1; }
-  .study-app:has(.hl-dashboard) .study-brand-text small { font-size: clamp(.82rem, calc(var(--hl-ui-unit) * .75), 1.22rem); max-width: 15ch; }
-  .study-app:has(.hl-dashboard) #nav { gap: clamp(1px, calc(.5svh - 4px), 3px); }
-  .study-app:has(.hl-dashboard) #nav > button {
+  .study-app .study-head { padding: 8px 6px clamp(16px, 1.1vw, 30px); }
+  .study-app .study-brand { font-size: clamp(1.4rem, calc(var(--hl-ui-unit) * 1.3), 2.2rem); gap: clamp(12px, .82vw, 22px); }
+  .study-app .study-brand .study-mark { width: clamp(44px, calc(var(--hl-ui-unit) * 2.6), 70px); height: auto; aspect-ratio: 1; }
+  .study-app .study-brand-text small { font-size: clamp(.82rem, calc(var(--hl-ui-unit) * .75), 1.22rem); max-width: 15ch; }
+  .study-app #nav { gap: clamp(1px, calc(.5svh - 4px), 3px); }
+  .study-app #nav > button {
     font-size: var(--hl-ui-text);
     min-height: clamp(40px, calc(var(--hl-ui-unit) * 2.48), 66px);
     gap: clamp(12px, .8vw, 22px);
     padding-inline: clamp(12px, .9vw, 24px);
     border-radius: clamp(12px, .85vw, 22px) !important;
   }
-  .study-app:has(.hl-dashboard) #nav .study-icon { width: var(--hl-ui-icon); height: var(--hl-ui-icon); }
-  .study-app:has(.hl-dashboard) #nav .study-nav-heading {
+  .study-app #nav .study-icon { width: var(--hl-ui-icon); height: var(--hl-ui-icon); }
+  .study-app #nav .study-nav-heading {
     font-size: clamp(.8rem, calc(var(--hl-ui-unit) * .74), 1.2rem);
     padding: clamp(7px, .65vh, 11px) clamp(10px, .8vw, 22px) 3px;
   }
 
-  body .study-app:has(.hl-dashboard) .study-header .study-tools {
+  body .study-app .study-header .study-tools {
     top: calc(var(--hl-frame-inset) + 8px);
     right: calc(var(--hl-frame-inset) + 8px);
     gap: clamp(7px, .45vw, 13px);
   }
-  body .study-app:has(.hl-dashboard) .study-appearance > summary {
+  body .study-app .study-appearance > summary {
     width: clamp(38px, calc(var(--hl-ui-unit) * 2.35), 60px);
     height: clamp(38px, calc(var(--hl-ui-unit) * 2.35), 60px);
     border-radius: clamp(10px, .62vw, 16px);
   }
-  body .study-app:has(.hl-dashboard) .study-appearance > summary svg { width: var(--hl-ui-icon); height: var(--hl-ui-icon); }
-  body .study-app:has(.hl-dashboard) .study-header #da-account-action {
+  body .study-app .study-appearance > summary svg { width: var(--hl-ui-icon); height: var(--hl-ui-icon); }
+  body .study-app .study-header #da-account-action {
     max-width: clamp(130px, 8.25vw, 215px);
     min-height: clamp(44px, calc(var(--hl-ui-unit) * 2.9), 75px);
     font-size: clamp(.9rem, calc(var(--hl-ui-unit) * .77), 1.25rem);
@@ -375,12 +375,12 @@ body #da-auth-screen .da-profile-v2.da-profile-c1 #da-profile-form { gap: 8px; }
     padding-inline: clamp(8px, .55vw, 15px);
     border-radius: clamp(14px, 1vw, 26px);
   }
-  body .study-app:has(.hl-dashboard) .study-header #da-account-action .da-profile-avatar {
+  body .study-app .study-header #da-account-action .da-profile-avatar {
     width: clamp(34px, calc(var(--hl-ui-unit) * 2.1), 56px);
     height: clamp(34px, calc(var(--hl-ui-unit) * 2.1), 56px);
   }
-  body .study-app:has(.hl-dashboard) .study-header #da-account-action .da-profile-label { max-width: 7ch; }
-  body .study-app:has(.hl-dashboard) .study-header #da-account-action .da-level-tag { font-size: .85em; padding: .55em .62em; }
+  body .study-app .study-header #da-account-action .da-profile-label { max-width: 7ch; }
+  body .study-app .study-header #da-account-action .da-level-tag { font-size: .85em; padding: .55em .62em; }
 
   .hl-search { width: min(45%, 1120px); }
   .hl-search > span:first-of-type { left: clamp(16px, 1vw, 27px); }
@@ -441,4 +441,52 @@ body #da-auth-screen .da-profile-v2.da-profile-c1 #da-profile-form { gap: 8px; }
     height: calc(100svh - 2 * var(--hl-frame-inset) - 12px);
     grid-template-rows: auto minmax(175px, 1fr) minmax(94px, .48fr) minmax(min-content, 1.54fr);
   }
+}
+
+/* Study pages share the dashboard's frame and scale. Keep exercise text readable. */
+body .study-app #view > :is(.top, .card, #adaptive-ai-root, .placement-exam, .learning-overview, .da-personal) { min-width: 0; }
+@media (min-width: 1000px) {
+  body .study-app #view > .placement-exam { width: 100%; max-width: none; min-height: auto; padding-inline: 0; }
+  body .study-app #view > .placement-exam > :is(.placement-header, .placement-progress, .placement-section-tabs, .placement-card, h1, p) {
+    max-width: none; margin-inline: 0;
+  }
+  .study-app #view :is(.placement-passage, .placement-prompt, .adaptive-passage, .lesson > p) { max-inline-size: 78ch; }
+  .study-app #view .c1-deck { max-width: min(100%, 900px); }
+  .study-app #view .lesson-flow { max-width: min(100%, 1100px); }
+}
+@media (min-width: 1600px) {
+  html body .app.study-app #view > .top h1 {
+    font-size: clamp(2.05rem, calc(var(--hl-ui-unit) * 2.22), 3.8rem);
+  }
+  html body .app.study-app #view > .top :is(.eyebrow, .date) { font-size: var(--hl-ui-small); }
+  body .study-app #view :is(.adaptive-ai-panel, .placement-card, .da-personal, .card, .stat) { font-size: var(--hl-ui-small); }
+  body .study-app #view :is(.adaptive-ai-head h2, .placement-card h1, .placement-card h2, .card h2) {
+    font-size: clamp(1.45rem, calc(var(--hl-ui-unit) * 1.28), 2.1rem);
+  }
+  body .study-app #view :is(.adaptive-ai-head p, .adaptive-notice, .adaptive-loading, .placement-card p, .placement-option, .placement-muted, .card .muted) {
+    font-size: var(--hl-ui-small);
+  }
+  html body .app.study-app #view .btn {
+    font-size: var(--hl-ui-small);
+    min-height: clamp(44px, calc(var(--hl-ui-unit) * 2.35), 64px);
+  }
+  body .study-app #view .c1-deck { max-width: min(100%, 1100px); }
+  body .study-app #view .c1-flashcard { min-height: clamp(275px, 36svh, 520px); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .study-app #nav .study-icon { transition: transform 180ms cubic-bezier(.2,.75,.25,1); }
+  .study-app #nav > button:active .study-icon { transform: scale(.9); }
+  .study-app #nav > button:focus-visible .study-icon { transform: scale(1.1); }
+  @media (hover: hover) {
+    .study-app #nav > button:hover .study-icon { transform: scale(1.12); }
+  }
+  body #da-auth-screen:not([hidden]) :is(.da-profile-card, .da-community-card) {
+    animation: study-dialog-arrival 220ms cubic-bezier(.19,.72,.25,1) backwards;
+  }
+}
+
+@keyframes study-dialog-arrival {
+  from { opacity: 0; transform: translateY(10px) scale(.98); }
+  to { opacity: 1; transform: none; }
 }
