@@ -38,10 +38,15 @@
     if (!Object.hasOwn(taskFormats, task)) throw new Error("Bilinmeyen Gemini çalışması.");
     const instructions = "Türkçe konuşan bir öğrenci için Almanca öğretmenisin. Genel çalışmalarda günlük iletişim ve kelime, gramer, dinleme, konuşma, okuma, yazma becerilerine odaklan. Öğrenci profilindeki learningGoal kalıcı eğitim hedefidir: mevcut seviyeyi hedef seviyeye karıştırma, hedefe kademeli ilerle. Goethe/telc/ÖSD/TestDaF hedeflerinde uygun özgün sınav hazırlığı yap; resmi sınav sorularını kopyalama ve başarı garantisi verme. Herhangi bir özel sınav veya amaç için learningGoal.label, details, assessment ve topics alanlarını kullan. YKS Almanca YDT hedefinde özgün çoktan seçmeli okuma, kelime ve dil bilgisi odaklı içerik üret, Goethe biçimini dayatma. Okul sınavında öğrencinin verdiği müfredat ve soru türleri önceliklidir. Bilinmeyen resmi sınav formatını uydurma. Hedef yoksa Goethe biçimini yalnızca istek özellikle belirttiğinde kullan. Almanca örnek ve soruları seçilen CEFR seviyesine, açıklamaları Türkçeye uyarla. Bir JSON nesnesi döndür. Kullanıcı isteğinde belirli bir JSON yapısı istendiğinde onu kullan. Aksi halde şu yapıyı kullan: " + taskFormats[task];
     if (brokerReady()) {
-      const prompt = instructions + "\nGörev: " + JSON.stringify({
-        task, profile:input.profile, history:Array.isArray(input.history)?input.history.slice(-12):[],
-        request:String(input.text || "")
-      }) + "\nYalnızca istenen geçerli JSON nesnesini döndür; Markdown kullanma.";
+      // The deployed Worker caps task at 3000 characters. Keep the actual request
+      // first, and include only bounded personalization instead of duplicating history.
+      const p=input.profile||{},g=p.learningGoal||{},lp=p.learnerProgress||{};
+      const context={level:p.level,daily:p.dailyMinutes||p.daily,goal:g.label?{label:g.label,targetLevel:g.targetLevel,details:String(g.details||'').slice(0,180),topics:(g.topics||[]).slice(0,5)}:null,focus:(p.focusAreas||[]).slice(0,5),weak:(p.mastery||[]).slice(0,4).map(x=>x.topic),recent:(lp.recentAnswers||[]).slice(-6).map(x=>({ok:x.ok,skill:x.skill}))};
+      const head='Edit Almanca öğretmeni. Türkçe açıkla, gerçek seviyeye ve hedefe uygun özgün içerik hazırla. Yalnız geçerli JSON, Markdown yok. Kullanıcının istediği JSON şeması öncelikli. Görev: '+task+'\n';
+      const request=String(input.text||'');
+      const tail='\nÖğrenci: '+JSON.stringify(context);
+      const room=3000-head.length-40;
+      const prompt=head+(request.length<=room-tail.length?request+tail:request.length<=room?request:request.slice(0,room))+'\nSadece JSON döndür.';
       const response = await window.DeutschAI.api('/ai/generate',{
         method:'POST',body:JSON.stringify({task:prompt,profile:input.profile||{}})
       });
