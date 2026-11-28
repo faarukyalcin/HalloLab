@@ -647,7 +647,7 @@
     const s=read('deutschai-online-v1'),p=read('deutschai-ai-profile-v1'),t=read('deutschai-ai-placement-v1'),d=read('deutschai-ai-daily-v1'),personal=read('deutschai-personal-profile-v1');
     const levels=['A1','A2','B1','B2','C1','C2'];
     const level=[t.level,p.level,s.level].find(x=>levels.includes(x))||'A1';
-    return {level,placementLevel:levels.includes(t.level)?t.level:null,goal:levels.includes(personal.goal)?personal.goal:null,dailyMinutes:Number(p.dailyMinutes)||Number(s.daily)||20,completedLessons:Array.isArray(s.completed)?s.completed.length:0,learnedWords:Object.keys(s.learned||{}).length,focusAreas:Array.isArray(p.focusAreas)?p.focusAreas.filter(x=>typeof x==='string').slice(0,10).map(x=>x.slice(0,100)):[],planDate:d.date||null,plan:Array.isArray(d.content?.schedule)?d.content.schedule.slice(0,12).map((x,i)=>({title:String(x.activity||x.title||'').slice(0,150),minutes:Number(x.minutes)||0,done:s.dailyPlanProgress?.date===d.date&&!!s.dailyPlanProgress?.completed?.[i]})):[],theme:s.theme||'dark',shortcuts:Array.isArray(s.mobileShortcuts)?s.mobileShortcuts.filter(x=>editRoutes.includes(x)).slice(0,3):['home','lessons','practice']};
+    return {weeklyProgram:window.deutschaiWeeklyContext?.()||null,level,placementLevel:levels.includes(t.level)?t.level:null,goal:levels.includes(personal.goal)?personal.goal:null,dailyMinutes:Number(p.dailyMinutes)||Number(s.daily)||20,completedLessons:Array.isArray(s.completed)?s.completed.length:0,learnedWords:Object.keys(s.learned||{}).length,focusAreas:Array.isArray(p.focusAreas)?p.focusAreas.filter(x=>typeof x==='string').slice(0,10).map(x=>x.slice(0,100)):[],planDate:d.date||null,plan:Array.isArray(d.content?.schedule)?d.content.schedule.slice(0,12).map((x,i)=>({title:String(x.activity||x.title||'').slice(0,150),minutes:Number(x.minutes)||0,done:s.dailyPlanProgress?.date===d.date&&!!s.dailyPlanProgress?.completed?.[i]})):[],theme:s.theme||'dark',shortcuts:Array.isArray(s.mobileShortcuts)?s.mobileShortcuts.filter(x=>editRoutes.includes(x)).slice(0,3):['home','lessons','practice']};
   }
   function felcanScreenContext(questionNumber){
     const root=document.getElementById('view');
@@ -730,7 +730,7 @@
     iframe.allow='microphone; autoplay';
     iframe.tabIndex=-1;
     iframe.setAttribute('aria-hidden','true');
-    iframe.src='./felkan.html?compact=1&v=app-awareness-1';
+    iframe.src='./felkan.html?compact=1&v=weekly-steps-1';
     iframe.addEventListener('load',()=>{
       felcanReady=true;
       sendFelcanContext(true);
