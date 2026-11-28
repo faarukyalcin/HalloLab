@@ -829,7 +829,8 @@ function finishGreeting(){
   clearTimeout(felcanGreetingTimer);
   if(S.speaking)return;
   if(greetingHasAudio)readyToListen();
-  else if(window.parent!==window)void fetchGeminiGreeting();
+  else if(window.parent!==window&&!contextualOpening)void fetchGeminiGreeting();
+  else if(contextualOpening){setStatus('listening','Ders anlatımı başlamadı; Edit’e tekrar dokun.');activationKey='';}
   else if(micNeedsPermission)readyToListen();
   else setStatus('listening','Sesli selam gelmedi. Konuşabilirsin.');
 }
@@ -849,7 +850,7 @@ function requestSpokenGreeting(text,model){
   return true;
 }
 
-let felcanScreen=null,felcanPendingExplain=false;
+let felcanScreen=null,felcanPendingExplain=false,activationIntent='auto',activationQueued=false,activationKey='',activeLiveModel='',contextualOpening=false;
 let felcanMinimizedMute=false;
 function describeFelcanScreen(context){
  if(!context)return '';
@@ -869,12 +870,40 @@ function describeFelcanScreen(context){
    'Aktif yüzey: '+String(context.surface||''),
    'Güncel öğrenme bilgisi: '+JSON.stringify(context.learning||{}).slice(0,3500),
    context.studyText?'Ders içeriği: '+String(context.studyText).slice(0,3600):'',
+   context.lessonDetails?'Aktif ders adımı '+(context.lessonDetails.stage+1)+': '+String(context.lessonDetails.text||'').slice(0,3200):'',
    'Sayfada '+(context.questionCount||questions.length)+' soru var.',
    context.selectedQuestion?'Öğrencinin seçtiği soru: '+context.selectedQuestion+'. soru':'',
    context.grammar?'Açık gramer içeriği: '+String(context.grammar).slice(0,800):'',
    context.lesson?'Öğrenme ilerlemesi: '+String(context.lesson).slice(0,250):''
  ].filter(Boolean).join('\n');
  return (header+'\nSORULAR (sırasıyla):\n'+overview.join('\n')).slice(0,12500);
+}
+function activationPrompt(context,intent='auto'){
+ const page=context?.surface||context?.page||'home',lesson=context?.lessonDetails;
+ const base='ŞİMDİ öğrencinin sesini veya sorusunu beklemeden Türkçe sesli konuşmaya başla. ';
+ if(page==='exam'||page==='placement')return base+'Bu bir sınav ekranı. Yalnız sınavın nasıl kullanılacağını kısaca anlat; soru çözme, doğru cevap ve ipucu verme.';
+ if(page==='home')return base+'Ana sayfadayız. Doğal, kısa bir selam ver ve nasılsın diye sor. Ders anlatmaya kendiliğinden başlama.';
+ if(['lessons','grammar'].includes(page)){
+  if(!lesson?.text&&!context?.studyText)return base+'Ders henüz hazır değilse bunu söyle, konu uydurma.';
+  return base+'Öğrenci bu ekrandaki dersi seninle çalışmak istiyor. Genel selamlaşma veya hedef sorma yapma. Ekrandaki gerçek konu ve aktif adımla hemen başla. '+(lesson?.stage>=2?'Görünen soruyu birlikte çözmek için yönlendir, cevabı hemen verme.':'Konuyu basit Türkçe ile anlat, Almanca örnek ver ve kısa bir anlama sorusu sor.')+' Ekranda olmayan konu uydurma.\n'+describeFelcanScreen(context);
+ }
+ if(['words','practice','writing'].includes(page))return base+'Doğrudan ekrandaki '+(page==='words'?'kelimelerle telaffuz ve örnek çalışmasına':page==='writing'?'yazma veya konuşma görevine':'görünen alıştırmaya')+' başla; yanıtı hemen söyleme.\n'+describeFelcanScreen(context);
+ if(page==='program'||page==='progress')return base+'Mevcut '+(page==='program'?'çalışma planını':'öğrenme ilerlemesini')+' kısa ve gerçek verilere göre açıkla; ardından bir sonraki adımı öner.\n'+describeFelcanScreen(context);
+ return base+'Kısa doğal selam ver, nasıl yardımcı olabileceğini sor. Özel hesap ve yönetim bilgilerini isteme.';
+}
+function activateVoice(context,intent='auto'){
+ felcanScreen=context||felcanScreen;activationIntent=intent;
+ const key=JSON.stringify([felcanScreen?.surface,felcanScreen?.lessonDetails,felcanScreen?.title,felcanScreen?.selectedQuestion,felcanScreen?.questions?.[0]?.prompt]);
+ const active=S.setupDone&&S.ws?.readyState===1;
+ if(active&&intent!=='lesson'&&key===activationKey){toggleCompanionVoice();return;}
+ activationKey=key;activationQueued=true;S.greeted=false;unlockCompanionAudio();
+ if(active){S.muted=false;S.stream?.getAudioTracks().forEach(t=>t.enabled=true);$('#bMute').classList.remove('on');requestCompanionMic();if(!felcanGreetingPending&&!S.speaking)flushActivation();}
+ else if(!felcanConnecting&&!(S.ws?.readyState===0||S.ws?.readyState===1))toggleCompanionVoice();
+}
+function flushActivation(){
+ if(!activationQueued||!S.setupDone||S.ws?.readyState!==1)return;
+ contextualOpening=(felcanScreen?.surface||felcanScreen?.page)!=='home';
+ if(requestSpokenGreeting(activationPrompt(felcanScreen,activationIntent),activeLiveModel||'gemini-3.1-flash-live-preview')){activationQueued=false;S.greeted=true;}
 }
 window.addEventListener('message',event=>{
   if(event.origin!==location.origin||event.source!==window.parent||!event.data)return;
@@ -898,7 +927,7 @@ window.addEventListener('message',event=>{
     felcanScreen=event.data.context||null;
     const explain=event.data.type==='deutschai:explain';
     if(explain)felcanPendingExplain=true;
-    if(S.setupDone&&S.ws?.readyState===1&&(!felcanGreetingPending||explain)){
+    if(explain&&S.setupDone&&S.ws?.readyState===1&&(!felcanGreetingPending)){
       notify('[Uygulama] Kullanıcının şu an gördüğü DilAtölyesi ekranı:\n'+describeFelcanScreen(felcanScreen)+(explain?'\nKullanıcı bu soruyu anlamadığını söylüyor. Türkçe ve basitçe kuralı anlat; doğru şıkkı hemen söylemeden ipucu ver.':'\nKullanıcı sorarsa bu bilgileri kullan.'));
       if(explain)felcanPendingExplain=false;
     }else if(explain){
@@ -988,9 +1017,10 @@ async function onMsg(ev,model){
   const txt=typeof ev.data==='string'?ev.data:await ev.data.text();
   const m=JSON.parse(txt);
   if(m.setupComplete){
-    S.setupDone=true;setStatus('listening','Dinliyorum… konuşabilirsin');log('Kurulum tamam');
+    activeLiveModel=model;S.setupDone=true;setStatus('listening','Dinliyorum… konuşabilirsin');log('Kurulum tamam');
     clearTimeout(S.stableTimer);S.stableTimer=setTimeout(()=>{S.retries=0},30000);
     $('#welcomeTitle').textContent='Hoş geldin, '+cfg.name+'.';
+    if(activationQueued){flushActivation();return;}
     if(!S.greeted){
       if(!DATA.plan)makePlan({});
       const ctx='Merhaba! Sen Edit, bu öğrencinin kişisel Almanca öğretmenisin. ŞİMDİ, herhangi bir soru veya ses beklemeden Türkçe olarak yüksek sesle kısa bir selam ver; öğrenciye ismiyle '+cfg.name+' diye hitap et. Kayıtlı öğrenme hedefi ve conversationMemory.lastStudy varsa gerçek kaldığı adımı kısa biçimde anımsat ve devam etmeyi öner; yoksa uydurma. Bugün kaldığı yerden çalışmaya devam etmeyi öner. En fazla 2-3 cümle söyle. Bu metni tekrar etme, doğal bir selamlama oluştur. '+resumeContext()+(felcanScreen?' Ekrandaki mevcut DilAtölyesi çalışma bağlamı: '+describeFelcanScreen(felcanScreen):'');
@@ -1017,7 +1047,7 @@ async function onMsg(ev,model){
     if(sc.interrupted&&!greetingClipPlaying){stopPlayback()}
     const parts=sc.modelTurn&&sc.modelTurn.parts||[];
     if(!greetingFallback&&!greetingClipPlaying)for(const p of parts){const d=p.inlineData;if(d&&d.data){const mt=/rate=(\d+)/.exec(d.mimeType||'');playPCM(d.data,mt?+mt[1]:24000)}}
-    if(sc.turnComplete||sc.interrupted)finishGreeting();
+    if(sc.turnComplete||sc.interrupted){finishGreeting();if(activationQueued)flushActivation();}
     if(sc.inputTranscription&&sc.inputTranscription.text){S.capIn+=sc.inputTranscription.text;showCaption()}
     if(sc.outputTranscription&&sc.outputTranscription.text){S.capOut+=sc.outputTranscription.text;showCaption()}
     if(PT.on&&PT.cap){
@@ -2145,7 +2175,7 @@ function toggleCompanionVoice(){
     connect();
   }
 }
-window.FelcanVoiceControl={toggle:toggleCompanionVoice};
+window.FelcanVoiceControl={toggle:toggleCompanionVoice,activate:activateVoice};
 
 $('#bCenter').onclick=()=>{closeAll();setPos('center')};
 $('#bMute').onclick=()=>{S.muted=!S.muted;$('#bMute').classList.toggle('on',S.muted);if(S.stream)S.stream.getAudioTracks().forEach(t=>t.enabled=!S.muted);
