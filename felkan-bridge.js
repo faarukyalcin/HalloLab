@@ -1,4 +1,4 @@
-/* DeutschAI ↔ Felkan; no API key is exposed to the browser. */
+/* DeutschAI ↔ Edit; no API key is exposed to the browser. */
 (() => {
   'use strict';
   const apiBase = String(window.DEUTSCHAI_API_URL || '').replace(/\/$/, '');
@@ -19,7 +19,7 @@
               headers: {'Content-Type':'application/json','Authorization':'Bearer ' + auth.token},
               body: JSON.stringify({bucket:'felkan_data',data:{raw:String(value)}})
             });
-          } catch(error) { console.warn('Felkan eşitleme başarısız',error); }
+          } catch(error) { console.warn('Edit eşitleme başarısız',error); }
         }, 900);
       }
     },
@@ -37,7 +37,7 @@
       });
       const result = await response.json();
       if(response.status===429||/\b429\b|RESOURCE_EXHAUSTED/.test(result.error||''))throw Error('Gemini ses kotası veya oturum sınırı doldu (429).');
-      if (!response.ok) throw Error(result.error || 'Felkan sesli bağlantı kurulamadı');
+      if (!response.ok) throw Error(result.error || 'Edit sesli bağlantı kurulamadı');
       return result.token;
     },
     navigate(page) {
@@ -62,7 +62,7 @@
       if(window.parent!==window){
         try{
           if(typeof window.parent.deutschaiRegenerateSection==='function')return window.parent.deutschaiRegenerateSection(page);
-        }catch(error){ console.warn('Felcan çalışma başlatamadı',error); }
+        }catch(error){ console.warn('Edit çalışma başlatamadı',error); }
         window.parent.postMessage({type:'deutschai:generate',page},window.location.origin);
         return true;
       }
