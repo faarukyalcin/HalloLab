@@ -4,7 +4,7 @@
 <script>if(new URLSearchParams(location.search).get('compact')==='1')document.documentElement.classList.add('compact-felcan');</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Felkan · DeutschAI Almanca Öğretmeni</title><script src="./api-config.js"></script><script src="./felkan-bridge.js?v=screen-aware-1"></script>
+<title>Felkan · DeutschAI Almanca Öğretmeni</title><script src="./api-config.js"></script><script src="./felkan-bridge.js?v=all-sections-1"></script>
 <style>
 :root{--card:#1b1338;--opt:#130d2b;--txt:#e8eaf0;--mut:#9aa3b5;--blue:#4c8dff;--pad:56px}
 *{box-sizing:border-box}
@@ -457,7 +457,7 @@ html.compact-felcan #startBtn{bottom:24px}
   <datalist id="models"><option value="gemini-3.1-flash-live-preview"><option value="gemini-2.5-flash-native-audio-latest"><option value="gemini-2.5-flash-native-audio-preview-09-2025"></datalist>
   <div class="hint">Bağlantı kurulamazsa uygulama otomatik olarak yedek modeli dener.</div>
   <label>Felkan'ın sesi</label>
-  <select id="sVoice"><option>Puck</option><option>Kore</option><option>Charon</option><option>Aoede</option><option>Fenrir</option><option>Leda</option><option>Orus</option><option>Zephyr</option></select>
+  <select id="sVoice"><option value="Aoede">Aoede · Neşeli kadın sesi</option><option value="Leda">Leda · Genç ve yumuşak kadın sesi</option><option value="Zephyr">Zephyr · Parlak kadın sesi</option><option value="Kore">Kore · Net kadın sesi</option><option>Puck</option><option>Charon</option><option>Fenrir</option><option>Orus</option></select>
   <label><input type="checkbox" id="sComment"> Test cevaplarıma Felkan sesli yorum yapsın</label>
   <div class="row"><button class="btn" id="sDisc">Bağlantıyı kes</button><button class="btn" id="sCancel">Kapat</button><button class="btn pri" id="sSave">Kaydet ve bağlan</button></div>
 </div></div>
@@ -478,10 +478,12 @@ const raf=()=>new Promise(r=>requestAnimationFrame(r));
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
 /* ---------- Ayarlar ---------- */
-const DEF={model:'gemini-3.1-flash-live-preview',voice:'Puck',name:window.FelkanBridge?.user?.firstName||'Öğrenci',comment:true};
+const DEF={model:'gemini-3.1-flash-live-preview',voice:'Aoede',name:window.FelkanBridge?.user?.firstName||'Öğrenci',comment:true};
 const FALLBACK_MODEL='gemini-2.5-flash-native-audio-latest';
 let cfg={...DEF};
 try{cfg={...DEF,...JSON.parse(window.FelkanStorage.getItem('felkan_cfg')||'{}')}}catch(e){}
+// Previously Puck was the app default. Move that default to the warmer Aoede voice; preserve any other selected voice.
+if(cfg.voice==='Puck')cfg.voice='Aoede';
 const saveCfg=()=>{try{window.FelkanStorage.setItem('felkan_cfg',JSON.stringify(cfg))}catch(e){}};
 
 /* ---------- Öğrenme verisi (ders programı + ilerleme), kalıcı ---------- */
@@ -640,6 +642,7 @@ const DECLS=[
  {name:'show_text',description:'Serbest metin paneli açar (açıklama, düzeltme, özet, okuma metni vb.). Diğer türlere uymayan her şey için kullan.',
   parameters:common({title:{type:'STRING'},body:{type:'STRING'}},['title','body'])},
  {name:'open_app_section',description:'Kullanıcının onayıyla DeutschAI uygulamasının gerçek gramer, kelime, ders, pratik veya ilerleme sayfasını açar.',parameters:{type:'OBJECT',properties:{page:{type:'STRING',enum:['home','lessons','grammar','words','practice','writing','exam','placement','progress']}},required:['page']}},
+ {name:'generate_app_questions',description:'DeutschAI gerçek öğrenme uygulamasında istenen bölümün sayfasını açıp Gemini ile yeni sorular hazırlar. Dersler, seviye tespiti, kelimeler, gramer, pratik, deneme sınavı, yazma ve ilerleme bölümlerini destekler. Kullanıcı bölümün içindeki mevcut soruları yenilemeni ya da test oluşturmanı istediğinde bunu çağır.',parameters:{type:'OBJECT',properties:{page:{type:'STRING',enum:['lessons','placement','words','grammar','practice','exam','writing','progress']}},required:['page']}},
  {name:'show_schedule',description:'Bugünün ders programı panelini açar (varsayılan: sol).',parameters:common({})},
  {name:'show_progress',description:'İlerleme durumu panelini açar: seviye, bugünkü ders sayısı, günlük hedef, çalışma süresi, değerlendirmeler (varsayılan: sağ).',parameters:common({})},
  {name:'update_progress',description:'Seviye, günlük hedef, çalışılan süre veya değerlendirme notunu günceller ve kalıcı kaydeder. Panel açık olmasa da çalışır.',
@@ -704,6 +707,8 @@ MEVCUT DURUM (uygulama verisi): ${JSON.stringify(stateSummary())}
 GENEL KURALLAR:
 - Türkçe konuş, Almanca örnekler ver. Cevapların sesli okunur: kısa, sıcak ve doğal ol (genelde 1-3 cümle).
 - Kullanıcının seviyesini, yanlışlarını ve günün çalışma planını göz önünde bulundur. "Bugün gramer çalışman var, açayım mı?" diye sor; kullanıcı kabul ettiğinde open_app_section fonksiyonuyla gerçek DeutschAI sayfasını aç. Zorlandığı konulardan kişiye özel kelimeler, gramer örnekleri ve sorular hazırla. Goethe odaklı çalışma yalnızca kullanıcı isterse yapılsın.
+- SES VE ÜSLUP: Kadınsı, neşeli, tatlı ve hafif oyunbaz bir öğretmen gibi sıcak Türkçe konuş. Kullanıcıyı motive et, doğal ve saygılı ol; ders anlatımını asla geri plana atma.
+- TÜM BÖLÜMLER: Ana menüde Dersler, Seviye Tespiti, Kelimeler, Gramer, Pratik, Deneme Sınavı, Yazma & Konuşma ve İlerleme gerçek sayfaları var. Kullanıcı yalnızca sayfayı aç derse open_app_section, o sayfada Gemini soruları hazırlamanı/yenilemeni isterse generate_app_questions çağır. Kendi iframe içindeki show_* panelini gerçek uygulama yerine kullanma.
 - ANA UYGULAMA: Gerçek DeutschAI sayfalarını açman istendiğinde kendi show_grammar, show_quiz gibi araçların yerine open_app_section kullan. Özellikle "grameri aç", "dersleri aç", "sorulara geç" dendiğinde gerçek ana site sayfasını aç. İşlem başarısızsa açıldı deme.
 - TÜM SORULARI GÖR: [Uygulama] ekran bilgisinde birden fazla soru (1, 2, 3...) gönderilir. Kullanıcı "2. soruyu açıkla" derse o numaralı sorunun metnini ve seçeneklerini seç; DAİMA numarayı kontrol et. Kullanıcı sadece "bu soru" derse selectedQuestion alanını kullan, yoksa hangi soru olduğunu sor. Görmediğin soruyu uydurma.
 - EKRANDAKİ SORU: Kullanıcı "bu soruyu anlamadım", "buradakini anlat", "şu soruya bak" dediğinde senden önce gönderilen [Uygulama] EKRAN bilgisini kullan. Soru ve seçenekleri incele, Türkçe kısa ipuçlarıyla öğret; cevabı hemen söyleme. Ekran bilgisi yoksa hangi soruyu kastettiğini sor.
@@ -875,6 +880,7 @@ function stateSummary(){return {level:DATA.level,daily_goal_min:DATA.dailyGoal,s
   topics_done:curriculum().filter(t=>DATA.ts[t.id]&&DATA.ts[t.id].done).map(t=>t.name),topics_remaining:curriculum().filter(t=>!(DATA.ts[t.id]&&DATA.ts[t.id].done)).map(t=>t.name)}}
 async function runTool(name,a){
   if(name==='open_app_section')return {success:window.FelkanBridge.navigate(a.page),page:a.page};
+  if(name==='generate_app_questions')return {success:window.FelkanBridge.generate(a.page),page:a.page,message:'Yeni Gemini çalışması gerçek DeutschAI sayfasında hazırlanıyor'};
   if(name==='set_layout'){const p=POS.includes(a.avatar_position)?a.avatar_position:'center';let closed=false;
     if(p==='center'&&anyOpen()){closeAll();closed=true}setPos(p);return {success:true,avatar_position:S.pos,panels_closed:closed}}
   if(name==='close_panel'){if(SLOTS.includes(a.slot))closeSlot(a.slot);else{closeAll();setPos('center')}
