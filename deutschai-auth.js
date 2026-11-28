@@ -7,6 +7,8 @@
   const del = localStorage.removeItem.bind(localStorage);
   const authKey = 'deutschai:auth:v2';
   const usernameKey = 'deutschai:last-username';
+  const rememberKey = 'deutschai:remember-login';
+  if(get(rememberKey)!=='1')del(usernameKey);
   const rememberUsername = name => {
     if(typeof name==='string'&&/^[a-zA-Z0-9_]{3,32}$/.test(name))put(usernameKey,name);
   };
@@ -15,7 +17,7 @@
   try { auth = JSON.parse(sessionStorage.getItem(authKey) || 'null'); } catch {}
   const oldSession=get(authKey);
   if(oldSession){
-    try{if(!get(usernameKey))rememberUsername(JSON.parse(oldSession)?.user?.username)}catch{}
+    try{if(get(rememberKey)==='1'&&!get(usernameKey))rememberUsername(JSON.parse(oldSession)?.user?.username)}catch{}
     del(authKey);
   }
   if (!auth?.token || !auth?.user?.id) auth = null;
@@ -266,6 +268,9 @@
     #da-auth-screen .da-login-modern .da-error:not(:empty){padding:10px;border-radius:10px;background:#ec668519;color:#ffbdca;margin:10px 0}
     #da-auth-screen .da-login-modern .da-login-submit{display:flex;justify-content:center;align-items:center;gap:12px;min-height:50px;margin-top:19px;border-radius:15px;background:linear-gradient(145deg,#a27cf1,#7450c8);box-shadow:inset 0 1px 0 #ffffff50,0 7px 22px #7954cb50}
     #da-auth-screen .da-login-modern .da-login-submit:disabled{opacity:.65;cursor:wait}
+    #da-auth-screen .da-login-modern .da-remember-login{display:flex;align-items:flex-start;gap:10px;margin:12px 0;color:#eee6ff;cursor:pointer}
+    #da-auth-screen .da-login-modern .da-remember-login input{flex:none;width:19px;height:19px;min-height:0;margin:2px 0 0;padding:0;accent-color:#a27cf1}
+    #da-auth-screen .da-login-modern .da-remember-login small{display:block;font-size:11px;font-weight:400;color:#bdb4d8;line-height:1.4;margin-top:3px}
     #da-auth-screen .da-login-modern .da-login-switch{text-align:center;margin:19px 0 12px}
     #da-auth-screen .da-login-modern .da-login-switch button{padding:4px;border:0;background:none;color:#d4bfff;font-size:13px}
     #da-auth-screen .da-login-privacy{text-align:center;color:#bdb4d8;font-size:11px}
@@ -321,6 +326,7 @@
       +'<form id="da-auth-form" autocomplete="on"><label>Kullanıcı adı<input name="username" autocomplete="username" autocapitalize="none" spellcheck="false" minlength="3" maxlength="32" required placeholder="Kullanıcı adın"></label>'
       +(mode==='register'?'<div class="da-name-row"><label>Ad<input name="firstName" autocomplete="given-name" maxlength="80" required placeholder="Adın"></label><label>Soyad<input name="lastName" autocomplete="family-name" maxlength="80" required placeholder="Soyadın"></label></div><label>E-posta<input name="email" type="email" autocomplete="email" autocapitalize="none" required placeholder="ornek@eposta.com"></label>':'')
       +'<label>Şifre<span class="da-password-wrap"><input name="password" type="password" minlength="'+(mode==='register'?'10':'1')+'" autocomplete="'+(mode==='register'?'new-password':'current-password')+'" required placeholder="'+(mode==='register'?'En az 10 karakter':'Şifren')+'"><button type="button" id="da-password-toggle" aria-label="Şifreyi göster" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/></svg></button></span></label>'
+      +(mode==='login'?'<label class="da-remember-login"><input type="checkbox" id="da-remember-login" '+(get(rememberKey)==='1'?'checked':'')+'><span>Beni hatırla<small>Bu cihazda kullanıcı adımı hatırla. Şifreyi tarayıcının parola yöneticisine kaydedebilirsin.</small></span></label>':'')
       +'<p class="da-error" role="alert">'+safe(message)+'</p><button class="da-login-submit" type="submit">'+(mode==='register'?'Hesap oluştur':'Giriş yap')+' <span aria-hidden="true">→</span></button></form>'
       +'<p class="da-login-switch">'+(mode==='register'?'Zaten hesabın var mı? <button type="button" id="da-switch-mode">Giriş yap</button>':'<button type="button" id="da-switch-mode">Yeni hesap oluştur</button>')+'</p><details class="da-login-discover"><summary>DilAtölyesi&#39;ni keşfet</summary><div class="da-discover-list"><div><b>Edit ile öğren</b><small>Yapay zekâ destekli Almanca konuşma pratiği.</small></div><div><b>Kendi seviyende ilerle</b><small>Seviye tespiti, dersler, kelime ve gramer çalışmaları.</small></div><div><b>Gelişimini takip et</b><small>Kişisel program, rozetler ve öğrenci topluluğu.</small></div></div></details><details class="da-login-privacy"><summary>Hesap ve gizlilik</summary><p>Öğrenme ilerlemen hesabında saklanır. Görünen adın, fotoğrafın, seviyen ve rozetlerin giriş yapmış topluluk üyelerine görünür. Yöneticiler giriş günlerini ve yaklaşık aktif çalışma sürelerini görebilir. API anahtarı gerekmez.</p></details></section></div>';
     const form=screen.querySelector('#da-auth-form');
@@ -328,7 +334,9 @@
     const reveal=screen.querySelector('#da-password-toggle');
     reveal.onclick=()=>{const field=form.elements.password,shown=field.type==='password';field.type=shown?'text':'password';reveal.setAttribute('aria-pressed',String(shown));reveal.setAttribute('aria-label',shown?'Şifreyi gizle':'Şifreyi göster')};
     if(mode==='login'){
-      const username=get(usernameKey)||'';
+      const username=get(rememberKey)==='1'?(get(usernameKey)||''):'';
+      const remember=form.querySelector('#da-remember-login');
+      remember.onchange=()=>{if(!remember.checked){del(rememberKey);del(usernameKey);}};
       form.elements.username.value=username;
       // Keep the keyboard closed until the learner taps a field.
     }
@@ -338,7 +346,7 @@
       const fields=Object.fromEntries(new FormData(form));
       try {
         auth=await request('/auth/'+(mode==='login'?'login':'register'),{method:'POST',body:JSON.stringify(fields)});
-        rememberUsername(auth?.user?.username);
+        if(mode==='login'&&form.querySelector('#da-remember-login')?.checked){put(rememberKey,'1');rememberUsername(auth?.user?.username);}else{del(rememberKey);del(usernameKey);}
         saveSession();sessionStorage.removeItem('da-hydrated');
         location.reload();
       } catch(e) {screen.querySelector('.da-error').textContent=e.message;submit.disabled=false;submit.innerHTML=original;form.removeAttribute('aria-busy');}
