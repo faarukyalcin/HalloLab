@@ -753,8 +753,8 @@ function setPage(p){
 
   trackTime();
   page=p==='ai'?'live':p;
+  renderNav();
   render();
-  queueStudyEntrance();
   resetStudyScroll();
 }
 function toggleMobileMore(force) {
