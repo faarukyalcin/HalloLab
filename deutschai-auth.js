@@ -285,7 +285,8 @@
               const byDay=new Map((result.days||[]).map(day=>[day.day,day]));
               const grid=document.createElement('div');grid.className='da-admin-daygrid';
               // Date keys are relative to Istanbul, matching server recording.
-              const ymd=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Istanbul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+              const dateParts=Object.fromEntries(new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Istanbul',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()).map(p=>[p.type,p.value]));
+              const ymd=dateParts.year+'-'+dateParts.month+'-'+dateParts.day;
               const [yy,mm,dd]=ymd.split('-').map(Number);
               const base=Date.UTC(yy,mm-1,dd);
               for(let i=29;i>=0;i--){
