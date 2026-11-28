@@ -490,3 +490,148 @@ body .study-app #view > :is(.top, .card, #adaptive-ai-root, .placement-exam, .le
   from { opacity: 0; transform: translateY(10px) scale(.98); }
   to { opacity: 1; transform: none; }
 }
+
+/* Phone dashboard chrome and cards. */
+.hl-phone-copy, .study-tools .hl-phone-updates, .study-app .study-header #nav > .hl-phone-profile { display: none; }
+
+@media (max-width: 719px) {
+  html body .app.study-app > .study-header {
+    top: 0;
+    width: 100%;
+    min-height: 54px;
+    margin: 0;
+    padding: 5px clamp(12px, 3.9vw, 24px);
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: linear-gradient(180deg, #14152d, #191c3c) !important;
+    box-shadow: none !important;
+  }
+  body .app.study-app > .study-header::before, body .app.study-app > .study-header::after { display: none; }
+  body .app.study-app > .study-header .study-brand { gap: 8px; font-size: clamp(1.16rem, 5.1vw, 1.42rem); }
+  body .app.study-app > .study-header .study-mark { width: 32px; height: 32px; }
+  body .app.study-app > .study-header .study-tools { display: flex; gap: 1px; align-items: center; }
+  body .app.study-app > .study-header :is(#theme-picker .study-appearance > summary, .hl-search-toggle) { display: none; }
+  body .app.study-app > .study-header .hl-search-toggle { display: none !important; }
+  body .app.study-app > .study-header #da-account-action {
+    display: grid; place-items: center;
+    width: 44px; min-height: 44px;
+    padding: 0; border: 0; border-radius: 50%;
+    background: transparent !important; box-shadow: none;
+    font-size: 0;
+  }
+  .study-app .study-header #da-account-action :is(.da-profile-label, .da-level-tag) { display: none; }
+  body .app.study-app > .study-header #da-account-action .da-profile-avatar {
+    width: 34px; height: 34px; border: 1px solid #bd8af9; font-size: .875rem;
+  }
+  .study-tools .hl-phone-updates { position: relative; display: block; }
+  .hl-phone-updates summary {
+    display: grid; place-items: center; position: relative;
+    width: 44px; height: 44px; color: #f6f0ff; cursor: pointer; list-style: none;
+  }
+  .hl-phone-updates summary::-webkit-details-marker { display: none; }
+  .hl-phone-updates summary svg { width: 22px; height: 22px; }
+  .hl-phone-updates summary i { position: absolute; top: 9px; right: 10px; width: 8px; height: 8px; border-radius: 50%; background: #fa3b55; box-shadow: 0 0 0 1px #171633; }
+  .hl-phone-popover {
+    position: absolute; top: calc(100% + 5px); right: 0; z-index: 3;
+    width: min(252px, calc(100vw - 70px)); padding: 10px;
+    border: 1px solid #544270; border-radius: 16px; background: #1c1b36; box-shadow: 0 12px 28px #060516b0;
+  }
+  .hl-phone-popover strong { display: block; margin: 4px 8px; font-size: .9rem; }
+  .hl-phone-popover button { display: block; width: 100%; min-height: 42px; padding: 7px 8px; border: 0; border-radius: 8px; background: transparent; color: var(--ink); text-align: left; font-size: .9rem; }
+  .hl-phone-popover button:is(:focus-visible,:hover) { background: #34274f; }
+
+  html body .app.study-app #view.main:has(.hl-dashboard) { padding-top: 0; padding-inline: 0; }
+  .hl-dashboard {
+    --hl-phone-inset: clamp(9px, 3vw, 15px);
+    max-width: 560px; gap: clamp(10px, 3.05vw, 15px);
+    padding-bottom: 0;
+  }
+  .hl-dashboard .hl-desktop-copy, .hl-banner .hl-actions { display: none; }
+  .hl-dashboard .hl-phone-copy { display: inline; }
+  .hl-banner {
+    align-items: flex-start;
+    min-height: clamp(132px, 41vw, 172px);
+    padding: clamp(15px, 4.3vw, 23px) calc(var(--hl-phone-inset) + 8px);
+    border: 0; border-radius: 0; box-shadow: none;
+    background:
+      linear-gradient(180deg, #191c3b 0%, #211e3d15 39%, #11153008 66%, #0b1028d9 100%),
+      linear-gradient(90deg, #172151cf, #1b234961 57%, #14204410),
+      url("./hallolab-castle.jpg") 74% center / cover no-repeat, #191c3b;
+  }
+  .hl-banner h1 { font-size: clamp(1.42rem, 6.35vw, 1.86rem); line-height: 1.12; }
+  .hl-banner p { font-size: clamp(.83rem, 3.85vw, 1rem); margin-top: 5px; }
+  .hl-dashboard :is(.hl-metrics,.hl-links,.hl-recommendation,.hl-ai,.hl-tasks) { margin-inline: var(--hl-phone-inset); }
+  .hl-metrics { z-index: 1; margin-top: clamp(-39px, -8vw, -25px); }
+  .hl-metrics > .hl-level {
+    min-height: clamp(63px, 17vw, 73px);
+    padding: 6px 12px 6px 9px;
+    gap: 10px; position: relative; border-radius: 17px;
+    background: linear-gradient(145deg, #20213b, #171832);
+  }
+  .hl-level::after {
+    content: ""; width: 7px; height: 7px; margin-inline: 4px 1px;
+    transform: rotate(-45deg); border: solid #eee6fa; border-width: 0 1.5px 1.5px 0; flex: none;
+  }
+  .hl-ring { width: clamp(49px, 14vw, 57px); }
+  .hl-ring b { font-size: .98rem; }
+  .hl-level-info { grid-template-columns: max-content minmax(0, 1fr); align-items: center; column-gap: 4px; row-gap: 6px; }
+  .hl-level-info > small { color: #f5f0fc; font-weight: 600; }
+  .hl-level-info > small::after { content: ":"; }
+  .hl-level-info strong { font-size: .81rem; line-height: 1.17; }
+  .hl-level-detail { grid-column: 1 / -1; gap: 8px; }
+  .hl-level-detail progress { height: 8px; }
+  .hl-level-detail small { font-size: .75rem; color: #f5f0fc; }
+
+  .hl-link-grid { gap: clamp(8px, 2.6vw, 12px); }
+  .hl-shortcut {
+    min-height: clamp(81px, 24vw, 98px);
+    border-radius: 15px; padding: 8px 4px;
+    font-size: .8rem !important; font-weight: 600 !important;
+    gap: 5px; line-height: 1.16;
+  }
+  .hl-shortcut .hl-icon svg { width: clamp(28px, 8.1vw, 36px); height: auto; }
+  .hl-shortcut:is([data-shortcut="writing"],[data-shortcut="words"],[data-shortcut="placement"],[data-shortcut="live"]) > span:last-child { max-width: 12ch; }
+
+  .hl-recommendation { min-height: clamp(100px, 30vw, 118px); padding: 9px 12px 11px; border-radius: 16px; }
+  .hl-recommendation .hl-tag { display: block; margin: 0 0 7px; padding: 0; border: 0; background: none; font-size: .92rem; font-weight: 750; }
+  .hl-recommendation .hl-tag .hl-phone-copy { display: flex; align-items: center; gap: 6px; }
+  .hl-recommendation .hl-tag svg { width: 16px; height: 16px; fill: #c66cc6; color: #f5b9ef; }
+  .hl-lesson-row { gap: 9px; }
+  .hl-lesson-row > .hl-icon { width: clamp(43px, 13vw, 53px); height: auto; aspect-ratio: 1; border-radius: 11px; }
+  .hl-lesson-row h2 { font-size: .89rem; }
+  .hl-lesson-row p { font-size: .77rem; }
+  .hl-dashboard .hl-play { width: 38px; height: 38px; min-height: 38px; }
+  .hl-dashboard .hl-search { top: 57px; }
+
+  html body .app.study-app > .study-header #nav {
+    inset-inline: clamp(8px, 2.8vw, 16px) !important;
+    bottom: calc(5px + env(safe-area-inset-bottom)) !important;
+    transform: none !important;
+    max-width: 540px !important;
+    margin-inline: auto !important;
+    width: auto !important;
+    min-height: 68px !important;
+    padding: 5px 5px 3px !important;
+    gap: 3px !important;
+    border-radius: 20px !important;
+    background: linear-gradient(150deg,#231c3a,#1a1d35 58%) !important;
+  }
+  html body .app.study-app > .study-header #nav > button.mobile-more-trigger { display: none !important; }
+  html body .app.study-app > .study-header #nav > .hl-phone-profile { display: flex !important; order: 5 !important; }
+  html body .app.study-app > .study-header #nav > button:not(.mobile-secondary-route):not([data-page="live"]) {
+    background: transparent !important; border-color: transparent !important; box-shadow: none !important;
+    min-height: 55px !important; padding: 5px 2px !important; gap: 4px !important;
+  }
+  html body .app.study-app > .study-header #nav > button[aria-current="page"]:not([data-page="live"]) { color: #d780ff !important; }
+  html body .app.study-app > .study-header #nav > button:not([data-page="live"]) .study-icon { width: 22px !important; height: 22px !important; }
+  html body .app.study-app > .study-header #nav > button[data-page="live"][data-voice="idle"] {
+    width: clamp(48px, 14vw, 55px) !important;
+    height: clamp(48px, 14vw, 55px) !important;
+    min-height: clamp(48px, 14vw, 55px) !important;
+    margin: -12px auto 0 !important; padding: 0 !important;
+    background: radial-gradient(circle at 65% 74%, #6c40ec, #a24dff 76%) !important;
+    color: #fff !important;
+  }
+  html body .app.study-app > .study-header #nav > button[data-page="live"][data-voice="idle"] .study-route-label { display: none; }
+  html body .app.study-app > .study-header #nav > button[data-page="live"][data-voice="idle"] .study-icon { display: grid !important; width: 26px !important; height: 26px !important; }
+}
