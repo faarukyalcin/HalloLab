@@ -28,7 +28,7 @@ body #view:has(.hl-dashboard) > .top { display: none; }
 
 .hl-search { grid-area: search; display: flex; align-items: center; position: relative; z-index: 3; width: min(100%, 525px); }
 .hl-search > span:first-of-type { position: absolute; left: 14px; color: #e2d5fb; pointer-events: none; }
-body .app.study-app .main .hl-search input[type="search"] { width: 100%; min-height: 42px; padding: 8px 14px; padding-inline-start: 42px !important; font-size: 1rem; background: #29284d !important; border-color: #3c3660 !important; }
+body .app.study-app #view .hl-search input[type="search"] { width: 100%; min-height: 42px; padding: 8px 14px; padding-inline-start: 42px !important; font-size: 1rem; background: #29284d !important; border-color: #3c3660 !important; }
 .hl-search input::placeholder { color: var(--hl-muted); opacity: 1; }
 .hl-search-results { position: absolute; inset: calc(100% + 6px) 0 auto; max-height: min(60vh, 320px); overflow: auto; padding: 5px; border: 1px solid var(--hl-border); border-radius: 13px; background: #242344; box-shadow: 0 12px 22px #090816a8; }
 .hl-search-results[hidden] { display: none; }
@@ -123,7 +123,7 @@ body .app.study-app > .study-header .study-mark svg { visibility: hidden; }
   .hl-search { max-width: min(525px, calc(100% - 174px)); }
 }
 @media (max-width: 999px) {
-  html body { background: linear-gradient(155deg, #14132e, #080a21 55%, #07091c) !important; }
+  html body:has(.study-app) { background: linear-gradient(155deg, #14132e, #080a21 55%, #07091c) !important; }
   .hl-dashboard { grid-template-columns: minmax(0, 1fr); grid-template-areas: "search" "hero" "metrics" "links" "lesson" "assistant" "tasks"; gap: 12px; max-width: 640px; }
   .hl-banner { align-items: end; min-height: 183px; padding: 16px; border-radius: 17px; background-position: center, 69% center; }
   .hl-banner h1 { font-size: clamp(1.58rem, 5.1vw, 2.1rem); }
