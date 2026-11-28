@@ -5,7 +5,7 @@ const enc = new TextEncoder();
 const dec = new TextDecoder();
 const MAX_JSON = 180_000;
 const day = () => new Date().toISOString().slice(0, 10);
-const attendanceDay = () => new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Istanbul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+const attendanceDay = () => {const parts=Object.fromEntries(new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Istanbul',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()).map(p=>[p.type,p.value]));return parts.year+'-'+parts.month+'-'+parts.day;};
 const now = () => Math.floor(Date.now() / 1000);
 const b64 = bytes => btoa(String.fromCharCode(...bytes));
 const bytes = str => Uint8Array.from(atob(str), c => c.charCodeAt(0));
