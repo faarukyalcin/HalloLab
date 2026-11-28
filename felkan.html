@@ -558,8 +558,17 @@ const b64ToBytes=b=>{const s=atob(b),u=new Uint8Array(s.length);for(let i=0;i<s.
 const bytesToB64=u=>{let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s)};
 function ensureAudio(){
   if(!S.playCtx){S.playCtx=new (window.AudioContext||window.webkitAudioContext)({sampleRate:24000});
-    S.analyser=S.playCtx.createAnalyser();S.analyser.fftSize=512;S.analyser.connect(S.playCtx.destination)}
-  if(S.playCtx.state==='suspended')S.playCtx.resume();
+    S.analyser=S.playCtx.createAnalyser();S.analyser.fftSize=512;S.analyser.connect(S.playCtx.destination);
+    S.playCtx.onstatechange=()=>{
+      if(S.playCtx.state==='running'&&S.sources.size)setSpeaking(true);
+    };
+  }
+  if(S.playCtx.state==='suspended')void S.playCtx.resume().catch(()=>{});
+  return S.playCtx;
+}
+function unlockCompanionAudio(){
+  ensureAudio();
+  if(S.micCtx?.state==='suspended')void S.micCtx.resume().catch(()=>{});
 }
 function playPCM(b64,rate){
   ensureAudio();const u=b64ToBytes(b64);const n=Math.floor(u.length/2);if(!n)return;
@@ -568,12 +577,14 @@ function playPCM(b64,rate){
   const buf=S.playCtx.createBuffer(1,n,rate||24000);buf.copyToChannel(f,0);
   const src=S.playCtx.createBufferSource();src.buffer=buf;src.connect(S.analyser);
   const t=Math.max(S.nextTime,S.playCtx.currentTime+0.03);src.start(t);S.nextTime=t+buf.duration;
-  S.sources.add(src);S.lastAudio=Date.now();setSpeaking(true);
+  S.sources.add(src);S.lastAudio=Date.now();
+  if(S.playCtx.state==='running')setSpeaking(true);
+  else setStatus('audio-blocked','Sesi açmak için dokun');
   src.onended=()=>{S.sources.delete(src);if(!S.sources.size)setSpeaking(false)};
 }
 function stopPlayback(){for(const s of S.sources){try{s.onended=null;s.stop()}catch(e){}}S.sources.clear();S.nextTime=0;setSpeaking(false)}
 function setSpeaking(v){if(S.speaking===v)return;S.speaking=v;S.vizDirty=true;
-  if(v)setStatus('speaking','Felkan konuşuyor…');else if(S.setupDone)setStatus('listening','Dinliyorum… konuşabilirsin')}
+  if(v)setStatus('speaking','Felcan konuşuyor…');else if(S.setupDone)readyToListen()}
 (function viz(){requestAnimationFrame(viz);
   const bars=avatar.querySelectorAll('.bars i');
   if(S.speaking&&S.analyser){const d=new Uint8Array(S.analyser.fftSize);S.analyser.getByteTimeDomainData(d);
@@ -587,7 +598,7 @@ async function startMic(){
   if(S.stream)return;
   S.stream=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1,echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
   S.micCtx=new (window.AudioContext||window.webkitAudioContext)({sampleRate:16000});
-  if(S.micCtx.state==='suspended')await S.micCtx.resume();
+  if(S.micCtx.state==='suspended')void S.micCtx.resume().catch(()=>{});
   const src=S.micCtx.createMediaStreamSource(S.stream);
   const onChunk=f32=>{
     if(S.muted||S.ttsBusy||felcanGreetingPending||!S.setupDone||!S.ws||S.ws.readyState!==1)return;
@@ -751,7 +762,10 @@ function requestSpokenGreeting(text,model){
   clearTimeout(felcanGreetingTimer);
   felcanGreetingTimer=setTimeout(()=>{
     felcanGreetingPending=false;
-    if(S.setupDone&&!S.speaking)setStatus('listening','Selam yanıtı gecikti. Konuşabilirsin.');
+    if(S.setupDone&&!S.speaking){
+      if(micNeedsPermission||S.sources.size)readyToListen();
+      else setStatus('listening','Selam yanıtı gecikti. Konuşabilirsin.');
+    }
   },14000);
   setStatus('connecting','Felcan seni karşılıyor…');
   return true;
@@ -803,7 +817,7 @@ window.addEventListener('message',event=>{
     felcanScreen=event.data.context||null;
     const explain=event.data.type==='deutschai:explain';
     if(explain)felcanPendingExplain=true;
-    if(S.setupDone&&S.ws?.readyState===1){
+    if(S.setupDone&&S.ws?.readyState===1&&(!felcanGreetingPending||explain)){
       notify('[Uygulama] Kullanıcının şu an gördüğü DeutschAI ekranı:\n'+describeFelcanScreen(felcanScreen)+(explain?'\nKullanıcı bu soruyu anlamadığını söylüyor. Türkçe ve basitçe kuralı anlat; doğru şıkkı hemen söylemeden ipucu ver.':'\nKullanıcı sorarsa bu bilgileri kullan.'));
       if(explain)felcanPendingExplain=false;
     }else if(explain){
@@ -814,15 +828,42 @@ window.addEventListener('message',event=>{
 });
 
 
+let felcanConnecting=false;
+let micNeedsPermission=false;
+let micRequest=null;
+function requestCompanionMic(){
+  if(micRequest||S.stream)return;
+  micRequest=startMic().then(()=>{
+    const retry=micNeedsPermission;
+    micNeedsPermission=false;
+    if(retry&&S.setupDone&&!S.sources.size&&!felcanGreetingPending)readyToListen();
+  }).catch(err=>{
+    micNeedsPermission=true;
+    log('Mikrofon hatası',String(err));
+    if(S.setupDone&&!felcanGreetingPending&&!S.sources.size)setStatus('mic-blocked','Konuşmak için mikrofon izni ver');
+  }).finally(()=>{micRequest=null});
+}
+function readyToListen(){
+  if(S.playCtx?.state==='suspended'&&S.sources.size){
+    setStatus('audio-blocked','Sesi açmak için dokun');
+  }else if(micNeedsPermission){
+    setStatus('mic-blocked','Konuşmak için mikrofon izni ver');
+  }else{
+    setStatus('listening','Dinliyorum… konuşabilirsin');
+  }
+}
 async function connect(){
+  if(felcanConnecting)return;
+  felcanConnecting=true;
   S.userClosed=false;$('#startBtn').hidden=true;setStatus('connecting','Bağlanıyor…');
-  try{ensureAudio();await startMic()}catch(err){
-    log('Mikrofon hatası',String(err));setStatus('error','Mikrofon izni gerekli');$('#startBtn').textContent='Tekrar dene';$('#startBtn').hidden=false;return}
+  try{unlockCompanionAudio();requestCompanionMic()}catch(err){
+    felcanConnecting=false;setStatus('error','Ses başlatılamadı');$('#startBtn').hidden=false;return;
+  }
   const cand=CANDS()[Math.min(S.attempt,CANDS().length-1)];
-  let token;try{token=await window.FelkanBridge.liveToken()}catch(err){setStatus('error',err.message);$('#startBtn').hidden=false;return}
+  let token;try{token=await window.FelkanBridge.liveToken()}catch(err){felcanConnecting=false;setStatus('error',err.message);$('#startBtn').hidden=false;return}
   const url='wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained?access_token='+encodeURIComponent(token);
   log('Bağlanılıyor:',cand);
-  const ws=new WebSocket(url);S.ws=ws;S.setupDone=false;
+  const ws=new WebSocket(url);S.ws=ws;S.setupDone=false;felcanConnecting=false;
   const timer=setTimeout(()=>{if(!S.setupDone&&S.ws===ws){log('Kurulum zaman aşımı');ws.close(4000,'setup timeout')}},12000);
   ws.onopen=()=>{log('WS açıldı, kurulum gönderiliyor');ws.send(JSON.stringify(buildSetup(cand)))};
   ws.onmessage=ev=>{S.q=S.q.then(()=>{if(S.ws===ws)return onMsg(ev,cand.model)}).catch(e=>log('Mesaj hatası',String(e)))};
@@ -869,7 +910,7 @@ async function onMsg(ev,model){
   if(sc){
     if((sc.turnComplete||sc.interrupted)&&felcanGreetingPending){
       felcanGreetingPending=false;clearTimeout(felcanGreetingTimer);
-      if(!S.speaking)setStatus('listening','Dinliyorum… konuşabilirsin');
+      if(!S.speaking)readyToListen();
     }
     if(sc.interrupted){stopPlayback()}
     const parts=sc.modelTurn&&sc.modelTurn.parts||[];
@@ -1963,6 +2004,10 @@ function disconnect(silent){S.userClosed=true;if(S.ws){try{S.ws.close(1000,'user
 $('#startBtn').onclick=()=>{S.attempt=0;S.retries=0;connect()};
 
 function toggleCompanionVoice(){
+  const needsAudio=avatar.dataset.state==='audio-blocked';
+  unlockCompanionAudio();
+  if(needsAudio||felcanGreetingPending||felcanConnecting)return;
+  if(S.setupDone&&micNeedsPermission){requestCompanionMic();return}
   if(S.ws && (S.ws.readyState===WebSocket.CONNECTING || (S.ws.readyState===WebSocket.OPEN && !S.setupDone)))return;
   if(S.setupDone && S.ws?.readyState===WebSocket.OPEN){
     S.muted=!S.muted;
@@ -1978,7 +2023,7 @@ function toggleCompanionVoice(){
     connect();
   }
 }
-window.FelcanVoiceControl={toggle:toggleCompanionVoice};
+window.FelcanVoiceControl={toggle:toggleCompanionVoice,unlockAudio:unlockCompanionAudio};
 
 $('#bCenter').onclick=()=>{closeAll();setPos('center')};
 $('#bMute').onclick=()=>{S.muted=!S.muted;$('#bMute').classList.toggle('on',S.muted);if(S.stream)S.stream.getAudioTracks().forEach(t=>t.enabled=!S.muted);
