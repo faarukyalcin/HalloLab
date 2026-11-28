@@ -6,8 +6,18 @@
   const put = localStorage.setItem.bind(localStorage);
   const del = localStorage.removeItem.bind(localStorage);
   const authKey = 'deutschai:auth:v2';
+  const usernameKey = 'deutschai:last-username';
+  const rememberUsername = name => {
+    if(typeof name==='string'&&/^[a-zA-Z0-9_]{3,32}$/.test(name))put(usernameKey,name);
+  };
+  const saveSession = () => sessionStorage.setItem(authKey,JSON.stringify(auth));
   let auth = null;
-  try { auth = JSON.parse(get(authKey) || 'null'); } catch {}
+  try { auth = JSON.parse(sessionStorage.getItem(authKey) || 'null'); } catch {}
+  const oldSession=get(authKey);
+  if(oldSession){
+    try{if(!get(usernameKey))rememberUsername(JSON.parse(oldSession)?.user?.username)}catch{}
+    del(authKey);
+  }
   if (!auth?.token || !auth?.user?.id) auth = null;
   const prefix = () => 'deutschai:user:' + (auth?.user?.id || 'guest') + ':';
   const syncKeys = key => /^deutschai-|^felkan_/.test(key);
@@ -247,27 +257,35 @@
       +'<p class="da-hero-note">Kendi hızında öğren. Kaldığın yerden devam et.</p></section>'
       +'<section class="da-card da-login-card"><div class="da-form-kicker">DEUTSCHAI HESABIN</div><h2>'+(mode==='register'?'Yolculuğuna başla':'Yeniden hoş geldin!')+'</h2><p>'+(mode==='register'?'Hesabını oluştur; Edit ilk programını birlikte hazırlasın.':'Almanca yolculuğuna kaldığın yerden devam et.')+'</p>'
       +'<div class="da-tabs" role="group" aria-label="Hesap işlemi"><button type="button" id="da-login-tab" aria-pressed="'+(mode==='login')+'">Giriş Yap</button><button type="button" id="da-signup-tab" aria-pressed="'+(mode==='register')+'">Kayıt Ol</button></div>'
-      +'<form id="da-auth-form"><label>Kullanıcı adı<input name="username" autocomplete="username" minlength="3" maxlength="32" required placeholder="Kullanıcı adın"></label>'
+      +'<form id="da-auth-form" autocomplete="off"><label>Kullanıcı adı<input name="username" autocomplete="username" minlength="3" maxlength="32" required placeholder="Kullanıcı adın"></label>'
       +(mode==='register' ? '<div class="da-name-row"><label>Adın<input name="firstName" autocomplete="given-name" maxlength="80" required placeholder="Adın"></label><label>Soyadın<input name="lastName" autocomplete="family-name" maxlength="80" required placeholder="Soyadın"></label></div><label>E-posta<input name="email" type="email" autocomplete="email" required placeholder="ornek@eposta.com"></label>' : '')
-      +'<label>Şifre<input name="password" type="password" minlength="'+(mode==='register'?'10':'1')+'" autocomplete="'+(mode==='register'?'new-password':'current-password')+'" required placeholder="Şifren"></label>'
+      +'<label>Şifre<input name="password" type="password" minlength="'+(mode==='register'?'10':'1')+'" autocomplete="new-password" required placeholder="Şifren"></label>'
       +'<p class="da-error" role="alert">'+safe(message)+'</p><button class="da-login-submit" type="submit">'+(mode==='register'?'Hesap Oluştur ✦':'Öğrenmeye Devam Et ✦')+'</button></form>'
       +'<p class="da-login-secure">🔒 İlerlemen hesabına özel saklanır. Yöneticiler giriş günlerini ve yaklaşık aktif çalışma sürelerini görebilir. API anahtarı istenmez.</p></section></div>';
     screen.querySelector('#da-login-tab').onclick=()=>show('login');
     screen.querySelector('#da-signup-tab').onclick=()=>show('register');
-    screen.querySelector('#da-auth-form').onsubmit=async event=>{
+    const form=screen.querySelector('#da-auth-form');
+    if(mode==='login'){
+      const username=get(usernameKey)||'';
+      form.elements.username.value=username;
+      if(username)form.elements.password.focus();
+    }
+    form.onsubmit=async event=>{
       event.preventDefault();
       const submit=screen.querySelector('[type=submit]');submit.disabled=true;
-      const fields=Object.fromEntries(new FormData(event.currentTarget));
+      const fields=Object.fromEntries(new FormData(form));
+      form.elements.password.value='';
       try {
         auth=await request('/auth/'+(mode==='login'?'login':'register'),{method:'POST',body:JSON.stringify(fields)});
-        put(authKey,JSON.stringify(auth));sessionStorage.removeItem('da-hydrated');
+        rememberUsername(auth?.user?.username);
+        saveSession();sessionStorage.removeItem('da-hydrated');
         location.reload();
       } catch(e) {screen.querySelector('.da-error').textContent=e.message;submit.disabled=false;}
     };
   }
   async function logout() {
     try {await request('/auth/logout',{method:'POST'});} catch {}
-    auth=null;del(authKey);sessionStorage.removeItem('da-hydrated');location.reload();
+    auth=null;sessionStorage.removeItem(authKey);sessionStorage.removeItem('da-hydrated');location.reload();
   }
   function admin() {
     if(auth?.user.role!=='admin')return;
@@ -422,7 +440,7 @@
       const b=e.querySelector('[type=submit]');b.disabled=true;
       try {
         await request('/admin/claim',{method:'POST',body:JSON.stringify(Object.fromEntries(new FormData(event.currentTarget)))});
-        const response=await request('/auth/me');auth.user=response.user;put(authKey,JSON.stringify(auth));location.reload();
+        const response=await request('/auth/me');auth.user=response.user;saveSession();location.reload();
       } catch(err) {e.querySelector('.da-error').textContent=err.message;b.disabled=false;}
     };
   }
@@ -521,7 +539,7 @@
     iframe.allow='microphone; autoplay';
     iframe.tabIndex=-1;
     iframe.setAttribute('aria-hidden','true');
-    iframe.src='./felkan.html?compact=1&v=edit-assistant-1';
+    iframe.src='./felkan.html?compact=1&v=remember-username-1';
     iframe.addEventListener('load',()=>{
       felcanReady=true;
       sendFelcanContext(true);
@@ -603,7 +621,7 @@
     if(!auth){show();return;}
     try{
       const me=await request('/auth/me');
-      auth.user=me.user;put(authKey,JSON.stringify(auth));
+      auth.user=me.user;saveSession();
       const changed=await hydrate();
       if(changed && !sessionStorage.getItem('da-hydrated')){
         sessionStorage.setItem('da-hydrated','1');location.reload();return;
@@ -611,6 +629,6 @@
       account();
       floatingFelcan();
       startStudyAttendance();
-    } catch(error) {auth=null;del(authKey);show('login',error.message);}
+    } catch(error) {auth=null;sessionStorage.removeItem(authKey);show('login',error.message);}
   });
 })();

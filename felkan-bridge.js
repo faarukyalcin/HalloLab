@@ -3,7 +3,7 @@
   'use strict';
   const apiBase = String(window.DEUTSCHAI_API_URL || '').replace(/\/$/, '');
   let auth = null;
-  try { auth = JSON.parse(localStorage.getItem('deutschai:auth:v2') || 'null'); } catch {}
+  try { auth = JSON.parse(sessionStorage.getItem('deutschai:auth:v2') || 'null'); } catch {}
   const userId = auth?.user?.id || 'guest';
   const scope = key => 'deutschai:user:' + userId + ':' + key;
   const storage = {
