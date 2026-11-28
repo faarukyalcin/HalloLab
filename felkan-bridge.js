@@ -36,6 +36,7 @@
         body:'{}'
       });
       const result = await response.json();
+      if(response.status===429||/\b429\b|RESOURCE_EXHAUSTED/.test(result.error||''))throw Error('Gemini ses kotası veya oturum sınırı doldu (429).');
       if (!response.ok) throw Error(result.error || 'Felkan sesli bağlantı kurulamadı');
       return result.token;
     },
