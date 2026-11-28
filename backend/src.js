@@ -157,7 +157,7 @@ async function main(req,env){
   const profile=x.profile&&typeof x.profile==='object'?x.profile:{};
   if(task.length<3)return error('İstek boş');
   const model=env.GEMINI_TEXT_MODEL||'gemini-2.5-flash';
-  const result=await geminiFetch(env,`models/${encodeURIComponent(model)}:generateContent`,{systemInstruction:{parts:[{text:aiPrompt(profile,'Kullanıcının düzeyine uygun sorular, kelimeler, gramer örnekleri hazırla. Gerektiğinde geçerli JSON üret.')} ]},contents:[{role:'user',parts:[{text:task}]}],generationConfig:{temperature:.55,maxOutputTokens:1700}});
+  const result=await geminiFetch(env,`models/${encodeURIComponent(model)}:generateContent`,{systemInstruction:{parts:[{text:aiPrompt(profile,'Kullanıcının düzeyine uygun sorular, kelimeler, gramer örnekleri hazırla. Gerektiğinde geçerli JSON üret.')} ]},contents:[{role:'user',parts:[{text:task}]}],generationConfig:{temperature:.55,maxOutputTokens:4000}});
   if(result.error)return error(result.error,result.status);
   if(result.status>=400)return error('Gemini isteği başarısız ('+result.status+')',502);
   return answer({text:(result.data.candidates?.[0]?.content?.parts||[]).map(x=>x.text||'').join('')});
