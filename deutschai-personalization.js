@@ -11,6 +11,7 @@ let inflight=false;
 const questionRequests=new Map();
 const style=document.createElement('style');
 style.textContent='.da-personal{margin:17px 0;padding:19px;border:1px solid #ae95ee6b;border-radius:22px;background:linear-gradient(135deg,#6650ae2c,#171a4050)}.da-personal h2{margin:0 0 8px;font-size:20px}.da-personal p{line-height:1.55}.da-personal button{cursor:pointer;border:1px solid #ad95ef8a;border-radius:12px;padding:10px 12px;background:#6747b8;color:#fff}.da-personal .da-question{padding:13px;margin:12px 0;border:1px solid #ad95ef42;border-radius:14px}.da-personal .da-opts{display:grid;gap:7px;margin:10px 0}.da-personal .da-opts button{text-align:left;background:#34265c}.da-personal .da-opts button.correct{background:#16634c}.da-personal .da-opts button.wrong{background:#873f56}.da-personal .da-plan-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}.da-personal label{display:grid;gap:5px;font-size:13px;color:#ded7fa}.da-personal select,.da-personal input{width:100%;min-width:0;padding:11px;border:1px solid #8e7bd0;border-radius:12px;background:#21193e;color:#fff;font:inherit}.da-personal .da-plan-days{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:9px;margin:12px 0}.da-personal .da-plan-day{padding:12px;border:1px solid #a98ce85a;border-radius:14px;background:#22193b9e}.da-personal .da-plan-day.today{border-color:#b4a1ff}.da-personal .da-plan-day h3{margin:0 0 8px;font-size:14px}.da-personal .da-plan-task{display:flex;align-items:flex-start;gap:6px;margin:7px 0;font-size:13px;line-height:1.4}.da-personal .da-plan-task input{width:auto;margin-top:3px;accent-color:#a38aff}.da-personal .da-plan-task.done span{text-decoration:line-through;opacity:.6}.da-personal .da-plan-actions{display:flex;flex-wrap:wrap;gap:8px}.da-personal .da-plan-muted{font-size:13px;color:#bcb2db}.da-personal .da-plan-wide{grid-column:1/-1}@media(max-width:540px){.da-personal .da-plan-form{grid-template-columns:1fr}}';
+style.textContent+=` .da-week-strip{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin:18px 0}.da-personal .da-week-strip button{padding:8px 2px;display:grid;gap:5px;justify-items:center;background:color-mix(in srgb,var(--paper) 80%,transparent);color:var(--ink);border:1px solid var(--line)}.da-week-strip button[aria-pressed=true]{border-color:var(--green);box-shadow:inset 0 0 0 1px var(--green)}.da-week-strip small{font-size:10px}.da-today-head{padding:14px 0}.da-today-head>span{font-size:11px;color:var(--green);font-weight:700}.da-today-head h3{font-size:21px;margin:7px 0}.da-today-head p{font-size:13px;color:var(--muted)}.da-plan-meter{height:5px;border-radius:9px;background:var(--line);overflow:hidden}.da-plan-meter i{display:block;height:100%;background:var(--green)}.da-step{display:grid;grid-template-columns:32px 1fr;gap:11px;padding:15px 0;border-top:1px solid var(--line)}.da-step-num{width:30px;height:30px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--line);color:var(--green);font-weight:700}.da-step small{display:block;color:var(--muted);margin:6px 0 10px}.da-step-actions{display:flex;gap:8px;flex-wrap:wrap}.da-personal .da-step-actions [data-done]{background:transparent;color:var(--ink);border-color:var(--line)}.da-step.done .da-step-num{background:var(--green);color:var(--paper)}`;
 document.head.append(style);
 
 const SETTINGS='deutschai-felcan-settings-v1', PLAN='deutschai-felcan-week-v1';
@@ -56,14 +57,36 @@ function renderProgram(host,s,edit=false){
  host.querySelector('.da-plan-toggle').onclick=()=>{const slot=host.querySelector('.da-week-slot');if(slot.childElementCount){slot.replaceChildren();return}if(current)drawWeek(host,current);else buildWeek(p,false,host)};
  if(current)drawWeek(host,current);
 }
+const routes=['lessons','grammar','words','practice','writing','exam'];
+function taskRoute(task){
+ if(routes.includes(task.route))return task.route;
+ const s=String(task.activity||'').toLocaleLowerCase('tr');
+ return /deneme|sınav/.test(s)?'exam':/yazma|konuşma|e-posta/.test(s)?'writing':/gramer|artikel|fiil çekimi/.test(s)?'grammar':/kelime/.test(s)?'words':/alıştırma|tekrar|dinleme|okuma/.test(s)?'practice':'lessons';
+}
+window.deutschaiWeeklyContext=()=>{
+ const plan=existingPlan();if(plan?.week!==weekStart()||!Array.isArray(plan.days))return null;
+ const today=weekdaysIndex(),days=plan.days.map((d,i)=>({day:weekdays[i],topic:d.topic,tasks:(d.tasks||[]).map((t,j)=>({step:j+1,activity:t.activity,minutes:t.minutes,route:taskRoute(t),done:!!plan.done?.[i+'-'+j]}))}));
+ return {week:plan.week,today:weekdays[today],todayIndex:today,days,next:days[today]?.tasks.find(t=>!t.done)||null};
+};
+window.deutschaiStartWeeklyTask=(dayIndex,taskIndex)=>{
+ const plan=existingPlan(),i=Number(dayIndex),j=Number(taskIndex),task=plan?.days?.[i]?.tasks?.[j];
+ if(!task||plan.week!==weekStart())return false;
+ const route=taskRoute(task),context={week:plan.week,day:i,step:j,route,topic:plan.days[i].topic,activity:task.activity,minutes:task.minutes};
+ if(typeof window.deutschaiStartPlannedStudy!=='function')return false;
+ return window.deutschaiStartPlannedStudy(context);
+};
 function drawWeek(host,plan){
  const slot=host.querySelector('.da-week-slot');if(!slot)return;
- const today=weekdaysIndex(),done=plan.done||{};
- slot.innerHTML='<div class="da-plan-days">'+plan.days.map((day,i)=>'<div class="da-plan-day '+(i===today?'today':'')+'"><h3>'+weekdays[i]+(i===today?' · Bugün':'')+'</h3><p class="da-plan-muted">'+esc(day.topic||'Almanca tekrarı')+'</p>'+day.tasks.map((task,j)=>'<label class="da-plan-task '+(done[i+'-'+j]?'done':'')+'"><input type="checkbox" data-day="'+i+'" data-task="'+j+'" '+(done[i+'-'+j]?'checked':'')+'><span>'+esc(task.activity)+' · '+task.minutes+' dk</span></label>').join('')+'</div>').join('')+'</div>'
-  +(plan.fallback?'<p class="da-plan-muted">Bu plan çevrimdışı şablonla hazırlandı. Yapay zekâ planını yeniden oluşturabilirsin.</p>':'')
-  +'<button class="da-refresh-plan">Programı yeniden hazırla</button>';
- slot.querySelectorAll('input[type="checkbox"]').forEach(input=>input.onchange=()=>{const latest=existingPlan();if(!latest||latest.week!==plan.week)return;latest.done=latest.done||{};const key=input.dataset.day+'-'+input.dataset.task;if(input.checked)latest.done[key]=true;else delete latest.done[key];store().setItem(PLAN,JSON.stringify(latest));input.closest('label').classList.toggle('done',input.checked)});
+ const today=weekdaysIndex();let selected=today;
+ const draw=()=>{
+ const current=existingPlan()||plan,done=current.done||{},day=current.days[selected],tasks=day.tasks||[],next=tasks.findIndex((_,j)=>!done[selected+'-'+j]);
+ const completed=tasks.filter((_,j)=>done[selected+'-'+j]).length;
+ slot.innerHTML='<div class="da-week-strip">'+current.days.map((d,i)=>'<button type="button" data-week-day="'+i+'" aria-pressed="'+(i===selected)+'"><small>'+weekdays[i].slice(0,3)+'</small><b>'+((d.tasks||[]).length&&(d.tasks||[]).every((_,j)=>done[i+'-'+j])?'✓':i===today?'●':i+1)+'</b></button>').join('')+'</div><div class="da-today-head"><span>'+weekdays[selected]+(selected===today?' · BUGÜN':'')+'</span><h3>'+esc(day.topic||'Almanca')+'</h3><p>'+tasks.reduce((n,t)=>n+Number(t.minutes||0),0)+' dk · '+completed+'/'+tasks.length+' tamamlandı</p><div class="da-plan-meter"><i style="width:'+(tasks.length?100*completed/tasks.length:0)+'%"></i></div></div><div class="da-step-list">'+tasks.map((t,j)=>'<article class="da-step '+(done[selected+'-'+j]?'done':'')+'"><span class="da-step-num">'+(done[selected+'-'+j]?'✓':j+1)+'</span><div><b>'+esc(t.activity)+'</b><small>'+t.minutes+' dk'+(j===next?' · Sıradaki adım':'')+'</small><div class="da-step-actions"><button data-start="'+j+'">'+(done[selected+'-'+j]?'Tekrar çalış':'Çalışmayı başlat →')+'</button><button data-done="'+j+'" aria-pressed="'+!!done[selected+'-'+j]+'">'+(done[selected+'-'+j]?'Geri al':'Tamamladım')+'</button></div></div></article>').join('')+'</div>'+(current.fallback?'<p class="da-plan-muted">Geçici plan · Edit ile yeniden hazırlayabilirsin.</p>':'')+'<button class="da-refresh-plan">Programı yeniden hazırla</button>';
+ slot.querySelectorAll('[data-week-day]').forEach(btn=>btn.onclick=()=>{selected=Number(btn.dataset.weekDay);draw()});
+ slot.querySelectorAll('[data-start]').forEach(btn=>btn.onclick=()=>{if(!window.deutschaiStartWeeklyTask(selected,Number(btn.dataset.start)))alert('Çalışma şu anda açılamadı. Tekrar dene.')});
+ slot.querySelectorAll('[data-done]').forEach(btn=>btn.onclick=()=>{const latest=existingPlan();if(latest?.week!==plan.week)return;const key=selected+'-'+btn.dataset.done;latest.done=latest.done||{};if(latest.done[key])delete latest.done[key];else latest.done[key]=true;store().setItem(PLAN,JSON.stringify(latest));draw()});
  slot.querySelector('.da-refresh-plan').onclick=()=>buildWeek(preferences(),true,host);
+ };draw();
 }
 function fallbackWeek(p,s){
  const focus=p.focus==='grammar'?'Gramer':p.focus==='speaking'?'Konuşma':p.focus==='vocabulary'?'Kelime':p.focus==='listening'?'Dinleme':p.focus==='writing'?'Yazma':'Karma tekrar';
@@ -76,7 +99,7 @@ async function buildWeek(p,force=false,host=null){
  const slot=e.querySelector('.da-week-slot');
  if(slot)slot.innerHTML='<p>✨ Edit, seviyeni ve önceki çalışmalarını inceleyerek haftalık planını hazırlıyor…</p>';
  const s=state(),level=s.level||'A1',minutes=p.minutes,week=weekStart();
- const task='Edit adlı Almanca öğretmenisin. Türkçe yaz. '+level+' seviyesindeki öğrenci için bu haftaya özel 7 günlük GERÇEKÇİ program hazırla. Günlük süre '+minutes+' dakika (aşma). Hedef: '+(goals[p.goal]||goals.general)+'. Odak: '+p.focus+'. Tamamlanan ders sayısı '+(s.completed||[]).length+'. Zorlanılan kelimeler '+JSON.stringify((s.wrongWords||[]).slice(0,8))+'. Her güne farklı konu ve tam 2 kısa etkinlik koy. Kesinlikle SADECE geçerli, kısa JSON döndür: {"days":[{"topic":"konu","tasks":[{"activity":"kısa görev","minutes":10},{"activity":"kısa görev","minutes":10}]}]}. days tam 7 eleman, Pazartesi-Pazar sıralı. Her günün süre toplamı '+minutes+' olmalı. Markdown kullanma.';
+ const task='Edit adlı Almanca öğretmenisin. Türkçe yaz. '+level+' seviyesindeki öğrenci için bu haftaya özel 7 günlük GERÇEKÇİ program hazırla. Günlük süre '+minutes+' dakika (aşma). Hedef: '+(goals[p.goal]||goals.general)+'. Odak: '+p.focus+'. Tamamlanan ders sayısı '+(s.completed||[]).length+'. Zorlanılan kelimeler '+JSON.stringify((s.wrongWords||[]).slice(0,8))+'. Her güne farklı konu ve 2 sıralı, uygulanabilir etkinlik koy. Her görevde route alanı mutlaka lessons, grammar, words, practice, writing, exam seçeneklerinden biri olsun. Kesinlikle SADECE geçerli, kısa JSON döndür: {"days":[{"topic":"konu","tasks":[{"activity":"kısa görev","minutes":10,"route":"lessons"},{"activity":"kısa görev","minutes":10,"route":"practice"}]}]}. days tam 7 eleman, Pazartesi-Pazar sıralı. Her günün süre toplamı '+minutes+' olmalı. Markdown kullanma.';
  let days=null,fallback=false;
  try {
   const res=await active().api('/ai/generate',{method:'POST',body:JSON.stringify({task,profile:{level,daily:minutes}})});
@@ -86,7 +109,7 @@ async function buildWeek(p,force=false,host=null){
    const tasks=Array.isArray(day.tasks)?day.tasks.slice(0,2):[];
    if(tasks.length!==2)throw Error('Plan eksik');
    const a=Math.max(5,Math.min(minutes-5,Math.round(Number(tasks[0].minutes)||minutes*.5)));
-   return {topic:String(day.topic||'Almanca').slice(0,90),tasks:[{activity:String(tasks[0].activity||'Ders').slice(0,130),minutes:a},{activity:String(tasks[1].activity||'Alıştırma').slice(0,130),minutes:minutes-a}]};
+   return {topic:String(day.topic||'Almanca').slice(0,90),tasks:[{activity:String(tasks[0].activity||'Ders').slice(0,130),minutes:a,route:taskRoute(tasks[0])},{activity:String(tasks[1].activity||'Alıştırma').slice(0,130),minutes:minutes-a,route:taskRoute(tasks[1])}]};
   });
  }catch(error){console.warn('Edit programı hazır planla değiştirildi:',error);fallback=true;days=fallbackWeek(p,s)}
  // Do not overwrite a more recent user's choices if another request was submitted.
