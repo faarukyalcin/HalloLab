@@ -478,7 +478,37 @@ body .app.study-app .main .glass-shortcuts > button { display:grid; justify-item
 </style><style>
 .study-brand .study-mark { background:linear-gradient(145deg,#6144b6,#3d267b 58%,#291d55); border:1px solid #d9beff75; border-radius:11px; box-shadow:inset 0 1px 0 #e2cfff4d,0 3px 12px #613ec858; }
 .study-brand .study-mark .deutschai-book-mark { display:block; width:87%; height:87%; }
-</style><link rel="stylesheet" href="./mobile-liquid-glass.css?v=felcan-speaking-glow-1"><link rel="stylesheet" href="./intro-motion.css?v=20261128-responsive"><script src="./api-config.js"></script><script src="./deutschai-auth.js?v=live-greeting-model-1"></script></head><body><div id="deutschai-intro" aria-label="DeutschAI açılış videosu"><div class="intro-frame"><video autoplay muted playsinline preload="auto" aria-label="Almanca kelimelerle DeutschAI açılış videosu"></video><div class="intro-shade" aria-hidden="true"></div><button class="intro-skip" type="button" aria-label="Açılış videosunu geç">Geç</button></div></div><div class="scene-ribbons" aria-hidden="true"></div><div class="app study-app"><header class="study-header"><div class="study-head"><div class="study-brand"><div class="study-mark"><svg class="deutschai-book-mark" viewBox="0 0 48 48" aria-hidden="true" fill="none">
+
+.study-nav-heading { display:none; }
+.home-sections h2 { margin:0 0 12px; font-size:18px; }
+.home-section-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
+.home-section-grid button {
+  display:grid; grid-template-columns:22px minmax(0,1fr) auto; align-items:center; gap:10px;
+  min-height:52px; padding:9px 11px; border:1px solid var(--line); border-radius:12px;
+  background:var(--paper); color:var(--ink); text-align:left; font-weight:650;
+}
+.home-section-grid button:hover { border-color:var(--green); }
+.home-section-grid .study-icon { width:20px; height:20px; color:var(--green); }
+.home-section-arrow { color:var(--muted); }
+@media(min-width:1000px){
+  .app.study-app .study-header .study-nav { gap:3px; }
+  .app.study-app .study-header .study-nav > button[data-page] { min-height:39px; padding-block:6px; }
+  .study-nav-heading { display:block; padding:9px 12px 2px; color:var(--muted); font-size:11px; font-weight:750; letter-spacing:.035em; }
+  .study-nav-heading:first-child { padding-top:0; }
+}
+@media(max-width:1150px){
+  .home-section-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media(max-width:999px){
+  .mobile-more-menu .mobile-more-sheet { max-height:calc(100dvh - 100px); overflow-y:auto; }
+  .mobile-more-group + .mobile-more-group { margin-top:12px; }
+  .mobile-more-group h3 { margin:0 0 6px; font-size:12px; color:var(--muted); }
+}
+@media(max-width:380px){
+  .home-section-grid button { gap:6px; padding-inline:7px; font-size:13px; }
+  .home-section-arrow { display:none; }
+}
+</style><link rel="stylesheet" href="./mobile-liquid-glass.css?v=felcan-speaking-glow-1"><link rel="stylesheet" href="./intro-motion.css?v=20261128-responsive"><script src="./api-config.js"></script><script src="./deutschai-auth.js?v=entry-voice-menu-1"></script></head><body><div id="deutschai-intro" aria-label="DeutschAI açılış videosu"><div class="intro-frame"><video autoplay muted playsinline preload="auto" aria-label="Almanca kelimelerle DeutschAI açılış videosu"></video><div class="intro-shade" aria-hidden="true"></div><button class="intro-skip" type="button" aria-label="Açılış videosunu geç">Geç</button></div></div><div class="scene-ribbons" aria-hidden="true"></div><div class="app study-app"><header class="study-header"><div class="study-head"><div class="study-brand"><div class="study-mark"><svg class="deutschai-book-mark" viewBox="0 0 48 48" aria-hidden="true" fill="none">
   <path d="M12 11h13c8 0 14 5.5 14 13s-6 13-14 13H12z" stroke="#fcfaff" stroke-width="3.1" stroke-linejoin="round"/>
   <path d="M12 18c4-1 8.2.2 12 3.2 3.5-2.8 7.3-4.1 11-3.4M12 27c4-1 8.2.2 12 3.2 4.2-3.3 8.5-4.6 13-3.1M24 21.2v9" stroke="#ded0ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
   <path d="M14.5 41h5" stroke="#f28a9c" stroke-width="2.2" stroke-linecap="round"/>
@@ -513,10 +543,13 @@ let state={...defaults,...JSON.parse(window.deutschaiStore.getItem(KEY)||'{}')};
 if(!state.themeVersion){if(state.theme==='light')state.theme='dark';else if(['ocean','violet','rose','sunset'].includes(state.theme))state.theme+='-dark';state.themeVersion=1;window.deutschaiStore.setItem(KEY,JSON.stringify(state))}
 function save(){window.deutschaiStore.setItem(KEY,JSON.stringify(state))}
 const navItems=[['home','⌂','Ana sayfa'],['lessons','▤','Dersler'],['placement','◈','Seviye tespiti'],['words','Aa','Kelime kartları'],['grammar','≋','Gramer'],['practice','✓','Alıştırmalar'],['exam','◷','Deneme sınavı'],['writing','✎','Yazma & konuşma'],['live','◉','Tek asistan'],['progress','↗','İlerleme']];
-function navIcon(id){const paths={placement:'M12 3 20 8v8l-8 5-8-5V8zm-3 9 2 2 4-5',home:'M3.5 10.5 12 3.5l8.5 7v9.2a1.3 1.3 0 0 1-1.3 1.3h-5v-6h-4.4v6h-5a1.3 1.3 0 0 1-1.3-1.3z',lessons:'M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22zm0 0V22m4-15h8m-8 4h8',words:'M8 4h12v15H8zm-3 3H4v14h12v-2m-5-11h6m-6 4h6',grammar:'M5 6h14M8 3v6m8-6v6M7 13h10m-8 4h6m-4 4h2',practice:'M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17zm-4 8.5 2.5 2.5 5-5',exam:'M7 3.5h8l4 4V21H5V3.5zm8 0V8h4m-9 5h6m-6 4h6',writing:'m14 5 5 5M4 20l4.2-.9L20 7.3 16.7 4 4.9 15.8z',live:'M4 10v4m4-7v10m4-13v16m4-11v6m4-8v10',ai:'m12 3 2.1 6.2L20 12l-5.9 2.1L12 21l-2.1-6.9L4 12l5.9-2.8z',progress:'M4 20V5m0 15h17M8 15l3-4 3 2 5-7'};return `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[id]||paths.home}"/></svg>`}
+const navGroups=[['Öğren',['home','lessons','words','grammar']],['Çalış',['practice','writing','live']],['Kendini değerlendir',['placement','exam','progress']]];
+const primaryMobile=['home','lessons','live','practice'];
+function navIcon(id){const paths={menu:'M4 6h16M4 12h16M4 18h16',placement:'M12 3 20 8v8l-8 5-8-5V8zm-3 9 2 2 4-5',home:'M3.5 10.5 12 3.5l8.5 7v9.2a1.3 1.3 0 0 1-1.3 1.3h-5v-6h-4.4v6h-5a1.3 1.3 0 0 1-1.3-1.3z',lessons:'M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22zm0 0V22m4-15h8m-8 4h8',words:'M8 4h12v15H8zm-3 3H4v14h12v-2m-5-11h6m-6 4h6',grammar:'M5 6h14M8 3v6m8-6v6M7 13h10m-8 4h6m-4 4h2',practice:'M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17zm-4 8.5 2.5 2.5 5-5',exam:'M7 3.5h8l4 4V21H5V3.5zm8 0V8h4m-9 5h6m-6 4h6',writing:'m14 5 5 5M4 20l4.2-.9L20 7.3 16.7 4 4.9 15.8z',live:'M4 10v4m4-7v10m4-13v16m4-11v6m4-8v10',ai:'m12 3 2.1 6.2L20 12l-5.9 2.1L12 21l-2.1-6.9L4 12l5.9-2.8z',progress:'M4 20V5m0 15h17M8 15l3-4 3 2 5-7'};return `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[id]||paths.home}"/></svg>`}
 let page='home',filter='Tümü',wordIndex=0,wordBack=false,wordFilter='Tümü',wordMode='kart';
 function escapeHtml(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function setPage(p){
+  toggleMobileMore(false);
   if (p === 'live' && window.DeutschAI?.ready) { window.DeutschAI.openFelkan(); return; }
 
   trackTime();
@@ -528,10 +561,16 @@ function toggleMobileMore(force) {
   const menu = document.getElementById('mobile-more-menu');
   const trigger = document.querySelector('.mobile-more-trigger');
   if (!menu) return;
+  const wasOpen=menu.classList.contains('open');
   const open = typeof force === 'boolean' ? force : !menu.classList.contains('open');
   menu.classList.toggle('open',open);
   trigger?.setAttribute('aria-expanded', String(open));
+  if(open&&!wasOpen)menu.querySelector('.mobile-more-heading button')?.focus();
+  if(!open&&wasOpen)trigger?.focus({preventScroll:true});
 }
+document.addEventListener('keydown',event=>{
+  if(event.key==='Escape')toggleMobileMore(false);
+});
 function renderNav() {
   const nav = document.querySelector('#nav');
   const picker = document.querySelector('#theme-picker');
@@ -539,10 +578,10 @@ function renderNav() {
   const active = page === 'welcome' ? 'home' : ['lesson','lesson-end'].includes(page) ? 'lessons' : page;
   const route = ([id, , name]) => {
     const label = { home: 'Ana sayfa', words: 'Kelimeler', practice: 'Pratik', live: 'Felcan' }[id] || name;
-    return `<button type="button" data-page="${id}" ${id==='live'?'class="mobile-felcan-route" aria-label="Felcan ile konuş"':''} ${active === id ? 'aria-current="page"' : ''} onclick="setPage('${id}')"><span class="study-icon" aria-hidden="true">${navIcon(id)}</span>${id==='live'?'<span class="mobile-felcan-emblem" aria-hidden="true"><span class="mobile-felcan-face"><i class="mobile-felcan-eyes">● ●</i><i class="mobile-felcan-mouth">ᴗ</i></span><span class="mobile-felcan-ear"></span><span class="mobile-felcan-feet"></span></span>':''}${label}</button>`;
+    return `<button type="button" data-page="${id}" ${id==='live'?'class="mobile-felcan-route" aria-label="Felcan ile konuş"':''} ${active === id ? 'aria-current="page"' : ''} onclick="setPage('${id}')"><span class="study-icon" aria-hidden="true">${navIcon(id)}</span>${id==='live'?'<span class="mobile-felcan-emblem" aria-hidden="true"><span class="mobile-felcan-face"><i class="mobile-felcan-eyes">● ●</i><i class="mobile-felcan-mouth">ᴗ</i></span><span class="mobile-felcan-ear"></span><span class="mobile-felcan-feet"></span></span>':''}<span class="study-route-label">${label}</span></button>`;
   };
-  const primaryMobile = ['home','lessons','live','practice'];
-  nav.innerHTML = navItems.map(route).join('') + `<button type="button" class="mobile-more-trigger" aria-label="Diğer sayfalar" aria-expanded="false" onclick="toggleMobileMore()"><span class="study-icon" aria-hidden="true">${navIcon('progress')}</span>Diğer</button>`;
+  const routeById = id => route(navItems.find(([item])=>item===id));
+  nav.innerHTML = navGroups.map(([heading,ids])=>`<div class="study-nav-heading">${heading}</div>${ids.map(routeById).join('')}`).join('') + `<button type="button" class="mobile-more-trigger" aria-label="Diğer çalışma bölümleri" aria-controls="mobile-more-menu" aria-expanded="false" onclick="toggleMobileMore()"><span class="study-icon" aria-hidden="true">${navIcon('menu')}</span>Menü</button>`;
   let mobileMore = document.getElementById('mobile-more-menu');
   if (!mobileMore) {
     mobileMore = document.createElement('div');
@@ -551,13 +590,19 @@ function renderNav() {
     document.body.appendChild(mobileMore);
   }
   mobileMore.classList.remove('open');
-  mobileMore.innerHTML = `<button type="button" class="mobile-more-dismiss" onclick="toggleMobileMore(false)" aria-label="Menüyü kapat"></button><div class="mobile-more-sheet" role="group" aria-label="Diğer sayfalar"><div class="mobile-more-heading">Diğer bölümler <button type="button" onclick="toggleMobileMore(false)" aria-label="Kapat">✕</button></div><div class="mobile-more-links">${navItems.filter(([id])=>!primaryMobile.includes(id)).map(route).join('')}</div></div>`;
+  mobileMore.innerHTML = `<button type="button" class="mobile-more-dismiss" onclick="toggleMobileMore(false)" aria-label="Menüyü kapat"></button><div class="mobile-more-sheet" role="group" aria-label="Diğer sayfalar"><div class="mobile-more-heading">Çalışma menüsü <button type="button" onclick="toggleMobileMore(false)" aria-label="Kapat">✕</button></div>${navGroups.map(([heading,ids])=>`<section class="mobile-more-group"><h3>${heading}</h3><div class="mobile-more-links">${ids.filter(id=>!primaryMobile.includes(id)).map(routeById).join('')}</div></section>`).join('')}</div>`;
   nav.querySelectorAll('[data-page]').forEach(button => {
     if(!primaryMobile.includes(button.dataset.page))button.classList.add('mobile-secondary-route');
   });
   if(!primaryMobile.includes(active))nav.querySelector('.mobile-more-trigger')?.setAttribute('data-current','');
   const felcanTab=nav.querySelector('[data-page="live"]');
-  if(felcanTab)felcanTab.dataset.voice=document.getElementById('da-felcan-float')?.dataset.voice||'idle';
+  if(felcanTab){
+    felcanTab.dataset.voice=document.getElementById('da-felcan-float')?.dataset.voice||'idle';
+    if(felcanTab.dataset.voice==='audio-blocked'){
+      felcanTab.querySelector('.study-route-label').textContent='Sesi aç';
+      felcanTab.setAttribute('aria-label','Felcan’ın sesini aç');
+    }
+  }
 
   const wasOpen = picker.querySelector('details')?.open;
   const colors = [['light','Yeşil','#167461'],['ocean','Mavi','#3978c5'],['violet','Mor','#7957c8'],['rose','Pembe','#c05f7a'],['sunset','Turuncu','#c47a24']];
@@ -611,7 +656,7 @@ document.addEventListener('keydown', event => {
 
 
 function dateStr(){return new Intl.DateTimeFormat('tr-TR',{weekday:'long',day:'numeric',month:'long'}).format(new Date())}
-function shell(title,body,eyebrow='DeutschAI · Almanca'){renderNav();applyTheme();document.querySelector('#view').innerHTML=`<header class="top"><div><div class="eyebrow">${eyebrow}</div><h1>${title}</h1>${page==='home'?'<p>Almanca öğrenme yolculuğunda kaldığın yerden devam et.</p>':''}</div><div class="settings-row"><div class="date">${dateStr()}</div></div></header>${body}`}
+function shell(title,body,eyebrow='DeutschAI · Almanca'){renderNav();applyTheme();document.querySelector('#view').innerHTML=`<header class="top"><div><div class="eyebrow">${eyebrow}</div><h1>${title}</h1></div><div class="settings-row"><div class="date">${dateStr()}</div></div></header>${body}`}
 function baseTheme(name=state.theme){return name==='dark'?'light':name.replace(/-dark$/,'')}
 function isDarkTheme(name=state.theme){return name==='dark'||name.endsWith('-dark')}
 function setTheme(name){if(!['light','dark','ocean','ocean-dark','violet','violet-dark','rose','rose-dark','sunset','sunset-dark'].includes(name))return;const dark=isDarkTheme();state.theme=dark?(name==='light'?'dark':name+'-dark'):name;save();render()}
@@ -870,7 +915,7 @@ function home() {
   const all=DATA.lessons.filter(l=>l.level===state.level);
   const done=all.filter(l=>state.completed.includes(l.id)).length;
   const next=all.find(l=>!state.completed.includes(l.id));
-  shell('Öğrenme Paneli',`<div class="classroom">
+  shell('Ana sayfa',`<div class="classroom">
     <div class="classroom-lead">
       <section class="card study-next"><span class="badge">${state.level} · ${CLASSROOM[state.level][0]}</span>
         <h2>${next?escapeHtml(next.title):'Seviye derslerin tamamlandı'}</h2>
@@ -880,6 +925,13 @@ function home() {
       <section class="card study-goal"><h2 class="glass-heading"><span class="glass-icon">${toolbarIcon("M17 10a7 7 0 1 1-7-7m4 7a4 4 0 1 1-4-4m0 4 6-6m-1-2v3h3")}</span>Günlük hedef</h2><strong id="today-count">${stats.today} / ${state.daily} dk</strong><progress id="today-goal" aria-label="Günlük çalışma hedefi" max="${state.daily}" value="${stats.today}"></progress>
       <small class="muted">Alıştırma ve derslerde etkin çalışma süresi</small></section>
     </div>
+    <section class="card home-sections" aria-labelledby="home-sections-title">
+      <h2 id="home-sections-title">Hızlı erişim</h2>
+      <div class="home-section-grid">
+        ${[['lessons','Dersler'],['words','Kelime kartları'],['grammar','Gramer'],['practice','Alıştırmalar']].map(([id,label])=>
+          `<button type="button" onclick="setPage('${id}')"><span class="study-icon" aria-hidden="true">${navIcon(id)}</span><span>${label}</span><span class="home-section-arrow" aria-hidden="true">→</span></button>`).join('')}
+      </div>
+    </section>
     <div class="grid study-metrics">
       <div class="stat"><span class="glass-icon">${toolbarIcon("M10 5C7 3 5 3 2 4v11c3-1 5-1 8 1 3-2 5-2 8-1V4c-3-1-5-1-8 1zm0 0v11")}</span><label>Öğrenilen kelimeler</label><strong>${Object.keys(state.learned).length}</strong></div>
       <div class="stat"><span class="glass-icon">${toolbarIcon("M16 7a6 6 0 0 0-10-2L3 8m0-4v4h4m-3 5a6 6 0 0 0 10 2l3-3m0 4v-4h-4")}</span><label>Tekrar bekleyen · ${state.level}</label><strong>${due}</strong><button class="study-text" onclick="openWordReview()">Kartları aç →</button></div>
@@ -890,7 +942,7 @@ function home() {
       <section class="card"><h2 class="glass-heading"><span class="glass-icon">${toolbarIcon("M4 16v-4m4 4V8m4 8V5m4 11v-6")}</span>Haftalık ilerleme</h2>${weekChart()}</section>
       <section class="card"><h2 class="glass-heading"><span class="glass-icon">${toolbarIcon("M10 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-3-1-2 6 3-1 2 2 1-6m2-1 2 6-3-1")}</span>Seviye ve dersler</h2>${levelControl(state.level,'chooseStudyLevel(this.value)')}
         <p class="muted">${done} / ${all.length} ders tamamlandı</p><progress aria-label="Seviye dersleri" max="${all.length}" value="${done}"></progress>
-        <div class="study-shortcuts glass-shortcuts"><button class="btn ghost" onclick="setPage('lessons')"><span class="glass-icon">${toolbarIcon("M10 5C7 3 5 3 2 4v11c3-1 5-1 8 1 3-2 5-2 8-1V4c-3-1-5-1-8 1zm0 0v11")}</span>Dersler</button><button class="btn ghost" onclick="setPage('grammar')"><span class="glass-icon">${toolbarIcon("M2 7l8-4 8 4-8 4zm0 4 8 4 8-4M2 15l8 4 8-4")}</span>Gramer</button><button class="btn ghost" onclick="setPage('words')"><span class="glass-icon">${toolbarIcon("M10 5C7 3 5 3 2 4v11c3-1 5-1 8 1 3-2 5-2 8-1V4c-3-1-5-1-8 1zm0 0v11")}</span>Kelimeler</button><button class="btn ghost" onclick="openPractice('order')"><span class="glass-icon">${toolbarIcon("M10 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-3-1-2 6 3-1 2 2 1-6m2-1 2 6-3-1")}</span>Cümle kurma</button><button class="btn ghost" onclick="openPractice('translation')"><span class="glass-icon">${toolbarIcon("M16 7a6 6 0 0 0-10-2L3 8m0-4v4h4m-3 5a6 6 0 0 0 10 2l3-3m0 4v-4h-4")}</span>Çeviri</button></div>
+
       </section>
     </div>
   </div>`, 'Guten Tag' + (window.deutschaiStudentName ? ', ' + escapeHtml(window.deutschaiStudentName) : ''));
