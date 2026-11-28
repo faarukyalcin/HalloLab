@@ -1224,6 +1224,8 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>window.deutschaiDesktop?.not
   const adaptiveKey = 'deutschai-ai-adaptive-content-v1';
   const adaptiveAutoRequested = new Set();
   const adaptiveErrors={};
+  let plannedStudy=null;
+  window.deutschaiStartPlannedStudy=context=>{if(!context||!adaptiveKinds.includes(context.route)||adaptiveBusy)return false;plannedStudy={...context};if(page!==context.route)setPage(context.route);else render();const host=document.querySelector('#adaptive-ai-root');if(!host||host.dataset.kind!==context.route)return false;if(!adaptiveBusy)void window.deutschaiGenerateAdaptiveContent(context.route);return true;};
   function currentGeneratedStudy(kind){const batch=adaptiveData().latest?.[kind];return batch?.content&&batch.content.source!=='local-fallback'?batch:null;}
   let adaptiveBusy = false;
   function adaptiveData() {
@@ -1300,7 +1302,8 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>window.deutschaiDesktop?.not
  let content,fresh=[];
  for(let attempt=0;attempt<3;attempt++){
   const variation=crypto.randomUUID?.()||String(Date.now());
-  const instruction=requestText[kind]+'\\nYENİ ÇALIŞMA KİMLİĞİ: '+variation+'. Önceki başlık: '+(previous?.title||'yok')+'. Önceki örnekler: '+JSON.stringify((previous?.examples||[]).map(x=>x.de)).slice(0,1200)+'. Önceki sorular/kelimeler: '+JSON.stringify(priorItems.map(x=>x.question||x.prompt||x.de||x.word)).slice(0,2400)+'. Yeni bir çalışma oluştur. Aynı beceriyi pekiştirmen gerekiyorsa farklı bağlam, farklı cümleler ve farklı başlık kullan. Eski örnek ve soruları kopyalama. Sorularda tam dört farklı metin seçeneği ve answer alanında 0-3 arasında tamsayı kullan. '+(attempt?'Önceki çıktı geçersiz veya tekrarlıydı; tamamen farklı örnekler hazırla.':'');
+  const scheduled=plannedStudy?.route===kind?plannedStudy:null;
+  const instruction=requestText[kind]+(scheduled?' HAFTALIK PROGRAM GÖREVİ: '+JSON.stringify({topic:scheduled.topic,activity:scheduled.activity,minutes:scheduled.minutes})+'. Bu görevi aynen uygula, konu dışına çıkma.':'')+'\\nYENİ ÇALIŞMA KİMLİĞİ: '+variation+'. Önceki başlık: '+(previous?.title||'yok')+'. Önceki örnekler: '+JSON.stringify((previous?.examples||[]).map(x=>x.de)).slice(0,1200)+'. Önceki sorular/kelimeler: '+JSON.stringify(priorItems.map(x=>x.question||x.prompt||x.de||x.word)).slice(0,2400)+'. Yeni bir çalışma oluştur. Aynı beceriyi pekiştirmen gerekiyorsa farklı bağlam, farklı cümleler ve farklı başlık kullan. Eski örnek ve soruları kopyalama. Sorularda tam dört farklı metin seçeneği ve answer alanında 0-3 arasında tamsayı kullan. '+(attempt?'Önceki çıktı geçersiz veya tekrarlıydı; tamamen farklı örnekler hazırla.':'');
   content=await desk.geminiTutor({task:prompts[kind],profile:learnerSnapshot(),history,text:instruction});
   if(!content||typeof content!=='object')continue;
   const raw=adaptiveItems(kind,content);
@@ -1316,16 +1319,16 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>window.deutschaiDesktop?.not
   fresh=[...new Map(fresh.map(item=>[normalize(kind==='words'?item.de:item.question),item])).values()];
   const teaching=kind==='lessons'||kind==='grammar';
   if(teaching){content.examples=(Array.isArray(content.examples)?content.examples:[]).filter(x=>x?.de&&x?.tr&&!priorExamples.has(normalize(x.de)));}
-  if(fresh.length>=required&&(!teaching||(normalize(content.title)&&normalize(content.title)!==priorTitle&&content.examples.length>=2&&String(content.explanation||content.explanationTr||'').trim())))break;
+  if(fresh.length>=required&&(!teaching||(normalize(content.title)&&(scheduled||normalize(content.title)!==priorTitle)&&content.examples.length>=2&&String(content.explanation||content.explanationTr||'').trim())))break;
   fresh=[];
  }
  if(fresh.length<required)throw Error('Edit yeterli sayıda farklı ve geçerli içerik üretemedi. Önceki çalışma korundu.');
  if(kind==='words')content.vocabulary=fresh;else content.questions=fresh;
  const fingerprints=fresh.map(item=>adaptiveFingerprint(item,kind,content)).filter(Boolean);
- const latest=adaptiveData();latest.latest=latest.latest||{};latest.latest[kind]={date:localDate(),at:new Date().toISOString(),content,selected:{}};latest.seen=latest.seen||{};latest.seen[kind]=[...seen,...fingerprints].slice(-80);window.deutschaiStore.setItem(adaptiveKey,JSON.stringify(latest));history.push({task:'adaptive-'+kind,level:profile.level,items:fingerprints.slice(0,12),at:new Date().toISOString()});saveHistory();
+ const latest=adaptiveData();latest.latest=latest.latest||{};latest.latest[kind]={date:localDate(),at:new Date().toISOString(),content,selected:{},planned:plannedStudy?.route===kind?{...plannedStudy}:null};latest.seen=latest.seen||{};latest.seen[kind]=[...seen,...fingerprints].slice(-80);window.deutschaiStore.setItem(adaptiveKey,JSON.stringify(latest));history.push({task:'adaptive-'+kind,level:profile.level,items:fingerprints.slice(0,12),at:new Date().toISOString()});saveHistory();
  }catch(error){adaptiveErrors[kind]=String(error?.message||error).slice(0,160);}finally{adaptiveBusy=false;const host=document.querySelector('#adaptive-ai-root');if(host&&host.dataset.kind===kind)host.innerHTML=adaptiveMarkup(kind,currentGeneratedStudy(kind));}};
   const baseWordsAdaptive=words,basePracticeAdaptive=practice,baseProgressAdaptive=progress;
-  function exclusiveStudy(kind,title){shell(title,'<div id="adaptive-ai-root" data-kind="'+kind+'"></div>');const host=document.querySelector('#adaptive-ai-root');host.innerHTML=adaptiveMarkup(kind,currentGeneratedStudy(kind));if(!currentGeneratedStudy(kind)&&!adaptiveAutoRequested.has(kind)&&!adaptiveBusy){adaptiveAutoRequested.add(kind);void window.deutschaiGenerateAdaptiveContent(kind,true);}}
+  function exclusiveStudy(kind,title){if(plannedStudy&&plannedStudy.route!==kind)plannedStudy=null;shell(title,'<div id="adaptive-ai-root" data-kind="'+kind+'"></div>');const host=document.querySelector('#adaptive-ai-root');host.innerHTML=adaptiveMarkup(kind,currentGeneratedStudy(kind));if(!plannedStudy&&!currentGeneratedStudy(kind)&&!adaptiveAutoRequested.has(kind)&&!adaptiveBusy){adaptiveAutoRequested.add(kind);void window.deutschaiGenerateAdaptiveContent(kind,true);}}
   lessons=function(){exclusiveStudy('lessons','Dersler');};
   progress=function(){baseProgressAdaptive();const data=adaptiveData(),results=data.results||[],recent=results.slice(-10),weak={};for(const result of recent)for(const topic of result.weak||[])weak[topic]=(weak[topic]||0)+1;const focus=Object.entries(weak).sort((a,b)=>b[1]-a[1]).slice(0,5);const avg=recent.length?Math.round(recent.reduce((sum,r)=>sum+Number(r.score||0),0)/recent.length):null;const panel=document.createElement('section');panel.className='card';panel.innerHTML='<h2>Edit · Kişisel gelişim</h2><p>Seviye: '+esc(placement?.level||profile.level||state.level)+' · '+results.length+' kişisel çalışma</p><p>'+ (avg===null?'Henüz yeterli kişisel çalışma sonucu yok.':'Son çalışmaların ortalaması: %'+avg)+'</p><h3>Öncelikli tekrar konuların</h3>'+(focus.length?focus.map(([topic,count])=>'<div class="row"><span class="grow">'+esc(topic)+'</span><small>'+count+' çalışmada tekrar gerekli</small></div>').join(''):'<p>Yeni çalışmalar tamamlandıkça eksik konular burada görünecek.</p>')+'<button class="btn" onclick="setPage(&quot;lessons&quot;)">Kişisel dersime geç</button>';document.querySelector('#view').append(panel);};
 
@@ -1619,4 +1622,4 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>window.deutschaiDesktop?.not
   };
   render();
 })();
-</script><script src="./learning-features.js"></script><script src="./deutschai-personalization.js?v=edit-direct-4"></script></body></html>
+</script><script src="./learning-features.js"></script><script src="./deutschai-personalization.js?v=weekly-steps-1"></script></body></html>
