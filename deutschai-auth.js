@@ -651,12 +651,38 @@
     window.setPage(page);
     return document.querySelector('#nav [aria-current="page"]')?.dataset.page===page;
   }
+  const editMemoryKey='deutschai-edit-memory-v1';
+  function editMemory(){
+    if(!auth)return {notes:[],lastStudy:null};
+    try{const m=JSON.parse(store.getItem(editMemoryKey)||'null');return {notes:Array.isArray(m?.notes)?m.notes.slice(-18):[],lastStudy:m?.lastStudy||null};}catch{return {notes:[],lastStudy:null}}
+  }
+  function editMemoryClean(v,max=240){
+    return String(v||'').replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi,'[e-posta]').replace(/\b(?:api[_ -]?key|password|şifre|parola|token)\s*[:=]\s*\S+/gi,'[gizli bilgi]').trim().slice(0,max);
+  }
+  let memoryWrites=Promise.resolve();
+  function saveEditMemory(input){
+    const owner=auth?.user?.id;
+    if(!owner)return Promise.resolve({success:false,error:'Oturum açık değil.'});
+    const category=String(input?.category||'');
+    if(!['preference','difficulty','study_context','next_step'].includes(category))return Promise.resolve({success:false,error:'Yalnız eğitim notları saklanabilir.'});
+    const note=editMemoryClean(input?.note);
+    if(!note||/api\s*anahtarı|şifre|parola|password|token|kimlik numarası|telefon numarası/i.test(note))return Promise.resolve({success:false,error:'Gizli veya boş not kaydedilemez.'});
+    const job=async()=>{
+      if(auth?.user?.id!==owner)return {success:false,error:'Hesap değişti.'};
+      const m=editMemory(),entry={category,note,at:new Date().toISOString()};
+      m.notes=m.notes.filter(x=>x.note.toLocaleLowerCase('tr')!==note.toLocaleLowerCase('tr'));
+      m.notes.push(entry);m.notes=m.notes.slice(-18);
+      if(category==='next_step'||category==='study_context')m.lastStudy=entry;
+      try{await request('/state',{method:'PUT',body:JSON.stringify({bucket:editMemoryKey,data:{raw:JSON.stringify(m)}})});if(auth?.user?.id!==owner)return {success:false,error:'Hesap değişti.'};put(prefix()+editMemoryKey,JSON.stringify(m));return {success:true,memory:m};}catch(e){return {success:false,error:'Not sunucuya kaydedilemedi.'}}
+    };
+    const result=memoryWrites.then(job,job);memoryWrites=result.catch(()=>{});return result;
+  }
   function editLearningSummary(){
     const read=k=>{try{return JSON.parse(store.getItem(k)||'null')||{}}catch{return {}}};
     const s=read('deutschai-online-v1'),p=read('deutschai-ai-profile-v1'),t=read('deutschai-ai-placement-v1'),d=read('deutschai-ai-daily-v1'),personal=read('deutschai-personal-profile-v1');
     const levels=['A1','A2','B1','B2','C1','C2'];
     const level=[t.level,p.level,s.level].find(x=>levels.includes(x))||'A1';
-    return {mastery:window.deutschaiMasterySummary?.()||null,learningGoal:window.deutschaiGetLearningGoal?.()||null,weeklyProgram:window.deutschaiWeeklyContext?.()||null,level,placementLevel:levels.includes(t.level)?t.level:null,goal:levels.includes(personal.goal)?personal.goal:null,dailyMinutes:Number(p.dailyMinutes)||Number(s.daily)||20,completedLessons:Array.isArray(s.completed)?s.completed.length:0,learnedWords:Object.keys(s.learned||{}).length,focusAreas:Array.isArray(p.focusAreas)?p.focusAreas.filter(x=>typeof x==='string').slice(0,10).map(x=>x.slice(0,100)):[],planDate:d.date||null,plan:Array.isArray(d.content?.schedule)?d.content.schedule.slice(0,12).map((x,i)=>({title:String(x.activity||x.title||'').slice(0,150),minutes:Number(x.minutes)||0,done:s.dailyPlanProgress?.date===d.date&&!!s.dailyPlanProgress?.completed?.[i]})):[],theme:s.theme||'dark',shortcuts:Array.isArray(s.mobileShortcuts)?s.mobileShortcuts.filter(x=>editRoutes.includes(x)).slice(0,3):['home','lessons','practice']};
+    return {conversationMemory:editMemory(),mastery:window.deutschaiMasterySummary?.()||null,learningGoal:window.deutschaiGetLearningGoal?.()||null,weeklyProgram:window.deutschaiWeeklyContext?.()||null,level,placementLevel:levels.includes(t.level)?t.level:null,goal:levels.includes(personal.goal)?personal.goal:null,dailyMinutes:Number(p.dailyMinutes)||Number(s.daily)||20,completedLessons:Array.isArray(s.completed)?s.completed.length:0,learnedWords:Object.keys(s.learned||{}).length,focusAreas:Array.isArray(p.focusAreas)?p.focusAreas.filter(x=>typeof x==='string').slice(0,10).map(x=>x.slice(0,100)):[],planDate:d.date||null,plan:Array.isArray(d.content?.schedule)?d.content.schedule.slice(0,12).map((x,i)=>({title:String(x.activity||x.title||'').slice(0,150),minutes:Number(x.minutes)||0,done:s.dailyPlanProgress?.date===d.date&&!!s.dailyPlanProgress?.completed?.[i]})):[],theme:s.theme||'dark',shortcuts:Array.isArray(s.mobileShortcuts)?s.mobileShortcuts.filter(x=>editRoutes.includes(x)).slice(0,3):['home','lessons','practice']};
   }
   function felcanScreenContext(questionNumber){
     const root=document.getElementById('view');
@@ -739,7 +765,7 @@
     iframe.allow='microphone; autoplay';
     iframe.tabIndex=-1;
     iframe.setAttribute('aria-hidden','true');
-    iframe.src='./felkan.html?compact=1&v=mastery-1';
+    iframe.src='./felkan.html?compact=1&v=memory-1';
     iframe.addEventListener('load',()=>{
       felcanReady=true;
       sendFelcanContext(true);
@@ -808,7 +834,7 @@
     setInterval(()=>{if(felcanReady&&document.visibilityState==='visible')sendFelcanContext()},5000);
   }
   window.deutschaiStore=store;
-  window.DeutschAI={api:request,store,openCommunity:community,get user(){return auth?.user||null;},get ready(){return !!origin && !!auth;},logout,showAdmin:admin,openFelkan:felkan,openStudySection:editOpenSection,getLearningSummary:()=>auth?editLearningSummary():null,getStudyContext:number=>auth?felcanScreenContext(number):null};
+  window.DeutschAI={api:request,store,getEditMemory:editMemory,saveEditMemory,openCommunity:community,get user(){return auth?.user||null;},get ready(){return !!origin && !!auth;},logout,showAdmin:admin,openFelkan:felkan,openStudySection:editOpenSection,getLearningSummary:()=>auth?editLearningSummary():null,getStudyContext:number=>auth?felcanScreenContext(number):null};
   window.addEventListener('message',event=>{
     const frame=felcanFrame();
     if(event.origin!==location.origin||!frame||event.source!==frame.contentWindow)return;
