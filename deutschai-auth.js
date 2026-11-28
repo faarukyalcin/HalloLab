@@ -295,7 +295,7 @@
     e.innerHTML='<div class="da-card da-admin-card"><div class="da-admin-top"><div><h1>Yönetici Paneli</h1><p>DilAtölyesi hesapları, roller ve Gemini yönetimi</p></div><button type="button" id="da-admin-close">✕ Kapat</button></div>'
       +'<div class="da-admin-stat-grid"><div><b id="da-users-count">—</b><small>Toplam kayıtlı hesap</small></div><div><b id="da-admins-count">—</b><small>Yöneticiler</small></div><div><b id="da-members-count">—</b><small>Öğrenciler</small></div></div>'
       +'<section class="da-admin-section"><h2>Hesap yönetimi</h2><div class="da-admin-toolbar"><label for="da-user-search">Hesap ara</label><input id="da-user-search" type="search" placeholder="Ad, kullanıcı adı veya e-posta"><button type="button" id="da-reload-users">Yenile</button></div><p id="da-admin-account-status" role="status"></p><div class="da-admin-users" id="da-admin-users" aria-live="polite">Üyeler yükleniyor…</div></section>'
-      +'<section class="da-admin-section"><h2>Gemini API anahtarı</h2><p>Ortak anahtarı yalnızca yöneticiler değiştirebilir. Mevcut anahtar tarayıcıya geri gönderilmez.</p><form id="da-admin-form"><label>Yeni Gemini API anahtarı<input name="apiKey" type="password" autocomplete="off" required></label><p class="da-error" role="alert"></p><button type="submit">Anahtarı Kaydet</button></form></section></div>';
+      +'<section class="da-admin-section"><h2>Gemini API anahtarı</h2><p>Ortak anahtarı yalnızca kurucu değiştirebilir. Mevcut anahtar tarayıcıya geri gönderilmez.</p><form id="da-admin-form"><label>Yeni Gemini API anahtarı<input name="apiKey" type="password" autocomplete="off" required></label><p class="da-error" role="alert"></p><button type="submit">Anahtarı Kaydet</button></form></section></div>';
     const list=e.querySelector('#da-admin-users');
     const search=e.querySelector('#da-user-search');
     const accountStatus=e.querySelector('#da-admin-account-status');
@@ -353,12 +353,14 @@
         e.querySelector('#da-admins-count').textContent=String(users.filter(u=>u.role==='admin').length);
         e.querySelector('#da-members-count').textContent=String(users.filter(u=>u.role!=='admin').length);
         list.replaceChildren();
+        if(data.isFounder===false)e.querySelector('#da-admin-form').hidden=true;
+        if(data.isFounder===false&&!users.some(u=>u.isFounder)&&data.total===users.length){const setup=document.createElement('button');setup.type='button';setup.textContent='Kurucu hesabını doğrula';setup.onclick=claimAdmin;list.append(setup)}
         if(!users.length)list.textContent='Henüz kayıtlı hesap yok.';
         for(const u of users){
           const item=document.createElement('article');item.className='da-admin-user';
           item.dataset.search=[u.firstName,u.lastName,u.username,u.email,u.id].join(' ').toLocaleLowerCase('tr-TR');
           const details=document.createElement('div');details.className='da-admin-user-info';
-          const title=document.createElement('strong');title.textContent=(u.firstName||'')+' '+(u.lastName||'')+' · @'+u.username;
+          const title=document.createElement('strong');title.textContent=(u.firstName||'')+' '+(u.lastName||'')+' · @'+u.username+(u.isFounder?' · 👑 Kurucu':'');
           const meta=document.createElement('small');meta.textContent=(u.email||'')+' · '+(u.createdAt?new Date(u.createdAt*1000).toLocaleDateString('tr-TR'):'Tarih yok');
           const summary=document.createElement('div');summary.className='da-admin-user-extra';
           for(const value of ['Son 7 gün: '+minutes(u.last7Seconds),'Toplam: '+minutes(u.totalSeconds),'Ziyaret günleri: '+u.visitedDays,'Son giriş/ziyaret: '+(u.lastVisit||'Yok')]){
@@ -398,7 +400,7 @@
           for(const [v,label] of [['user','Öğrenci'],['admin','Yönetici']]){
             const option=document.createElement('option');option.value=v;option.textContent=label;option.selected=v===u.role;select.append(option);
           }
-          if(u.id===auth.user.id)select.disabled=true;
+          if(u.id===auth.user.id||u.isFounder||data.isFounder===false)select.disabled=true;
           select.onchange=async()=>{
             const next=select.value;
             if(!confirm('@'+u.username+' hesabının rolü '+(next==='admin'?'yönetici':'öğrenci')+' olarak değiştirilsin mi? Kullanıcının oturumu kapatılır.')){select.value=u.role;return}
@@ -413,7 +415,7 @@
               const reset=document.createElement('button');reset.type='button';reset.textContent='Parolayı sıfırla';
               reset.onclick=()=>accountAction(u,'password');actions.append(reset);
             }
-            if(u.id!==auth.user.id){
+            if(u.id!==auth.user.id&&!u.isFounder&&(u.role!=='admin'||data.isFounder!==false)){
               const remove=document.createElement('button');remove.type='button';remove.textContent='Hesabı sil';remove.className='da-admin-danger';
               remove.onclick=()=>accountAction(u,'delete');actions.append(remove);
             }
