@@ -243,7 +243,6 @@
   }
   async function logout() {
     try {await request('/auth/logout',{method:'POST'});} catch {}
-    if(auth?.user?.id)sessionStorage.removeItem('da:felcan-live-greet-v2:'+auth.user.id);
     auth=null;del(authKey);sessionStorage.removeItem('da-hydrated');location.reload();
   }
   function admin() {
@@ -401,12 +400,18 @@
   function felcanVisual(state,message){
     felcanState=state;
     const mobile=document.querySelector('#nav [data-page="live"]');
-    if(mobile)mobile.dataset.voice=state;
+    if(mobile){
+      mobile.dataset.voice=state;
+      mobile.title=message||'Felcan ile konuş';
+      const label=mobile.querySelector('.study-route-label');
+      if(label)label.textContent=state==='audio-blocked'?'Sesi aç':'Felcan';
+      mobile.setAttribute('aria-label',state==='audio-blocked'?'Felcan’ın sesini aç':'Felcan ile konuş');
+    }
     const button=document.getElementById('da-felcan-float');
     if(!button)return;
     button.dataset.voice=state;
     button.setAttribute('aria-pressed',String(['connecting','listening','speaking','muted'].includes(state)));
-    button.setAttribute('aria-label',state==='idle'?'Felcan ile sesli konuşmaya başla':state==='error'?'Felcan bağlantısını yeniden dene':state==='muted'?'Felcan mikrofonunu aç':'Felcan mikrofonunu duraklat');
+    button.setAttribute('aria-label',state==='idle'?'Felcan ile sesli konuşmaya başla':state==='error'?'Felcan bağlantısını yeniden dene':state==='audio-blocked'?'Felcan’ın sesini aç':state==='mic-blocked'?'Felcan için mikrofon izni ver':state==='muted'?'Felcan mikrofonunu aç':'Felcan mikrofonunu duraklat');
     const sub=button.querySelector('.da-felcan-sub');
     if(sub)sub.textContent=message||({idle:'Konuşmak için dokun',connecting:'Bağlanıyor…',listening:'Seni dinliyorum',speaking:'Felcan konuşuyor',muted:'Mikrofon duraklatıldı',error:'Tekrar dokun'}[state]||'Felcan');
   }
@@ -421,7 +426,7 @@
     iframe.allow='microphone; autoplay';
     iframe.tabIndex=-1;
     iframe.setAttribute('aria-hidden','true');
-    iframe.src='./felkan.html?compact=1&v=live-greeting-model-1';
+    iframe.src='./felkan.html?compact=1&v=entry-voice-menu-1';
     iframe.addEventListener('load',()=>{
       felcanReady=true;
       sendFelcanContext(true);
@@ -461,19 +466,18 @@
     window.addEventListener('blur',ping);
   }
   function felcanWelcome(){
-    const button=document.getElementById('da-felcan-float');
-    if(!button||!auth?.user)return;
-    const once='da:felcan-live-greet-v2:'+auth.user.id;
-    if(sessionStorage.getItem(once))return;
-    sessionStorage.setItem(once,'1');
-    // No text bubble or system TTS: begin the real Gemini Live teacher.
-    button.classList.add('da-felcan-waving');
-    setTimeout(()=>button.classList.remove('da-felcan-waving'),4700);
-    felcanVisual('connecting','Felcan sesli karşılıyor…');
+    if(!auth?.user)return;
+    felcanVisual('connecting','Felcan bağlanıyor…');
     if(felcanReady)startFelcanVoice();
     else felcanRequested=true;
-    // Browsers can block unattended microphone or audio playback. The
-    // character stays tappable and shows an error rather than faking speech.
+  }
+  function unlockFelcanOnInteraction(event){
+    if(!event.isTrusted||!felcanReady)return;
+    const voice=felcanFrame()?.contentWindow?.FelcanVoiceControl;
+    if(!voice?.unlockAudio)return;
+    voice.unlockAudio();
+    document.removeEventListener('pointerup',unlockFelcanOnInteraction,true);
+    document.removeEventListener('keydown',unlockFelcanOnInteraction,true);
   }
 
   function floatingFelcan(){
@@ -488,6 +492,8 @@
     document.getElementById('view')?.addEventListener('click',e=>{const q=e.target.closest('.question, #da-personal-practice .da-question');if(!q)return;felcanFocusedQuestion=[...document.querySelectorAll('#view .question, #view #da-personal-practice .da-question')].indexOf(q)+1;sendFelcanContext(true)},true);
     document.body.append(button);
     ensureFelcanRuntime();
+    document.addEventListener('pointerup',unlockFelcanOnInteraction,true);
+    document.addEventListener('keydown',unlockFelcanOnInteraction,true);
     felcanWelcome();
     setInterval(()=>{if(felcanReady)sendFelcanContext()},1400);
   }
