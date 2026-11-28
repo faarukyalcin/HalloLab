@@ -227,7 +227,7 @@
       +(mode==='register' ? '<div class="da-name-row"><label>Adın<input name="firstName" autocomplete="given-name" maxlength="80" required placeholder="Adın"></label><label>Soyadın<input name="lastName" autocomplete="family-name" maxlength="80" required placeholder="Soyadın"></label></div><label>E-posta<input name="email" type="email" autocomplete="email" required placeholder="ornek@eposta.com"></label>' : '')
       +'<label>Şifre<input name="password" type="password" minlength="'+(mode==='register'?'10':'1')+'" autocomplete="'+(mode==='register'?'new-password':'current-password')+'" required placeholder="Şifren"></label>'
       +'<p class="da-error" role="alert">'+safe(message)+'</p><button class="da-login-submit" type="submit">'+(mode==='register'?'Hesap Oluştur ✦':'Öğrenmeye Devam Et ✦')+'</button></form>'
-      +'<p class="da-login-secure">🔒 İlerlemen hesabına özel saklanır. API anahtarı istenmez.</p></section></div>';
+      +'<p class="da-login-secure">🔒 İlerlemen hesabına özel saklanır. Yöneticiler giriş günlerini ve yaklaşık aktif çalışma sürelerini görebilir. API anahtarı istenmez.</p></section></div>';
     screen.querySelector('#da-login-tab').onclick=()=>show('login');
     screen.querySelector('#da-signup-tab').onclick=()=>show('register');
     screen.querySelector('#da-auth-form').onsubmit=async event=>{
@@ -243,6 +243,7 @@
   }
   async function logout() {
     try {await request('/auth/logout',{method:'POST'});} catch {}
+    if(auth?.user?.id)sessionStorage.removeItem('da:felcan-live-greet-v1:'+auth.user.id);
     auth=null;del(authKey);sessionStorage.removeItem('da-hydrated');location.reload();
   }
   function admin() {
@@ -420,7 +421,7 @@
     iframe.allow='microphone; autoplay';
     iframe.tabIndex=-1;
     iframe.setAttribute('aria-hidden','true');
-    iframe.src='./felkan.html?compact=1&v=autogreet-attendance-1';
+    iframe.src='./felkan.html?compact=1&v=autogreet-attendance-2';
     iframe.addEventListener('load',()=>{
       felcanReady=true;
       sendFelcanContext(true);
