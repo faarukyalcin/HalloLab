@@ -228,7 +228,6 @@ async function main(req,env){
   }
   if(route==='/admin/status'&&req.method==='GET')return answer({geminiConfigured:!!(await geminiKey(env))});
   if(route==='/admin/gemini-key'&&req.method==='PUT'){
-   if(!isFounder)return error('API anahtarını yalnızca kurucu değiştirebilir',403);
    const x=await body(req),key=String(x.apiKey||'').trim();if(key.length<20||key.length>200)return error('Geçersiz API anahtarı');
    const encrypted=await seal(env,key);
    await env.DB.prepare("INSERT INTO app_settings(key,value,updated_at) VALUES('gemini_api_key',?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at").bind(encrypted,now()).run();return answer({ok:true});
