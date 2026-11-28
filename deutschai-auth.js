@@ -78,7 +78,7 @@
   }
   const style=document.createElement('style');
   style.textContent = [
-    'body #da-felcan-float:not(.da-dock-hidden){display:grid!important;place-items:center;left:max(14px,env(safe-area-inset-left));right:auto;bottom:max(16px,env(safe-area-inset-bottom));width:50px;height:50px;padding:0;border-radius:18px;animation:none}',
+    'body #da-felcan-float:not(.da-dock-hidden){display:grid!important;place-items:center;left:auto;right:max(14px,env(safe-area-inset-right));top:50%;bottom:auto;transform:translateY(-50%);width:50px;height:50px;padding:0;border-radius:18px;animation:none}',
     'body #da-felcan-float.da-dock-hidden{display:none!important}',
     '#da-felcan-float .da-felcan-text{display:none}',
     'body #da-felcan-float .da-felcan-orb{transform:scale(.56)}',
@@ -108,7 +108,7 @@
     '.da-admin-action-dialog h2{margin:0;font-size:21px}',
     '.da-admin-action-dialog label{display:grid;gap:6px}',
     '.da-admin-action-dialog [role="alert"]{color:#ffa8b7}',
-    '@media(max-width:999px){body #da-felcan-float:not(.da-dock-hidden){bottom:calc(86px + env(safe-area-inset-bottom))}}',
+    '@media(max-width:999px){body #da-felcan-float:not(.da-dock-hidden){display:none!important}}',
     '@media(max-width:650px){#da-auth-screen .da-admin-user{flex-direction:column}#da-auth-screen .da-admin-actions{justify-content:flex-start}}',
     '@media(prefers-reduced-motion:reduce){#da-felcan-welcome .da-toy-smile{animation:none!important}}',
     '#da-auth-screen{position:fixed;inset:0;z-index:2147483600;display:grid;place-items:center;padding:18px;background:radial-gradient(circle at 15% 10%,#4e3895,#130d2c 56%,#080b19);color:#f4f1ff;font:15px system-ui}',
@@ -604,7 +604,8 @@
       sessionStorage.setItem(welcomeKey,'1');
       dialog.remove();
       dock.classList.remove('da-dock-hidden');
-      dock.focus({preventScroll:true});
+      const control=matchMedia('(max-width:999px)').matches?document.querySelector('#nav [data-page="live"]'):dock;
+      control?.focus({preventScroll:true});
     },{once:true});
     document.body.append(dialog);
     dock.classList.add('da-dock-hidden');
