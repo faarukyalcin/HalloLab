@@ -21,9 +21,36 @@ const weekdaysIndex=()=> (new Date().getDay()+6)%7;
 const weekStart=()=>{const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()-weekdaysIndex());return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')};
 const preferences=()=>read(SETTINGS);
 const existingPlan=()=>read(PLAN);
+const GOAL='deutschai-learning-goal-v1';
+const levelCodes=['A1','A2','B1','B2','C1','C2'];
+const goalLabels={goethe:'Goethe-Zertifikat',general:'Genel Almanca',conversation:'Günlük konuşma',work:'İş ve kariyer',travel:'Seyahat',relocation:'Almanya’da yaşam',telc:'telc',osd:'ÖSD',testdaf:'TestDaF',other:'Diğer'};
+window.deutschaiGetLearningGoal=()=>read(GOAL);
+window.deutschaiSaveLearningGoal=async input=>{
+ if(!active()?.ready)return {success:false,error:'Önce hesabına giriş yap.'};
+ const old=read(GOAL)||{},type=String(input?.type||old.type||'');
+ if(!Object.hasOwn(goalLabels,type))return {success:false,error:'Geçerli hedef türü gerekli.'};
+ const targetLevel=String(input?.targetLevel||old.targetLevel||'').toUpperCase();
+ if(!levelCodes.includes(targetLevel))return {success:false,error:'A1–C2 hedef seviyesi gerekli.'};
+ const minutes=Number(input?.dailyMinutes||old.dailyMinutes);
+ if(!Number.isInteger(minutes)||minutes<10||minutes>240)return {success:false,error:'Günlük 10–240 dakika arasında çalışma süresi gerekli.'};
+ const today=new Date();const local=[today.getFullYear(),String(today.getMonth()+1).padStart(2,'0'),String(today.getDate()).padStart(2,'0')].join('-');
+ const deadline=input?.deadline===null||input?.deadline===''?null:String(input?.deadline??old.deadline??'')||null;
+ if(deadline&&(!/^\d{4}-\d{2}-\d{2}$/.test(deadline)||!Number.isFinite(Date.parse(deadline))||new Date(deadline).toISOString().slice(0,10)!==deadline||deadline<local))return {success:false,error:'Geçerli, geçmişte olmayan sınav tarihi gerekli.'};
+ const goal={type,label:goalLabels[type],targetLevel,dailyMinutes:minutes,deadline,details:String(input?.details??(old.type===type?old.details:'')??'').trim().slice(0,240),updatedAt:new Date().toISOString()};
+ // Persist through the existing authenticated state endpoint before reporting success.
+ try{await active().api('/state',{method:'PUT',body:JSON.stringify({bucket:GOAL,data:{raw:JSON.stringify(goal)}})});}catch(e){return {success:false,error:'Hedef sunucuya kaydedilemedi: '+String(e.message||e)}}
+ store().setItem(GOAL,JSON.stringify(goal));
+ const pref={...(preferences()||{}),minutes,goal: ['goethe','general','conversation','work','travel'].includes(type)?type:'general',focus:preferences()?.focus||'balanced'};
+ store().setItem(SETTINGS,JSON.stringify(pref));
+ window.deutschaiApplyLearningGoal?.(goal);
+ window.dispatchEvent(new CustomEvent('deutschai:learning-goal-changed',{detail:goal}));
+ const plan=await buildWeek(pref,true,null,true);
+ return {success:true,goal,weeklyPlanReady:!!plan&&!plan.fallback,weeklyPlan:window.deutschaiWeeklyContext?.()||null,message:plan&&!plan.fallback?'Hedef kaydedildi ve haftalık plan hazır.':'Hedef kaydedildi; yapay zekâ planı hazır değil. Program bölümünden yeniden oluştur.'};
+};
+
 const minutesDisplay=n=>n>=60?(n%60?n/60+' saat':n/60+' saat'):n+' dakika';
 function renderProgram(host,s,edit=false){
- const p=preferences(), plan=existingPlan(), current=plan?.week===weekStart()&&Array.isArray(plan.days)?plan:null;
+ const p=preferences(), plan=existingPlan(), learningGoal=read(GOAL), current=plan?.week===weekStart()&&Array.isArray(plan.days)&&(!learningGoal||plan.learningGoalRevision===learningGoal.updatedAt)?plan:null;
  if(!p||edit){
   const duration=Number(p?.minutes||s.daily||20);
   host.innerHTML='<h2>Program ayarları</h2>'
@@ -46,7 +73,7 @@ function renderProgram(host,s,edit=false){
   host.querySelector('.da-cancel')?.addEventListener('click',()=>renderProgram(host,s));
   return;
  }
- const goal=goals[p.goal]||goals.general;
+ const goal=learningGoal?learningGoal.label+' '+learningGoal.targetLevel+(learningGoal.deadline?' · '+learningGoal.deadline:''):goals[p.goal]||goals.general;
  const today=current?.days[weekdaysIndex()];
  host.innerHTML='<h2>Haftalık çalışma planı</h2>'
   +'<p>Hedefin <b>'+esc(goal)+'</b> · Günlük <b>'+esc(minutesDisplay(p.minutes))+'</b> · Seviye <b>'+esc(s.level||'A1')+'</b>. '+(today?'Bugün '+esc(today.topic)+' çalışıyoruz.':'Bu haftaki programını birlikte hazırlayalım.')+'</p>'
@@ -64,7 +91,7 @@ function taskRoute(task){
  return /deneme|sınav/.test(s)?'exam':/yazma|konuşma|e-posta/.test(s)?'writing':/gramer|artikel|fiil çekimi/.test(s)?'grammar':/kelime/.test(s)?'words':/alıştırma|tekrar|dinleme|okuma/.test(s)?'practice':'lessons';
 }
 window.deutschaiWeeklyContext=()=>{
- const plan=existingPlan();if(plan?.week!==weekStart()||!Array.isArray(plan.days))return null;
+ const plan=existingPlan();if(plan?.week!==weekStart()||!Array.isArray(plan.days)||(read(GOAL)&&plan.learningGoalRevision!==read(GOAL).updatedAt))return null;
  const today=weekdaysIndex(),days=plan.days.map((d,i)=>({day:weekdays[i],topic:d.topic,tasks:(d.tasks||[]).map((t,j)=>({step:j+1,activity:t.activity,minutes:t.minutes,route:taskRoute(t),done:!!plan.done?.[i+'-'+j]}))}));
  return {week:plan.week,today:weekdays[today],todayIndex:today,days,next:days[today]?.tasks.find(t=>!t.done)||null};
 };
@@ -93,13 +120,13 @@ function fallbackWeek(p,s){
  const first=Math.max(5,Math.round(p.minutes*.4)),second=p.minutes-first;
  return weekdays.map((_,i)=>({topic:[focus,'Yeni ders','Kelime ve tekrar','Konuşma alıştırması','Gramer ve uygulama','Okuma / dinleme','Haftalık tekrar'][i],tasks:[{activity:i===6?'Haftalık öğrendiklerini tekrar et':'Seviyene uygun Almanca dersini çalış',minutes:first},{activity:i===6?'Yanlışlarını gözden geçir':'Kelime ve gramer alıştırmalarını yap',minutes:second}]}));
 }
-async function buildWeek(p,force=false,host=null){
+async function buildWeek(p,force=false,host=null,background=false){
  if(!p)return;
- const e=host||document.getElementById('da-study-program');if(!e)return;
- const slot=e.querySelector('.da-week-slot');
+ const e=host||document.getElementById('da-study-program');if(!e&&!background)return;
+ const slot=e?.querySelector('.da-week-slot');
  if(slot)slot.innerHTML='<p>✨ Edit, seviyeni ve önceki çalışmalarını inceleyerek haftalık planını hazırlıyor…</p>';
- const s=state(),level=s.level||'A1',minutes=p.minutes,week=weekStart();
- const task='Edit adlı Almanca öğretmenisin. Türkçe yaz. '+level+' seviyesindeki öğrenci için bu haftaya özel 7 günlük GERÇEKÇİ program hazırla. Günlük süre '+minutes+' dakika (aşma). Hedef: '+(goals[p.goal]||goals.general)+'. Odak: '+p.focus+'. Tamamlanan ders sayısı '+(s.completed||[]).length+'. Zorlanılan kelimeler '+JSON.stringify((s.wrongWords||[]).slice(0,8))+'. Her güne farklı konu ve 2 sıralı, uygulanabilir etkinlik koy. Her görevde route alanı mutlaka lessons, grammar, words, practice, writing, exam seçeneklerinden biri olsun. Kesinlikle SADECE geçerli, kısa JSON döndür: {"days":[{"topic":"konu","tasks":[{"activity":"kısa görev","minutes":10,"route":"lessons"},{"activity":"kısa görev","minutes":10,"route":"practice"}]}]}. days tam 7 eleman, Pazartesi-Pazar sıralı. Her günün süre toplamı '+minutes+' olmalı. Markdown kullanma.';
+ const s=state(),level=s.level||'A1',minutes=p.minutes,week=weekStart(),goal=read(GOAL);
+ const task='Edit adlı Almanca öğretmenisin. Türkçe yaz. '+level+' seviyesindeki öğrenci için bu haftaya özel 7 günlük GERÇEKÇİ program hazırla. Günlük süre '+minutes+' dakika (aşma). Hedef: '+(goals[p.goal]||goals.general)+'. Kalıcı hedef: '+JSON.stringify(goal||{})+'. Mevcut seviye ile hedef seviyesi arasındaki farkı dikkate al; hedef sınav ise ilgili sınavın becerilerine odaklan, resmi soru kopyalama ve sınav başarısı vaat etme. Odak: '+p.focus+'. Tamamlanan ders sayısı '+(s.completed||[]).length+'. Zorlanılan kelimeler '+JSON.stringify((s.wrongWords||[]).slice(0,8))+'. Her güne farklı konu ve 2 sıralı, uygulanabilir etkinlik koy. Her görevde route alanı mutlaka lessons, grammar, words, practice, writing, exam seçeneklerinden biri olsun. Kesinlikle SADECE geçerli, kısa JSON döndür: {"days":[{"topic":"konu","tasks":[{"activity":"kısa görev","minutes":10,"route":"lessons"},{"activity":"kısa görev","minutes":10,"route":"practice"}]}]}. days tam 7 eleman, Pazartesi-Pazar sıralı. Her günün süre toplamı '+minutes+' olmalı. Markdown kullanma.';
  let days=null,fallback=false;
  try {
   const res=await active().api('/ai/generate',{method:'POST',body:JSON.stringify({task,profile:{level,daily:minutes}})});
@@ -115,9 +142,9 @@ async function buildWeek(p,force=false,host=null){
  // Do not overwrite a more recent user's choices if another request was submitted.
  if(JSON.stringify(preferences())!==JSON.stringify(p))return;
  const prev=existingPlan(),done=(!force&&prev?.week===week)?prev.done||{}:{};
- const plan={week,minutes,goal:p.goal,focus:p.focus,days,done,fallback};
+ const plan={week,minutes,goal:p.goal,focus:p.focus,learningGoalRevision:goal?.updatedAt||null,days,done,fallback};
  store().setItem(PLAN,JSON.stringify(plan));
- if(e.isConnected)renderProgram(e,state());
+ if(e?.isConnected)renderProgram(e,state());return plan;
 }
 
 const AI_SECTIONS={
