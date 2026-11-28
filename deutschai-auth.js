@@ -125,6 +125,22 @@
     '#da-auth-screen .da-login-secure{margin:20px 0 0!important;text-align:center;font-size:11px!important}',
     '@media(max-width:780px){#da-auth-screen{padding:10px;align-items:flex-start}#da-auth-screen .da-login-shell{grid-template-columns:1fr;min-height:unset;border-radius:23px}#da-auth-screen .da-login-hero{padding:22px 23px 17px;border-right:0;border-bottom:1px solid #e2cbff25}#da-auth-screen .da-login-hero h1{font-size:33px}#da-auth-screen .da-hero-mascot{display:none}#da-auth-screen .da-login-stats{margin:16px 0 0}#da-auth-screen .da-brand-pill{display:none}#da-auth-screen .da-login-card{padding:24px 23px 30px}#da-auth-screen .da-hero-content{padding:20px 0 0}#da-auth-screen .da-login-hero p{font-size:13px}#da-auth-screen .da-login-stats b{font-size:17px}}',
     '@media(max-width:370px){#da-auth-screen .da-name-row{grid-template-columns:1fr}#da-auth-screen .da-login-stats>div{padding:9px 7px}#da-auth-screen .da-login-stats span{font-size:9px}}',
+    '#da-auth-screen .da-admin-card{width:min(850px,100%);max-height:calc(100dvh - 32px);padding:clamp(16px,3vw,30px);background:linear-gradient(130deg,#29234fea,#16182fec);overflow:auto}',
+    '#da-auth-screen .da-admin-top{display:flex;justify-content:space-between;align-items:start;gap:12px}',
+    '#da-auth-screen .da-admin-top button{white-space:nowrap}',
+    '#da-auth-screen .da-admin-stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:15px 0}',
+    '#da-auth-screen .da-admin-stat-grid>div{border:1px solid #c6b0ff55;border-radius:16px;background:#ffffff0a;padding:15px}',
+    '#da-auth-screen .da-admin-stat-grid b{display:block;font-size:29px;color:#e1c5ff}',
+    '#da-auth-screen .da-admin-stat-grid small{font-size:11px;color:#cbbfe6}',
+    '#da-auth-screen .da-admin-section{margin:16px 0;padding:17px;border:1px solid #cbb5ff44;background:#1b173d8a;border-radius:19px}',
+    '#da-auth-screen .da-admin-section h2{font-size:19px;margin:0 0 7px}',
+    '#da-auth-screen .da-admin-users{display:grid;gap:9px;max-height:45dvh;overflow-y:auto;margin:13px 0}',
+    '#da-auth-screen .da-admin-user{display:flex;align-items:center;justify-content:space-between;gap:11px;padding:12px;border:1px solid #a88aee55;border-radius:13px;background:#342a5970}',
+    '#da-auth-screen .da-admin-user-info{min-width:0;overflow-wrap:anywhere}',
+    '#da-auth-screen .da-admin-user-info strong{display:block;font-size:13px}',
+    '#da-auth-screen .da-admin-user-info small{display:block;color:#b9acd9;margin-top:4px;font-size:11px}',
+    '#da-auth-screen .da-admin-user select{max-width:128px;min-width:103px;border:1px solid #ab90e7;border-radius:10px;background:#211b43;color:#fff;padding:10px;font:12px system-ui}',
+    '@media(max-width:600px){#da-auth-screen .da-admin-card{max-height:calc(100dvh - 20px)}#da-auth-screen .da-admin-stat-grid{gap:6px}#da-auth-screen .da-admin-stat-grid>div{padding:9px}#da-auth-screen .da-admin-stat-grid b{font-size:22px}#da-auth-screen .da-admin-user{flex-direction:column;align-items:stretch}#da-auth-screen .da-admin-user select{max-width:none}}',
     '#da-account-action{position:fixed;top:97px;right:12px;z-index:98;font-size:12px}',
     '#da-felcan-float{position:fixed;right:22px;bottom:24px;z-index:990;display:flex;align-items:center;gap:10px;cursor:pointer;border:1px solid #d9c6ff77;border-radius:24px;padding:7px 16px 7px 8px;background:linear-gradient(135deg,#6550a9b8,#242148e3);color:#fff;backdrop-filter:blur(26px) saturate(150%);box-shadow:0 16px 45px #160d4570,inset 0 1px #ffffff50;font:700 13px system-ui;animation:da-felcan-fly 5s ease-in-out infinite}',
     '#da-felcan-float:hover{border-color:#e2ceff;box-shadow:0 18px 48px #6c43b766;animation-play-state:paused}',
@@ -221,13 +237,53 @@
   }
   function admin() {
     const e=overlay();
-    e.innerHTML='<div class="da-card"><h1>Yönetici Paneli</h1><p>Ortak Gemini API anahtarını yalnızca yönetici tanımlar. Anahtar tarayıcıya geri gönderilmez.</p><form id="da-admin-form"><label>Gemini API anahtarı<input name="apiKey" type="password" autocomplete="off" required></label><p class="da-error"></p><button type="submit">Kaydet</button> <button type="button" id="da-close">Kapat</button></form></div>';
-    e.querySelector('#da-close').onclick=()=>e.hidden=true;
+    e.innerHTML='<div class="da-card da-admin-card"><div class="da-admin-top"><div><h1>Yönetici Paneli</h1><p>DeutschAI hesapları, roller ve Gemini yönetimi</p></div><button type="button" id="da-admin-close">✕ Kapat</button></div>'
+      +'<div class="da-admin-stat-grid"><div><b id="da-users-count">—</b><small>Toplam kayıtlı hesap</small></div><div><b id="da-admins-count">—</b><small>Yöneticiler</small></div><div><b id="da-members-count">—</b><small>Öğrenciler</small></div></div>'
+      +'<section class="da-admin-section"><h2>Üyeler ve yetkiler</h2><p>Şifreler güvenlik nedeniyle görüntülenemez; sistemde tek yönlü özet olarak saklanır. Rol değişikliğinde ilgili oturumlar kapatılır.</p><div class="da-admin-users" id="da-admin-users" aria-live="polite">Üyeler yükleniyor…</div><button type="button" id="da-reload-users">Listeyi yenile</button></section>'
+      +'<section class="da-admin-section"><h2>Gemini API anahtarı</h2><p>Ortak anahtarı yalnızca yöneticiler değiştirebilir. Mevcut anahtar tarayıcıya geri gönderilmez.</p><form id="da-admin-form"><label>Yeni Gemini API anahtarı<input name="apiKey" type="password" autocomplete="off" required></label><p class="da-error" role="alert"></p><button type="submit">Anahtarı Kaydet</button></form></section></div>';
+    const list=e.querySelector('#da-admin-users');
+    e.querySelector('#da-admin-close').onclick=()=>e.hidden=true;
+    const load=async()=>{
+      list.textContent='Hesaplar yükleniyor…';
+      try{
+        const data=await request('/admin/users');
+        const users=Array.isArray(data.users)?data.users:[];
+        e.querySelector('#da-users-count').textContent=String(data.total??users.length);
+        e.querySelector('#da-admins-count').textContent=String(users.filter(u=>u.role==='admin').length);
+        e.querySelector('#da-members-count').textContent=String(users.filter(u=>u.role!=='admin').length);
+        list.replaceChildren();
+        if(!users.length)list.textContent='Henüz kayıtlı hesap yok.';
+        for(const u of users){
+          const item=document.createElement('article');item.className='da-admin-user';
+          const details=document.createElement('div');details.className='da-admin-user-info';
+          const title=document.createElement('strong');title.textContent=(u.firstName||'')+' '+(u.lastName||'')+' · @'+u.username;
+          const meta=document.createElement('small');meta.textContent=(u.email||'')+' · '+(u.createdAt?new Date(u.createdAt*1000).toLocaleDateString('tr-TR'):'Tarih yok');
+          details.append(title,meta);
+          const select=document.createElement('select');select.setAttribute('aria-label','@'+u.username+' hesabının rolü');
+          for(const [v,label] of [['user','Öğrenci'],['admin','Yönetici']]){
+            const option=document.createElement('option');option.value=v;option.textContent=label;option.selected=v===u.role;select.append(option);
+          }
+          if(u.id===auth.user.id)select.disabled=true;
+          select.onchange=async()=>{
+            const next=select.value;
+            if(!confirm('@'+u.username+' hesabının rolü '+(next==='admin'?'yönetici':'öğrenci')+' olarak değiştirilsin mi? Kullanıcının oturumu kapatılır.')){select.value=u.role;return}
+            select.disabled=true;
+            try{await request('/admin/users/role',{method:'PUT',body:JSON.stringify({userId:u.id,role:next})});await load()}
+            catch(error){alert(error.message);select.value=u.role;select.disabled=u.id===auth.user.id}
+          };
+          item.append(details,select);list.append(item);
+        }
+        if(data.total>users.length){const caption=document.createElement('p');caption.textContent='İlk '+users.length+' hesap görüntüleniyor.';list.append(caption)}
+      }catch(error){list.textContent='Liste alınamadı: '+error.message+' — Backend güncellemesinin yayımlandığından emin ol.'}
+    };
+    e.querySelector('#da-reload-users').onclick=load;
     e.querySelector('form').onsubmit=async ev=>{
       ev.preventDefault();
-      try{await request('/admin/gemini-key',{method:'PUT',body:JSON.stringify(Object.fromEntries(new FormData(ev.currentTarget)))});e.querySelector('.da-error').textContent='Anahtar güvenli olarak kaydedildi';}
-      catch(err){e.querySelector('.da-error').textContent=err.message;}
+      const status=e.querySelector('.da-error');
+      try{await request('/admin/gemini-key',{method:'PUT',body:JSON.stringify(Object.fromEntries(new FormData(ev.currentTarget)))});status.textContent='Anahtar güvenli olarak kaydedildi';ev.currentTarget.reset()}
+      catch(error){status.textContent=error.message}
     };
+    load();
   }
   function claimAdmin() {
     const e=overlay();
