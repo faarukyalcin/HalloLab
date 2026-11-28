@@ -551,7 +551,7 @@ body .study-app #view > :is(.top, .card, #adaptive-ai-root, .placement-exam, .le
   .hl-dashboard .hl-phone-copy { display: inline; }
   .hl-banner {
     align-items: flex-start;
-    min-height: calc(clamp(132px, 41vw, 172px) + var(--hl-phone-extra) * .24);
+    min-height: calc(clamp(132px, 41vw, 172px) + var(--hl-phone-extra) * .19);
     padding: clamp(15px, 4.3vw, 23px) calc(var(--hl-phone-inset) + 8px);
     border: 0; border-radius: 0; box-shadow: none;
     background:
@@ -585,7 +585,7 @@ body .study-app #view > :is(.top, .card, #adaptive-ai-root, .placement-exam, .le
 
   .hl-link-grid { gap: clamp(8px, 2.6vw, 12px); }
   .hl-shortcut {
-    min-height: calc(clamp(81px, 24vw, 98px) + var(--hl-phone-extra) * .17);
+    min-height: calc(clamp(81px, 24vw, 98px) + var(--hl-phone-extra) * .115);
     border-radius: 15px; padding: 8px 4px;
     font-size: .8rem !important; font-weight: 600 !important;
     gap: 5px; line-height: 1.16;
@@ -593,7 +593,7 @@ body .study-app #view > :is(.top, .card, #adaptive-ai-root, .placement-exam, .le
   .hl-shortcut .hl-icon svg { width: clamp(28px, 8.1vw, 36px); height: auto; }
   .hl-shortcut:is([data-shortcut="writing"],[data-shortcut="words"],[data-shortcut="placement"],[data-shortcut="live"]) > span:last-child { max-width: 12ch; }
 
-  .hl-recommendation { display: grid; grid-template-rows: auto 1fr; min-height: calc(clamp(100px, 30vw, 118px) + var(--hl-phone-extra) * .14); padding: 9px 12px 11px; border-radius: 16px; }
+  .hl-recommendation { display: grid; grid-template-rows: auto 1fr; min-height: calc(clamp(100px, 30vw, 118px) + var(--hl-phone-extra) * .19); padding: 9px 12px 11px; border-radius: 16px; }
   .hl-recommendation .hl-tag { display: block; margin: 0 0 7px; padding: 0; border: 0; background: none; font-size: .92rem; font-weight: 750; }
   .hl-recommendation .hl-tag .hl-phone-copy { display: flex; align-items: center; gap: 6px; }
   .hl-recommendation .hl-tag svg { width: 16px; height: 16px; fill: #c66cc6; color: #f5b9ef; }
@@ -646,4 +646,24 @@ body .study-app #view > :is(.top, .card, #adaptive-ai-root, .placement-exam, .le
   }
   html body .app.study-app > .study-header #nav > button[data-page="live"][data-voice="idle"] .study-route-label { display: none; }
   html body .app.study-app > .study-header #nav > button[data-page="live"][data-voice="idle"] .study-icon { display: grid !important; width: 26px !important; height: 26px !important; }
+}
+
+@media (max-width: 719px) {
+  .hl-dashboard {
+    grid-template-areas: "hero" "metrics" "links" "lesson";
+    grid-template-rows: none;
+    min-height: 0;
+  }
+  .hl-dashboard .hl-extra,
+  #mobile-more-menu .mobile-shortcut-edit[aria-expanded] { display: none !important; }
+}
+
+@media (max-width: 719px) and (max-height: 620px) {
+  .hl-dashboard { gap: 8px; }
+  .hl-banner { min-height: 116px; padding-block: 12px; }
+  .hl-metrics { margin-top: -22px; }
+  .hl-metrics > .hl-level { min-height: 59px; }
+  .hl-shortcut { min-height: 72px; padding-block: 5px; gap: 3px; }
+  .hl-shortcut .hl-icon svg { width: 25px; }
+  .hl-recommendation { min-height: 90px; }
 }
