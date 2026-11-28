@@ -236,6 +236,22 @@ async function main(req,env){
   if(result.status>=400)return error('Gemini isteği başarısız ('+result.status+')',502);
   return answer({text:(result.data.candidates?.[0]?.content?.parts||[]).map(x=>x.text||'').join('')});
  }
+ if(route==='/ai/greeting-audio'&&req.method==='POST'){
+  if(!(await throttle(env,'greeting-audio:'+user.id,8,3600)))return error('Sesli selam sınırına ulaştın (429).',429);
+  const x=await body(req);
+  const voices=['Aoede','Puck','Charon','Kore','Fenrir','Leda','Orus','Zephyr'];
+  const voiceName=voices.includes(x.voice)?x.voice:'Aoede';
+  const result=await geminiFetch(env,'models/gemini-3.1-flash-tts-preview:generateContent',{
+   contents:[{parts:[{text:'Aşağıdaki cümleyi akıcı, rahat, enerjik Türkiye Türkçesiyle söyle. Yalnızca tırnak içindeki cümleyi oku: “Merhaba! Ben Felcan. Hazırsan Almanca çalışmaya başlayalım.”'}]}],
+   generationConfig:{responseModalities:['AUDIO'],speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName}}}}
+  });
+  if(result.error)return error(result.error,result.status);
+  if(result.status===429)return error('Gemini selam kotası doldu (429).',429);
+  if(result.status>=400)return error('Gemini selam sesi üretilemedi ('+result.status+').',502);
+  const part=result.data?.candidates?.[0]?.content?.parts?.find(p=>p.inlineData?.data&&/^audio\/(?:l16|pcm)/i.test(p.inlineData.mimeType||''));
+  if(!part)return error('Gemini selam sesi göndermedi.',502);
+  return answer({audio:part.inlineData.data,sampleRate:Number(/rate=(\d+)/.exec(part.inlineData.mimeType)?.[1])||24000});
+ }
  if(route==='/ai/live-token'&&req.method==='POST'){
   if(!(await throttle(env,'live:'+user.id,20,3600)))return error('Çok fazla sesli oturum',429);
   const expire=new Date(Date.now()+30*60*1000).toISOString();
