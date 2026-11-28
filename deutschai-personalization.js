@@ -111,48 +111,75 @@ async function buildWeek(p,force=false,host=null){
  store().setItem(PLAN,JSON.stringify(plan));
  if(e.isConnected)renderWelcome(e,state(),planSection(state()));
 }
+
+const AI_SECTIONS={
+ lessons:{title:'Dersler',count:5,focus:'Öğretici yeni bir konu ve pekiştirme.'},
+ placement:{title:'Seviye tespiti',count:8,focus:'A1-B2 arası özgün, dengeli seviye belirleme soruları. Tek başına resmi seviye tespiti olduğunu iddia etme.'},
+ words:{title:'Kelimeler',count:7,focus:'Almanca kelimeler, artikeller, gündelik kullanımlar.'},
+ grammar:{title:'Gramer',count:7,focus:'Gramer kuralı, çeviri, doğru fiil çekimi.'},
+ practice:{title:'Pratik',count:8,focus:'Kelime, okuma, gramer, konuşma ve cümle kurma.'},
+ exam:{title:'Deneme sınavı',count:12,focus:'Goethe tarzında özgün okuma, gramer, kelime ve iletişim. Resmi Goethe sınavı olduğunu söyleme.'},
+ writing:{title:'Yazma ve konuşma',count:6,focus:'E-posta, cümle kurma, konuşma, dil kullanımı.'},
+ progress:{title:'Tekrar ve ilerleme',count:5,focus:'Zayıf noktaları ve önceki yanlışları tekrarlama.'}
+};
 function draw(host,lesson,subject){
- host.innerHTML='<h2>'+esc(lesson.title||'Felkan soruları')+'</h2><p>'+esc(lesson.intro||'')+'</p><div class="da-list"></div><button class="da-new">Yeni sorular</button>';
+ const conf=AI_SECTIONS[subject]||AI_SECTIONS.practice;
+ host.innerHTML='<h2>✦ Felcan · '+esc(conf.title)+'</h2><p>'+esc(lesson.intro||'Sana özel hazırlanmış çalışmalar.')+'</p><div class="da-list"></div><div class="da-plan-actions"><button class="da-new">Yeni sorular hazırla</button><button class="da-talk-questions">Felcan ile sesli çalış</button></div>';
  const dest=host.querySelector('.da-list');
- (lesson.questions||[]).slice(0,4).forEach((q,i)=>{
-  if(!Array.isArray(q.options)||q.options.length!==4||!Number.isInteger(q.answer)||q.answer<0||q.answer>3)return;
-  const e=document.createElement('div');e.className='da-question';e.innerHTML='<b>'+esc((i+1)+'. '+q.question)+'</b><div class="da-opts"></div><p class="da-feedback" aria-live="polite"></p>';
+ let shown=0;
+ (Array.isArray(lesson.questions)?lesson.questions:[]).slice(0,conf.count).forEach((q,i)=>{
+  if(!Array.isArray(q.options)||q.options.length!==4||!Number.isInteger(Number(q.answer))||Number(q.answer)<0||Number(q.answer)>3)return;
+  const e=document.createElement('div');e.className='da-question';e.dataset.questionIndex=String(i+1);
+  e.innerHTML='<b>'+esc((i+1)+'. '+String(q.question||''))+'</b><div class="da-opts"></div><p class="da-feedback" aria-live="polite"></p>';
   q.options.forEach((option,j)=>{
-   const b=document.createElement('button');b.textContent=option;b.onclick=()=>{
-    e.querySelectorAll('.da-opts button').forEach(x=>x.disabled=true);
-    b.classList.add(j===q.answer?'correct':'wrong');
-    e.querySelector('.da-feedback').textContent=(j===q.answer?'Doğru! ':'Tekrar edelim. ')+String(q.explanation||'');
-   };e.querySelector('.da-opts').append(b);
-  });dest.append(e);
+   const button=document.createElement('button');button.textContent=String(option);
+   button.onclick=()=>{
+    if(e.dataset.done)return;
+    e.dataset.done='1';
+    const correct=j===Number(q.answer);
+    e.querySelectorAll('.da-opts button').forEach((x,k)=>{x.disabled=true;if(k===Number(q.answer))x.classList.add('correct')});
+    if(!correct)button.classList.add('wrong');
+    e.querySelector('.da-feedback').textContent=(correct?'Harika! ':'Tekrar edelim. ')+String(q.explanation||'').slice(0,480);
+   };
+   e.querySelector('.da-opts').append(button);
+  });
+  dest.append(e);shown++;
  });
+ if(!shown)dest.textContent='Geçerli soru bulunamadı. Yeniden oluşturabilirsin.';
  host.querySelector('.da-new').onclick=()=>generate(subject,host,true);
+ host.querySelector('.da-talk-questions').onclick=()=>active()?.openFelkan();
 }
 async function generate(subject,host,force=false){
- if(inflight)return;
- const k='da-personal-'+subject+'-'+new Date().toLocaleDateString('en-CA'),cached=read(k);
+ const conf=AI_SECTIONS[subject];if(!conf||!host?.isConnected)return;
+ const date=new Date().toLocaleDateString('en-CA'),s=state();
+ const cacheKey='da-personal-'+subject+'-'+(s.level||'A1')+'-'+date,cached=read(cacheKey);
  if(cached&&!force){draw(host,cached,subject);return}
- inflight=true;host.innerHTML='<h2>Felkan sana özel hazırlıyor…</h2><p>Seviyene uygun sorular hazırlanıyor.</p>';
- const s=state();
- const task='Genel Almanca '+subject+' çalışması. Seviye '+(s.level||'A1')+'. Yanlış kelimeler '+JSON.stringify((s.wrongWords||[]).slice(0,15))+'. Tamamlanan ders sayısı '+(s.completed||[]).length+'. Yalnızca geçerli JSON oluştur: {"title":"...","intro":"Türkçe açıklama","questions":[{"question":"soru","options":["a","b","c","d"],"answer":0,"explanation":"Türkçe kısa açıklama"}]}. Dört farklı soru, answer 0-3.';
+ if(host.dataset.generating==='1')return;
+ host.dataset.generating='1';
+ host.innerHTML='<h2>✦ Felcan '+esc(conf.title)+' hazırlıyor…</h2><p>Gemini, seviyene ve ilerlemene uygun sorular üretiyor.</p>';
+ const level=s.level||'A1';
+ const task="Sen DeutschAI öğretmeni Felcan'sın. Türkçe açıkla. "+level+' düzeyine uygun '+conf.title+' bölümü hazırlıyorsun. '+conf.focus+' Tamamlanan ders sayısı '+(s.completed||[]).length+', yanlış kelimeler '+JSON.stringify((s.wrongWords||[]).slice(0,12))+'. Tam '+conf.count+' farklı 4 şıklı özgün soru üret. Cevap sırası dengeli olsun. Yalnızca geçerli JSON döndür, Markdown kullanma: {"intro":"Türkçe kısa öğretici açıklama","questions":[{"question":"özgün soru","options":["A","B","C","D"],"answer":0,"explanation":"Türkçe öğretici açıklama"}]}. answer 0-3 tamsayıdır.';
  try{
-  const res=await active().api('/ai/generate',{method:'POST',body:JSON.stringify({task,profile:{level:s.level,daily:s.daily}})});
-  const raw=String(res.text||'').trim();
-  const json=JSON.parse(raw.slice(raw.indexOf('{'),raw.lastIndexOf('}')+1));
-  if(!Array.isArray(json.questions)||!json.questions.length)throw Error('Geçersiz soru yanıtı');
-  store().setItem(k,JSON.stringify(json));draw(host,json,subject);
+  const res=await active().api('/ai/generate',{method:'POST',body:JSON.stringify({task,profile:{level,daily:s.daily||20}})});
+  const raw=String(res.text||'').trim(),first=raw.indexOf('{'),last=raw.lastIndexOf('}');
+  if(first<0||last<first)throw Error('Gemini JSON sorusu göndermedi');
+  const json=JSON.parse(raw.slice(first,last+1));
+  if(!Array.isArray(json.questions)||json.questions.length<Math.min(4,conf.count))throw Error('Yeterli soru oluşturulamadı');
+  if(host.isConnected&&section()===subject){store().setItem(cacheKey,JSON.stringify(json));draw(host,json,subject)}
  }catch(err){
-  host.innerHTML='<h2>Felkan şu anda hazırlanamadı</h2><p>'+esc(err.message)+'</p><button class="retry">Yeniden dene</button>';
+  if(!host.isConnected)return;
+  host.innerHTML='<h2>Felcan bu çalışmayı hazırlayamadı</h2><p>'+esc(err.message)+'</p><button class="retry">Yeniden dene</button>';
   host.querySelector('.retry').onclick=()=>generate(subject,host,true);
- }finally{inflight=false}
+ }finally{delete host.dataset.generating}
 }
 function update(){
  if(!active()?.ready)return;
  const root=document.getElementById('view');if(!root)return;
- const p=section();if(p==='home'){greet();return}
- if(!['grammar','words','practice'].includes(p)||root.querySelector('#da-personal-practice'))return;
- const sectionEl=document.createElement('section');sectionEl.className='da-personal';sectionEl.id='da-personal-practice';
- const top=root.querySelector('.top');if(top)top.after(sectionEl);else root.prepend(sectionEl);
- generate(p,sectionEl);
+ const page=section();if(page==='home'){greet();return}
+ if(!AI_SECTIONS[page]||root.querySelector('#da-personal-practice'))return;
+ const el=document.createElement('section');el.className='da-personal';el.id='da-personal-practice';
+ const top=root.querySelector('.top');if(top)top.after(el);else root.prepend(el);
+ generate(page,el);
 }
 document.addEventListener('DOMContentLoaded',()=>{
  const root=document.getElementById('view');
