@@ -96,10 +96,17 @@ async function main(req,env){
  }
  if(route==='/auth/login'&&req.method==='POST'){
   const x=await body(req),username=String(x.username||'').trim(),p=String(x.password||'');
-  if(!(await throttle(env,'login:'+req.headers.get('CF-Connecting-IP')+':'+username.toLowerCase(),8,900)))return error('Çok fazla deneme. Sonra tekrar deneyin.',429);
+  const loginKey='login:'+req.headers.get('CF-Connecting-IP')+':'+username.toLowerCase();
+  if(!(await throttle(env,loginKey,8,900))){
+   const lock=await env.DB.prepare('SELECT reset_at FROM login_attempts WHERE key=?').bind(await sha(loginKey)).first();
+   const remaining=Math.max(1,Number(lock?.reset_at||now()+900)-now());
+   return Response.json({error:'Çok fazla giriş denemesi. '+Math.ceil(remaining/60)+' dakika sonra tekrar dene.',retryAfter:remaining},{status:429,headers:{'Retry-After':String(remaining),'Cache-Control':'no-store'}});
+  }
   const u=await env.DB.prepare('SELECT * FROM users WHERE username=? COLLATE NOCASE').bind(username).first();
   if(!u||!p||await passwordHash(p,u.password_salt,env)!==u.password_hash)return error('Kullanıcı adı veya şifre yanlış',401);
-  return loginUser(env,u);
+  const result=await loginUser(env,u);
+  if(result.ok)await env.DB.prepare('DELETE FROM login_attempts WHERE key=?').bind(await sha(loginKey)).run();
+  return result;
  }
  const user=await currentUser(req,env);
  if(!user)return error('Giriş yapmalısın',401);
