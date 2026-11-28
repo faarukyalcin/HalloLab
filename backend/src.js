@@ -5,6 +5,7 @@ const enc = new TextEncoder();
 const dec = new TextDecoder();
 const MAX_JSON = 180_000;
 const day = () => new Date().toISOString().slice(0, 10);
+const attendanceDay = () => new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Istanbul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 const now = () => Math.floor(Date.now() / 1000);
 const b64 = bytes => btoa(String.fromCharCode(...bytes));
 const bytes = str => Uint8Array.from(atob(str), c => c.charCodeAt(0));
@@ -38,10 +39,17 @@ async function currentUser(req,env) {
  WHERE s.token_hash=? AND s.expires_at>?`).bind(hash,now()).first();
 }
 function safeUser(u){return {id:u.id,username:u.username,firstName:u.first_name,lastName:u.last_name,email:u.email,role:u.role};}
+async function logLogin(env,userId){
+ const time=now(),date=attendanceDay();
+ await env.DB.prepare(`INSERT INTO activity_days(user_id,day,first_seen_at,last_seen_at,login_count)
+ VALUES(?,?,?,?,1) ON CONFLICT(user_id,day) DO UPDATE SET last_seen_at=excluded.last_seen_at,login_count=activity_days.login_count+1`)
+ .bind(userId,date,time,time).run();
+}
 async function loginUser(env,u) {
  const token = rand(36);
  await env.DB.prepare('INSERT INTO sessions(token_hash,user_id,expires_at,created_at) VALUES (?,?,?,?)')
   .bind(await sha(token),u.id,now()+7*86400,now()).run();
+ await logLogin(env,u.id);
  return answer({token,user:safeUser(u),expiresIn:7*86400});
 }
 async function throttle(env,key,max=8,window=900) {
@@ -92,6 +100,23 @@ async function main(req,env){
  const user=await currentUser(req,env);
  if(!user)return error('Giriş yapmalısın',401);
  if(route==='/auth/me'&&req.method==='GET')return answer({user:safeUser(user)});
+ if(route==='/activity/ping'&&req.method==='POST'){
+  const payload=await body(req);
+  const active=payload.active===true,time=now(),date=attendanceDay();
+  // Each authenticated heartbeat contributes at most 65s, capped by elapsed
+  // server time. Hidden/unfocused tabs contribute no active study time.
+  await env.DB.prepare(`INSERT INTO activity_days(user_id,day,first_seen_at,last_seen_at,active_seconds,last_ping_at)
+   VALUES(?,?,?,?,0,?)
+   ON CONFLICT(user_id,day) DO UPDATE SET
+    last_seen_at=excluded.last_seen_at,
+    active_seconds=activity_days.active_seconds+
+      CASE WHEN ?=1 AND activity_days.last_ping_at IS NOT NULL
+      THEN MIN(65,MAX(0,excluded.last_seen_at-activity_days.last_ping_at)) ELSE 0 END,
+    last_ping_at=excluded.last_ping_at`)
+   .bind(user.id,date,time,time,time,active?1:0).run();
+  return answer({ok:true,day:date});
+ }
+
  if(route==='/auth/logout'&&req.method==='POST'){
   await env.DB.prepare('DELETE FROM sessions WHERE token_hash=?').bind(user.token_hash).run();return answer({ok:true});
  }
@@ -123,7 +148,28 @@ async function main(req,env){
    // Never expose password hashes, salts, session tokens or API secrets.
    const rows=await env.DB.prepare("SELECT id,username,first_name,last_name,email,role,created_at FROM users ORDER BY created_at DESC LIMIT 500").all();
    const count=await env.DB.prepare('SELECT COUNT(*) AS count FROM users').first();
-   return answer({users:rows.results.map(u=>({...safeUser(u),createdAt:u.created_at})),total:count.count});
+   const totals=await env.DB.prepare(`SELECT user_id,
+    SUM(active_seconds) AS total_seconds,
+    SUM(CASE WHEN day>=date('now','-6 days') THEN active_seconds ELSE 0 END) AS last7_seconds,
+    COUNT(*) AS visited_days,
+    MAX(day) AS last_day
+    FROM activity_days GROUP BY user_id`).all();
+   const stats=new Map(totals.results.map(row=>[row.user_id,row]));
+   return answer({users:rows.results.map(u=>{
+    const v=stats.get(u.id)||{};
+    return {...safeUser(u),createdAt:u.created_at,totalSeconds:v.total_seconds||0,last7Seconds:v.last7_seconds||0,visitedDays:v.visited_days||0,lastVisit:v.last_day||null};
+   }),total:count.count});
+  }
+  if(route==='/admin/users/activity'&&req.method==='GET'){
+   const id=String(url.searchParams.get('userId')||'');
+   if(!/^[a-f0-9-]{36}$/i.test(id))return error('Geçersiz hesap');
+   const target=await env.DB.prepare('SELECT id,username FROM users WHERE id=?').bind(id).first();
+   if(!target)return error('Hesap bulunamadı',404);
+   const entries=await env.DB.prepare(`SELECT day,active_seconds AS activeSeconds,
+     login_count AS logins,first_seen_at AS firstSeenAt,last_seen_at AS lastSeenAt
+     FROM activity_days WHERE user_id=? AND day >= date('now','-30 days')
+     ORDER BY day DESC LIMIT 31`).bind(id).all();
+   return answer({username:target.username,days:entries.results,timeZone:'Europe/Istanbul'});
   }
   if(route==='/admin/users/role'&&req.method==='PUT'){
    const x=await body(req),id=String(x.userId||''),role=String(x.role||'');
