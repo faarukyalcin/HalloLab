@@ -623,6 +623,24 @@
   let lastFelcanContext='', felcanReady=false, felcanRequested=false;
   let felcanFocusedQuestion=null;
   const felcanQuestionSelector='.question, .da-question, .adaptive-question, .placement-question';
+  const editRoutes=['home','lessons','program','grammar','words','practice','writing','exam','placement','progress','community','profile'];
+  function editOpenSection(page){
+    if(!auth||!editRoutes.includes(page))return false;
+    const overlay=document.getElementById('da-auth-screen');
+    if(page==='profile'){const button=document.getElementById('da-account-action');if(!button)return false;button.click();return !!document.querySelector('#da-auth-screen:not([hidden]) .da-profile-card')}
+    if(page==='community'){community();return !!document.querySelector('#da-auth-screen:not([hidden]) .da-community-card')}
+    if(overlay&&!overlay.hidden)return false;
+    if(typeof window.setPage!=='function')return false;
+    window.setPage(page);
+    return document.querySelector('#nav [aria-current="page"]')?.dataset.page===page;
+  }
+  function editLearningSummary(){
+    const read=k=>{try{return JSON.parse(store.getItem(k)||'null')||{}}catch{return {}}};
+    const s=read('deutschai-online-v1'),p=read('deutschai-ai-profile-v1'),t=read('deutschai-ai-placement-v1'),d=read('deutschai-ai-daily-v1'),personal=read('deutschai-personal-profile-v1');
+    const levels=['A1','A2','B1','B2','C1','C2'];
+    const level=[t.level,p.level,s.level].find(x=>levels.includes(x))||'A1';
+    return {level,placementLevel:levels.includes(t.level)?t.level:null,goal:levels.includes(personal.goal)?personal.goal:null,dailyMinutes:Number(p.dailyMinutes)||Number(s.daily)||20,completedLessons:Array.isArray(s.completed)?s.completed.length:0,learnedWords:Object.keys(s.learned||{}).length,focusAreas:Array.isArray(p.focusAreas)?p.focusAreas.filter(x=>typeof x==='string').slice(0,10).map(x=>x.slice(0,100)):[],planDate:d.date||null,plan:Array.isArray(d.content?.schedule)?d.content.schedule.slice(0,12).map((x,i)=>({title:String(x.activity||x.title||'').slice(0,150),minutes:Number(x.minutes)||0,done:s.dailyPlanProgress?.date===d.date&&!!s.dailyPlanProgress?.completed?.[i]})):[],theme:s.theme||'dark',shortcuts:Array.isArray(s.mobileShortcuts)?s.mobileShortcuts.filter(x=>editRoutes.includes(x)).slice(0,3):['home','lessons','practice']};
+  }
   function felcanScreenContext(questionNumber){
     const root=document.getElementById('view');
     if(!root)return null;
@@ -648,7 +666,13 @@
       const options=saved?.options||[...((placement||node)?.querySelectorAll('.option, .da-opts button, .adaptive-option, .placement-option, label:has(input[type="radio"])')||[])].map(option=>option.textContent.trim());
       return {number,prompt,passage,options,feedback:node?.querySelector('.feedback, .da-feedback, .adaptive-feedback')?.textContent?.trim()||''};
     });
+    const activeOverlay=document.querySelector('#da-auth-screen:not([hidden])');
+    const surface=activeOverlay?.querySelector('.da-community-card')?'community':activeOverlay?.querySelector('.da-admin-card')?'admin':activeOverlay?.querySelector('.da-profile-card')?'profile':null;
+    const pageCode=document.querySelector('#nav [aria-current="page"]')?.dataset.page||'home';
+    // Only read learner-facing study content. Never send account forms, admin records, secrets or community member data to the model.
+    const studyText=!surface&&pageCode!=='placement'&&pageCode!=='exam'?[...root.querySelectorAll('h1,h2,h3,.lesson p,.lesson li,.example,.study-prompt,.adaptive-passage,.adaptive-word-card span,.adaptive-word-card small')].filter(n=>n.getClientRects().length).slice(0,35).map(n=>n.textContent.trim().slice(0,240)).filter(Boolean).join('\n').slice(0,3600):'';
     return {
+      surface:surface||pageCode,sections:editRoutes,learning:editLearningSummary(),studyText,
       title:root.querySelector('.top h1, h1, .placement-card h2')?.textContent?.trim()||'DilAtölyesi',
       page:document.querySelector('#nav [aria-current="page"]')?.dataset.page||'home',
       selectedQuestion:selected,centeredQuestion:centered,visibleQuestions:visible.map(item=>item.number),
@@ -698,7 +722,7 @@
     iframe.allow='microphone; autoplay';
     iframe.tabIndex=-1;
     iframe.setAttribute('aria-hidden','true');
-    iframe.src='./felkan.html?compact=1&v=dilatolyesi-1';
+    iframe.src='./felkan.html?compact=1&v=app-awareness-1';
     iframe.addEventListener('load',()=>{
       felcanReady=true;
       sendFelcanContext(true);
@@ -760,9 +784,14 @@
     const nav=document.getElementById('nav');
     nav?.addEventListener('pointerover',warmMobileVoice,{passive:true});
     nav?.addEventListener('focusin',warmMobileVoice);
+    let syncTimer;const sync=()=>{clearTimeout(syncTimer);syncTimer=setTimeout(()=>sendFelcanContext(),350)};
+    const view=document.getElementById('view');if(view)new MutationObserver(sync).observe(view,{childList:true,subtree:true,characterData:true});
+    if(nav)new MutationObserver(sync).observe(nav,{childList:true,subtree:true,attributes:true,attributeFilter:['aria-current']});
+    document.addEventListener('click',sync,true);window.addEventListener('scroll',sync,{passive:true});
+    setInterval(()=>{if(felcanReady&&document.visibilityState==='visible')sendFelcanContext()},5000);
   }
   window.deutschaiStore=store;
-  window.DeutschAI={api:request,store,openCommunity:community,get user(){return auth?.user||null;},get ready(){return !!origin && !!auth;},logout,showAdmin:admin,openFelkan:felkan,getStudyContext:number=>auth?felcanScreenContext(number):null};
+  window.DeutschAI={api:request,store,openCommunity:community,get user(){return auth?.user||null;},get ready(){return !!origin && !!auth;},logout,showAdmin:admin,openFelkan:felkan,openStudySection:editOpenSection,getLearningSummary:()=>auth?editLearningSummary():null,getStudyContext:number=>auth?felcanScreenContext(number):null};
   window.addEventListener('message',event=>{
     const frame=felcanFrame();
     if(event.origin!==location.origin||!frame||event.source!==frame.contentWindow)return;
@@ -777,10 +806,8 @@
       return;
     }
     if(event.data?.type!=='deutschai:navigate')return;
-    if(!['home','lessons','grammar','words','practice','writing','exam','placement','progress'].includes(event.data.page))return;
-    if(typeof window.setPage==='function')window.setPage(event.data.page);
-    const current=document.querySelector('#nav [aria-current="page"]')?.dataset.page;
-    event.source?.postMessage({type:'deutschai:navigated',page:event.data.page,ok:current===event.data.page},event.origin);
+    const ok=editOpenSection(event.data.page);
+    event.source?.postMessage({type:'deutschai:navigated',page:event.data.page,ok},event.origin);
     sendFelcanContext(true);
   });
   document.addEventListener('DOMContentLoaded',async()=>{
