@@ -507,6 +507,26 @@ body .app.study-app .main .glass-shortcuts > button { display:grid; justify-item
   .home-section-grid button { gap:6px; padding-inline:7px; font-size:13px; }
   .home-section-arrow { display:none; }
 }
+
+/* Unified Liquid Glass controls and learning surfaces, all screen sizes. */
+body .study-app{--lg-edge:color-mix(in srgb,var(--green) 27%,var(--line));--lg-surface:linear-gradient(145deg,color-mix(in srgb,var(--green) 10%,var(--paper) 75%),color-mix(in srgb,var(--paper) 78%,transparent));--lg-inset:linear-gradient(155deg,color-mix(in srgb,var(--green) 7%,var(--paper) 76%),color-mix(in srgb,var(--bg) 55%,transparent));--lg-shadow:inset 0 1px 0 #ffffff24,inset 0 -1px 0 #ffffff08,0 9px 26px #00000012}
+body .app.study-app .main :is(.card,.stat,.adaptive-ai-panel,.placement-card,.da-personal,.assistant-program-column,.assistant-progress-column,.assistant-extra,.assistant-assessment,.learning-overview .card):not(.study-next){background:var(--lg-surface)!important;border:1px solid var(--lg-edge)!important;border-radius:24px!important;box-shadow:var(--lg-shadow)!important;backdrop-filter:blur(18px) saturate(125%);-webkit-backdrop-filter:blur(18px) saturate(125%);color:var(--ink)}
+body .app.study-app .main :is(.example,.question,.adaptive-question,.adaptive-task,.adaptive-passage,.adaptive-word-card,.placement-prompt,.placement-passage,.placement-result-row,.da-plan-day,.da-question,.assistant-assessment-question){background:var(--lg-inset)!important;border:1px solid var(--lg-edge)!important;border-radius:17px!important;box-shadow:inset 0 1px 0 #ffffff18;color:var(--ink)}
+body .app.study-app .main :is(select,textarea,input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file])){background:var(--lg-inset)!important;border:1px solid var(--lg-edge)!important;color:var(--ink)!important;border-radius:15px!important;box-shadow:inset 0 1px 0 #ffffff20,0 4px 12px #0000000c;padding:12px 14px;min-height:46px;font:inherit;font-size:16px}
+body .app.study-app .main select option{background:var(--paper);color:var(--ink)}
+body .app.study-app .main :is(.btn.ghost,.option,.adaptive-option,.placement-option,.adaptive-word,.adaptive-word-learned,.da-opts button,.da-plan-actions button,.da-refresh-plan,.da-step-actions button,.assistant-retry-plan,.assistant-assessment-option):not(.correct):not(.wrong):not(.selected){background:var(--lg-inset)!important;color:var(--ink)!important;border:1px solid var(--lg-edge)!important;border-radius:15px!important;box-shadow:inset 0 1px 0 #ffffff23;min-height:44px}
+body .app.study-app .main :is(.option,.adaptive-option,.placement-option,.assistant-assessment-option,.da-opts button).correct{background:color-mix(in srgb,#369b75 22%,var(--paper))!important;border:1px solid #439d7c!important;color:var(--ink)!important}
+body .app.study-app .main :is(.option,.adaptive-option,.placement-option,.assistant-assessment-option,.da-opts button).wrong{background:color-mix(in srgb,#c35372 22%,var(--paper))!important;border:1px solid #c76a82!important;color:var(--ink)!important}
+body .app.study-app .main :is(.btn:not(.ghost),.da-personal button[data-start],.da-personal button[type=submit]){border-radius:15px!important;min-height:46px;box-shadow:inset 0 1px 0 #ffffff55,0 5px 18px #6e49bb28!important}
+body .app.study-app .main .lg-settings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:18px 0}
+body .app.study-app .main .lg-field{display:grid;gap:8px;min-width:0;color:var(--muted);font-size:12px;font-weight:600}
+body .app.study-app .main .lg-field select{width:100%}
+body .app.study-app .main .lg-settings-note{padding:14px;border-radius:16px;border:1px solid var(--lg-edge);background:var(--lg-inset);color:var(--muted);font-size:13px;line-height:1.6}
+body .app.study-app .main .lg-settings-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:15px}
+body .app.study-app .main .lg-danger{color:var(--ink)!important;border-color:color-mix(in srgb,#ce6885 50%,var(--line))!important;background:color-mix(in srgb,#ce6885 9%,var(--paper))!important}
+body .app.study-app .main :is(.adaptive-notice,.placement-muted,.da-plan-muted){color:var(--muted)}
+body .app.study-app .main :is(button,select,input,textarea):focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+@media(max-width:600px){body .app.study-app .main .lg-settings{gap:9px}body .app.study-app .main .lg-field select{padding:12px 8px}body .app.study-app .main :is(.adaptive-ai-panel,.placement-card,.da-personal){padding:17px!important}body .app.study-app .main :is(.adaptive-question,.adaptive-task,.example){padding:13px!important}}
 </style><link rel="stylesheet" href="./mobile-liquid-glass.css?v=dock-studio-1"><script src="./api-config.js"></script><script src="./deutschai-auth.js?v=start-top-1"></script></head><body><div class="scene-ribbons" aria-hidden="true"></div><div class="app study-app"><header class="study-header"><div class="study-head"><div class="study-brand"><div class="study-mark"><svg class="deutschai-book-mark" viewBox="0 0 48 48" aria-hidden="true" fill="none">
   <path d="M12 11h13c8 0 14 5.5 14 13s-6 13-14 13H12z" stroke="#fcfaff" stroke-width="3.1" stroke-linejoin="round"/>
   <path d="M12 18c4-1 8.2.2 12 3.2 3.5-2.8 7.3-4.1 11-3.4M12 27c4-1 8.2.2 12 3.2 4.2-3.3 8.5-4.6 13-3.1M24 21.2v9" stroke="#ded0ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -785,11 +805,11 @@ function progress() {
     '</strong></div><div class="stat"><label>Kelime hazinesi</label><strong>' + Object.keys(state.learned).length +
     '</strong><small>' + DATA.vocabulary.length + ' kelimeden</small></div><div class="stat"><label>Alıştırmalar</label><strong>' +
     n + '</strong><small>' + good + ' doğru</small></div><div class="stat"><label>Çalışma süresi</label><strong>' + (Number(state.minutes || 0) + Math.floor((state.studySeconds || 0)/60)) +
-    '<small> dk</small></strong></div></div><section class="card"><h2>Kişisel program</h2><p class="muted">Süre hedefi değişince günlük program otomatik yeniden düzenlenir.</p><div class="settings-row"><label>Seviye</label><select onchange="chooseStudyLevel(this.value)">' +
-    levelOptions + '</select><label>Günlük çalışma süresi</label><select onchange="state.daily=+this.value;save();progress()">' + timeOptions +
-    '</select></div><p>Bugünkü plan: ' + planSteps().join(" · ") + '</p><p>Günlük tekrar: kelime → ders → alıştırma → kelime pekiştirme ve gramer tekrarı.</p><button class="btn ghost" onclick="toggleTheme()">Tema: ' +
-    (state.theme === "dark" ? "Koyu · değiştir" : "Açık · değiştir") + '</button><hr style="border:0;border-top:1px solid var(--line);margin:20px 0"><h2>Deneme sonuçları</h2>' +
-    results + '<button class="btn ghost" onclick="if(confirm(\'Bu cihazdaki tüm ilerlemen silinsin mi?\')){window.deutschaiStore.removeItem(KEY);location.reload()}">İlerlemeyi sıfırla</button></section>');
+    '<small> dk</small></strong></div></div><section class="card lg-progress-settings"><h2>Kişisel program</h2><p class="muted">Süre hedefi değişince günlük program otomatik yeniden düzenlenir.</p><div class="lg-settings"><label class="lg-field">Seviye<select onchange="chooseStudyLevel(this.value)">' +
+    levelOptions + '</select></label><label class="lg-field">Günlük çalışma süresi<select onchange="state.daily=+this.value;save();progress()">' + timeOptions +
+    '</select></label></div><div class="lg-settings-note"><b>Bugünkü plan</b><p>' + planSteps().join(" · ") + '</p><p>Günlük tekrar: kelime → ders → alıştırma → kelime pekiştirme ve gramer tekrarı.</p></div><div class="lg-settings-actions"><button class="btn ghost" onclick="toggleTheme()">Tema: ' +
+    (state.theme === "dark" ? "Koyu · değiştir" : "Açık · değiştir") + '</button><button class="btn ghost" onclick="setPage(&quot;program&quot;)">Ders programını aç →</button></div><hr style="border:0;border-top:1px solid var(--line);margin:20px 0"><h2>Deneme sonuçları</h2>' +
+    results + '<button class="btn ghost lg-danger" onclick="if(confirm(\'Bu cihazdaki tüm ilerlemen silinsin mi?\')){window.deutschaiStore.removeItem(KEY);location.reload()}">İlerlemeyi sıfırla</button></section>');
 }
 function render() {
   document.body.classList.toggle("theme-dark", state.theme === "dark");
