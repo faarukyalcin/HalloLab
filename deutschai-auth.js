@@ -539,7 +539,7 @@
     iframe.allow='microphone; autoplay';
     iframe.tabIndex=-1;
     iframe.setAttribute('aria-hidden','true');
-    iframe.src='./felkan.html?compact=1&v=welcome-admin-1';
+    iframe.src='./felkan.html?compact=1&v=welcome-admin-2';
     iframe.addEventListener('load',()=>{
       felcanReady=true;
       const greet=document.querySelector('#da-felcan-welcome .da-welcome-greet');
