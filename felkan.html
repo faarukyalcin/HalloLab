@@ -422,7 +422,33 @@ html.compact-felcan #avatar[data-pos="center"] .orb{border-radius:44%;transform:
 html.compact-felcan #startBtn{bottom:24px}
 
 </style>
-</head>
+<style id="edit-hologram-style">
+#avatar{--h:calc(var(--s)*1.12);--mouth:.08;filter:drop-shadow(0 0 14px #8f9aff65)}
+#avatar .orb{display:none!important}
+#avatar .halo{inset:8% -5% 0;opacity:.45}
+#avatar .edit-hologram{width:100%;height:100%;display:block;overflow:visible;position:relative}
+#avatar .eh-figure{transform-origin:50% 90%;animation:eh-breathe 5s ease-in-out infinite}
+#avatar .eh-head{transform-origin:120px 155px;animation:eh-head 7s ease-in-out infinite}
+#avatar .eh-eyes{transform-origin:120px 106px;animation:eh-blink 5.7s infinite}
+#avatar .eh-mouth-open{transform-origin:120px 140px;transform:scaleY(var(--mouth));transition:transform 45ms linear}
+#avatar[data-state="speaking"] .eh-brows{animation:eh-express 2.2s ease-in-out infinite}
+#avatar[data-state="speaking"] .eh-head{animation-duration:3.2s}
+#avatar[data-state="listening"] .eh-head{animation:eh-listen 4.5s ease-in-out infinite}
+#avatar[data-state="connecting"] .eh-figure{animation:eh-connect 1.5s ease-in-out infinite}
+#avatar[data-pos="center"]{--s:clamp(160px,min(48vw,44vh),340px);top:45%}
+#avatar:not([data-pos="center"]){--s:118px}
+#avatar .label{top:100%;max-width:min(90vw,290px)}
+@keyframes eh-breathe{50%{transform:translateY(-3px) scale(1.012)}}
+@keyframes eh-head{35%{transform:rotate(-2deg)}70%{transform:rotate(2deg)}}
+@keyframes eh-listen{50%{transform:rotate(-3deg) translateY(1px)}}
+@keyframes eh-express{50%{transform:translateY(-1.8px)}}
+@keyframes eh-blink{0%,45%,49%,90%,94%,100%{transform:scaleY(1)}47%,92%{transform:scaleY(.08)}}
+@keyframes eh-connect{50%{opacity:.65}}
+@media(max-width:600px){#avatar[data-pos="center"]{--s:clamp(155px,min(64vw,43vh),275px);top:44%}#avatar:not([data-pos="center"]){--s:85px}}
+html.compact-felcan #avatar[data-pos="center"]{--s:clamp(105px,min(48vw,39vh),190px);top:43%}
+html.compact-felcan #avatar:not([data-pos="center"]){--s:72px}
+@media(prefers-reduced-motion:reduce){#avatar .eh-figure,#avatar .eh-head,#avatar .eh-eyes,#avatar .eh-brows{animation:none!important}}
+</style></head>
 <body>
 
 <div id="welcome"><small>DEUTSCHAI · KİŞİSEL ALMANCA ÖĞRETMENİN</small><h1 id="welcomeTitle">Hoş geldin.</h1></div>
@@ -439,7 +465,30 @@ html.compact-felcan #startBtn{bottom:24px}
 
 <div id="avatar" data-pos="center" data-state="idle">
   <div class="halo"></div><div class="halo h2"></div>
-  <div class="orb"><div class="bars"><i></i><i></i><i></i></div><div class="spark"></div></div>
+  <svg class="edit-hologram" viewBox="0 0 240 280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Edit, kadın hologram öğretmen">
+<defs><linearGradient id="ehHair" x2=".8" y2="1"><stop stop-color="#6256a4"/><stop offset=".45" stop-color="#25234e"/><stop offset="1" stop-color="#151936"/></linearGradient><linearGradient id="ehSkin" x2=".8" y2="1"><stop stop-color="#e3e9ff"/><stop offset=".55" stop-color="#b7b2e8"/><stop offset="1" stop-color="#817cc8"/></linearGradient><linearGradient id="ehSuit" x2="0" y2="1"><stop stop-color="#6576be"/><stop offset="1" stop-color="#20284e"/></linearGradient><radialGradient id="ehGlow"><stop stop-color="#8d9aff" stop-opacity=".25"/><stop offset="1" stop-color="#586fff" stop-opacity="0"/></radialGradient><linearGradient id="ehFade" x2="0" y2="1"><stop stop-color="white"/><stop offset=".8" stop-color="white"/><stop offset="1" stop-color="black"/></linearGradient><mask id="ehMask"><rect width="240" height="280" fill="url(#ehFade)"/></mask><pattern id="ehScan" width="4" height="5" patternUnits="userSpaceOnUse"><path d="M0 1H4" stroke="#a4eaff" stroke-opacity=".14"/></pattern></defs>
+<ellipse cx="120" cy="136" rx="115" ry="134" fill="url(#ehGlow)"/>
+<g mask="url(#ehMask)" class="eh-figure">
+<path d="M60 144Q42 89 55 54Q71 10 117 13Q169 7 184 53Q201 91 178 158L154 181 81 178Z" fill="url(#ehHair)" stroke="#8a9ce5" stroke-width="1.1"/>
+<path d="M103 146L102 174Q79 178 54 191Q36 207 28 268L212 268Q203 208 185 191L138 174 137 146Z" fill="url(#ehSkin)" stroke="#a9baff"/>
+<path d="M101 174L120 199 139 174Q173 180 188 193Q204 210 214 270H26Q36 212 53 194Z" fill="url(#ehSuit)" stroke="#9ebdff" stroke-width="1.4"/>
+<path d="M99 177L83 195 110 219 120 200 130 219 157 195 141 177M120 201V267" fill="none" stroke="#b4d7ff" stroke-width="1.5"/>
+<path d="M50 238L57 213M190 238L183 213" stroke="#92d9ff" stroke-opacity=".6" stroke-width="2"/>
+<g class="eh-head">
+<path d="M71 82Q64 61 76 43Q91 26 120 25Q151 25 169 46Q181 64 170 89L165 119Q158 151 140 163Q120 178 100 163Q82 151 75 119Z" fill="url(#ehSkin)" stroke="#b4c5ff" stroke-width="1.3"/>
+<path d="M75 98Q62 91 64 103Q66 116 77 120M165 98Q178 91 176 103Q174 116 163 120" fill="#a3a3dd" stroke="#a9baff"/>
+<path d="M70 89Q59 67 77 41Q100 13 134 25Q164 24 177 56Q183 73 169 99L163 75Q135 69 119 44Q100 73 77 78Z" fill="url(#ehHair)" stroke="#8e9fef" stroke-width="1.2"/>
+<path d="M81 54Q102 32 119 36M130 35Q155 40 165 59" fill="none" stroke="#a2a7ed" stroke-opacity=".65" stroke-width="2"/>
+<g class="eh-brows" fill="none" stroke="#4c4679" stroke-width="3" stroke-linecap="round"><path d="M87 96Q98 90 109 95"/><path d="M131 95Q142 90 153 96"/></g>
+<g class="eh-eyes"><path d="M86 106Q98 96 110 106Q99 116 86 106M130 106Q142 96 154 106Q142 116 130 106" fill="#eef4ff" stroke="#66609a" stroke-width="1.3"/><circle cx="99" cy="106" r="5" fill="#6653bc"/><circle cx="141" cy="106" r="5" fill="#6653bc"/><circle cx="99" cy="106" r="2.6" fill="#212044"/><circle cx="141" cy="106" r="2.6" fill="#212044"/><circle cx="100" cy="104" r="1.4" fill="#eaffff"/><circle cx="142" cy="104" r="1.4" fill="#eaffff"/></g>
+<path d="M120 108L116 125Q120 129 125 125" fill="none" stroke="#7973b3" stroke-width="1.3" stroke-linecap="round"/>
+<ellipse cx="88" cy="128" rx="9" ry="4" fill="#cd8fc9" opacity=".28"/><ellipse cx="152" cy="128" rx="9" ry="4" fill="#cd8fc9" opacity=".28"/>
+<g class="eh-mouth"><path d="M106 140Q113 137 120 140Q127 137 134 140Q120 151 106 140" fill="#a16aaf"/><ellipse class="eh-mouth-open" cx="120" cy="143" rx="9" ry="5" fill="#39244d"/><path d="M110 140Q120 144 130 140" fill="none" stroke="#ecc7ef" stroke-width="1.2"/></g>
+<path d="M69 97Q61 125 78 157M173 91Q181 123 162 157" fill="none" stroke="#6769ad" stroke-width="5" stroke-linecap="round"/>
+<path d="M70 99V119M170 99V119" stroke="#a8eaff" stroke-width="4" stroke-linecap="round"/>
+</g><rect x="25" y="15" width="190" height="255" fill="url(#ehScan)" pointer-events="none"/>
+</g><ellipse cx="120" cy="260" rx="84" ry="12" fill="#698cff" fill-opacity=".11" stroke="#93d8ff" stroke-opacity=".65"/><ellipse cx="120" cy="260" rx="62" ry="7" fill="none" stroke="#b1baff" stroke-opacity=".55"/>
+</svg><div class="orb" aria-hidden="true"><div class="bars"><i></i><i></i><i></i></div><div class="spark"></div></div>
   <div class="label"><span id="dot"></span><span id="statusText">Başlatmak için dokun</span></div>
 </div>
 <button id="startBtn">Edit ile çalışmaya başla</button>
@@ -604,6 +653,7 @@ function drawVoiceBars(){
   let sum=0;
   for(const value of waveform){const sample=(value-128)/128;sum+=sample*sample}
   const level=Math.min(1,Math.sqrt(sum/waveform.length)*5);
+  avatar.style.setProperty("--mouth",String(.08+level*1.45));
   voiceBars.forEach((bar,index)=>{bar.style.transform='scaleY('+(0.45+level*(0.7+index*0.12)).toFixed(3)+')'});
   voiceAnimation=requestAnimationFrame(drawVoiceBars);
 }
@@ -612,11 +662,11 @@ function setSpeaking(speaking){
   S.speaking=speaking;
   if(speaking){
     setStatus('speaking','Edit konuşuyor…');
-    if(!document.documentElement.classList.contains('compact-felcan')&&!voiceMotion.matches)voiceAnimation=requestAnimationFrame(drawVoiceBars);
+    if(!voiceMotion.matches)voiceAnimation=requestAnimationFrame(drawVoiceBars);
   }else{
     cancelAnimationFrame(voiceAnimation);
     voiceAnimation=0;
-    voiceBars.forEach(bar=>{bar.style.transform=''});
+    voiceBars.forEach(bar=>{bar.style.transform=''});avatar.style.setProperty('--mouth','.08');
     if(S.setupDone)readyToListen();
   }
 }
