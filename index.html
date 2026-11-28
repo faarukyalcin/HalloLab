@@ -591,7 +591,52 @@ body .placement-exam .placement-result-details{margin:20px 0;padding:12px 0;bord
 body .placement-exam .placement-result-details summary{cursor:pointer;font-weight:650}
 body .placement-exam .placement-card>.btn:not(.ghost){margin-top:12px}
 @media(max-width:600px){body .app.study-app .main .placement-exam{padding:10px 7px}body .placement-exam .placement-options{gap:8px}body .placement-exam .placement-card>.btn:not(.ghost){width:100%}}
-</style><script src="./api-config.js"></script><script src="./deutschai-auth.js?v=admin-studio-1"></script></head><body><div class="scene-ribbons" aria-hidden="true"></div><div class="app study-app"><header class="study-header"><div class="study-head"><div class="study-brand"><div class="study-mark"><svg class="deutschai-book-mark" viewBox="0 0 48 48" aria-hidden="true" fill="none">
+</style><style id="concept1-glass">
+body:not(:is(.theme-dark,.theme-ocean-dark,.theme-violet-dark,.theme-rose-dark,.theme-sunset-dark)){--bg:#eef0fa;--paper:#f8f9ff;--ink:#22233e;--muted:#626480;--line:#d6d9ec;--mint:color-mix(in srgb,var(--accent-soft) 22%,white);background:radial-gradient(ellipse at 2% 0%,#f0dcfa 0%,transparent 45%),radial-gradient(ellipse at 95% 12%,#c8e2fb 0%,transparent 45%),linear-gradient(160deg,#f3f1fb,#e6eafa)!important}
+body:is(.theme-dark,.theme-ocean-dark,.theme-violet-dark,.theme-rose-dark,.theme-sunset-dark){--bg:#17172c;--paper:#242640;--ink:#f6f5ff;--muted:#c3c6df;--line:#464b69;background:radial-gradient(ellipse at 0 0,color-mix(in srgb,var(--accent) 25%,transparent),transparent 50%),radial-gradient(ellipse at 100% 10%,#27466b77,transparent 48%),#17172c!important}
+body .scene-ribbons{opacity:.18}
+body .app.study-app{--lg-edge:color-mix(in srgb,var(--line) 70%,transparent);--lg-surface:color-mix(in srgb,var(--paper) 80%,transparent);--lg-inset:color-mix(in srgb,var(--paper) 74%,transparent)}
+body .app.study-app .main{min-width:0}
+body .app.study-app .main :is(.card,.adaptive-question,.adaptive-word-card,.adaptive-task,.da-personal){border-radius:22px!important;background:linear-gradient(145deg,color-mix(in srgb,var(--paper) 93%,transparent),color-mix(in srgb,var(--paper) 69%,transparent))!important;border:1px solid color-mix(in srgb,var(--line) 60%,#ffffff30)!important;box-shadow:0 6px 24px #2926530b,inset 0 1px 0 #ffffff35!important}
+body .app.study-app .main .btn:not(.ghost){border-radius:18px;min-height:46px}
+body .app.study-app .main .btn.ghost{min-height:44px}
+.concept1-home{display:grid;gap:23px;max-width:880px;margin:0 auto;padding:4px 0 20px}
+.concept1-hero{position:relative;overflow:hidden;isolation:isolate;min-height:190px;padding:24px;border-radius:27px;color:#fff;background:radial-gradient(ellipse at 90% 10%,#a1d7ffcc,transparent 65%),linear-gradient(140deg,#6551d8,#a482f2 62%,#608cdb);border:1px solid #ffffff90;box-shadow:0 12px 30px #6352b92e,inset 0 1px 2px #fff9}
+.concept1-hero:after{content:"";position:absolute;z-index:-1;left:20%;top:58%;width:100%;height:80%;border:1px solid #ffffff75;transform:rotate(-20deg);border-radius:50%;background:#ffffff18}
+.concept1-hero-copy{position:relative;z-index:1;max-width:70%}.concept1-hero-copy small{font-size:10px;font-weight:750;letter-spacing:.08em;color:#fff}.concept1-hero h2{color:#fff!important;font-size:clamp(25px,5.5vw,39px);letter-spacing:-.045em;line-height:1.08;margin:10px 0}.concept1-hero p{color:#fff!important;font-size:13px;line-height:1.4;margin:0 0 16px}
+.concept1-play{display:inline-flex;align-items:center;gap:12px;min-height:44px;border:1px solid #ffffff80;border-radius:99px;padding:9px 17px;background:#ffffff30;color:#fff;font-weight:750;box-shadow:inset 0 1px 0 #fff6}
+.concept1-robot{position:absolute;right:5%;top:25%;width:100px;transform:rotate(-9deg);filter:drop-shadow(0 8px 10px #4534a855)}.c1-robot-head{position:relative;height:78px;border-radius:38%;display:grid;place-content:center;text-align:center;background:linear-gradient(140deg,#fff,#b7c6ff);border:2px solid #fff;color:#fff;box-shadow:inset 0 -5px 12px #a6a7f0}.c1-robot-head:before{content:"";position:absolute;inset:10px;border-radius:30%;background:#25204b;box-shadow:inset 0 0 12px #6d8fff}.c1-robot-head i,.c1-robot-head b{z-index:1;position:relative;color:#c2f2ff;text-shadow:0 0 7px #7fd7ff;font-style:normal}.c1-robot-head i{font-size:16px;letter-spacing:6px}.c1-robot-body{height:55px;width:64px;margin:-1px auto;border-radius:22px 22px 32px 32px;background:linear-gradient(135deg,#fff,#c3c5ff);display:grid;place-items:center;color:#7854d8;font-size:24px}
+.concept1-section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.concept1-section-head h2{font-size:18px;letter-spacing:-.03em;margin:0;color:var(--ink)}.concept1-section-head button{border:0;background:none;color:var(--green);font-size:12px;font-weight:650;padding:6px}
+.concept1-list,.concept1-goal{border:1px solid var(--line);border-radius:21px;overflow:hidden;background:color-mix(in srgb,var(--paper) 82%,transparent);box-shadow:0 5px 17px #25234b0a,inset 0 1px 0 #fff5}
+.concept1-list>button{display:flex;align-items:center;gap:12px;text-align:left;width:100%;min-height:56px;padding:11px 13px;color:var(--ink);background:none;border:0}.concept1-list>button+button{border-top:1px solid var(--line)}.concept1-list>button>span:nth-child(2),.concept1-list>button>b{flex:1;min-width:0}.concept1-list b{font-size:14px;font-weight:650}.concept1-list small{display:block;color:var(--muted);font-size:11px;margin-top:4px}.concept1-list i{font-style:normal;color:var(--muted);margin-left:auto}
+.concept1-icon{display:grid;place-items:center;flex:none;width:34px;height:34px;border-radius:11px;color:var(--green);background:var(--mint)}.concept1-home svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.concept1-quick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.concept1-quick button{min-width:0;min-height:94px;border:1px solid var(--line);border-radius:20px;background:color-mix(in srgb,var(--paper) 85%,transparent);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--ink);padding:10px 4px;box-shadow:0 4px 15px #25234b0a,inset 0 1px 0 #fff5}.concept1-quick button span{color:var(--green)}.concept1-quick b{font-size:12px;line-height:1.3;text-align:center}
+.concept1-goal{padding:16px;display:grid;gap:10px}.concept1-goal strong{font-size:20px}.concept1-goal progress{width:100%;accent-color:var(--accent)}.concept1-goal small{color:var(--muted)}
+body .lesson-flow .example{border:1px solid var(--line);border-radius:18px;padding:15px;background:color-mix(in srgb,var(--accent-soft) 12%,var(--paper));display:flex;align-items:center;justify-content:space-between;gap:10px}
+body .lesson-flow>button.btn.ghost:last-child{background:linear-gradient(135deg,var(--accent),var(--accent-deep))!important;color:white!important;border:0;width:100%;min-height:48px;margin-top:6px}
+body #da-auth-screen :is(.da-profile-v2,.da-community-card,.da-admin-studio){background:linear-gradient(155deg,var(--paper),color-mix(in srgb,var(--paper) 85%,var(--accent-soft)))!important}
+body #da-auth-screen .da-profile-v2 .da-profile-menu button{background:transparent!important;box-shadow:none!important}
+body #da-auth-screen .da-profile-v2 .da-profile-level{background:linear-gradient(135deg,var(--mint),color-mix(in srgb,var(--paper) 80%,var(--accent-soft)));border-color:var(--line)}
+body #da-auth-screen .da-admin-studio .da-admin-tabs button[aria-pressed=true]{color:var(--green)!important}
+body .placement-exam .placement-option{background:color-mix(in srgb,var(--paper) 90%,transparent)!important;border-radius:18px;min-height:58px}
+body .placement-exam .placement-question{background:color-mix(in srgb,var(--paper) 85%,transparent);padding:20px;border-radius:22px;border:1px solid var(--line)}
+@media(max-width:999px){
+body .app.study-app>.study-header .study-nav{border-radius:24px!important;background:color-mix(in srgb,var(--paper) 86%,transparent)!important;backdrop-filter:blur(26px) saturate(145%);-webkit-backdrop-filter:blur(26px) saturate(145%);box-shadow:0 8px 28px #19143925,inset 0 1px 0 #fff8!important}
+body .app.study-app>.study-header .study-nav>button{background:transparent!important;border:0!important;box-shadow:none!important;color:var(--muted)!important;min-height:49px}
+body .app.study-app>.study-header .study-nav>button[aria-current=page]{color:var(--green)!important;background:var(--mint)!important}
+body .app.study-app>.study-header .study-nav>button[data-page=live]{background:transparent!important;color:var(--green)!important}
+body .app.study-app>.study-header .study-nav>button .study-route-label{font-size:10px!important}
+body #mobile-more-menu .mobile-more-sheet{width:min(340px,calc(100vw - 28px));border-radius:24px!important}
+body .concept1-home{gap:20px}
+body #view:has(.concept1-home)>.top{display:none}
+body #da-auth-screen:has(.da-profile-v2){padding:0!important;align-items:stretch!important}
+body #da-auth-screen .da-profile-v2{width:100%!important;max-width:none!important;max-height:100dvh!important;height:100dvh;padding:22px 18px!important;border-radius:0!important;border:0!important;overflow:auto}
+body .placement-exam .placement-card{padding:8px!important}
+body .placement-exam .placement-option{font-size:16px}
+body .placement-exam textarea{font-size:16px!important}
+}
+@media(max-width:360px){.concept1-robot{right:3%;width:76px}.c1-robot-head{height:64px}.concept1-hero{padding:19px}}
+</style><script src="./api-config.js"></script><script src="./deutschai-auth.js?v=concept1-1"></script></head><body><div class="scene-ribbons" aria-hidden="true"></div><div class="app study-app"><header class="study-header"><div class="study-head"><div class="study-brand"><div class="study-mark"><svg class="deutschai-book-mark" viewBox="0 0 48 48" aria-hidden="true" fill="none">
   <path d="M12 11h13c8 0 14 5.5 14 13s-6 13-14 13H12z" stroke="#fcfaff" stroke-width="3.1" stroke-linejoin="round"/>
   <path d="M12 18c4-1 8.2.2 12 3.2 3.5-2.8 7.3-4.1 11-3.4M12 27c4-1 8.2.2 12 3.2 4.2-3.3 8.5-4.6 13-3.1M24 21.2v9" stroke="#ded0ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
   <path d="M14.5 41h5" stroke="#f28a9c" stroke-width="2.2" stroke-linecap="round"/>
@@ -627,7 +672,7 @@ if(!state.themeVersion){if(state.theme==='light')state.theme='dark';else if(['oc
 function save(){window.deutschaiStore.setItem(KEY,JSON.stringify(state))}
 const navItems=[['home','⌂','Ana sayfa'],['lessons','▤','Dersler'],['program','▦','Ders programı'],['placement','◈','Seviye tespiti'],['words','Aa','Kelime kartları'],['grammar','≋','Gramer'],['practice','✓','Alıştırmalar'],['exam','◷','Deneme sınavı'],['writing','✎','Yazma & konuşma'],['live','◉','Edit'],['progress','↗','İlerleme'],['community','♧','Öğrenci topluluğu']];
 const navGroups=[['Öğren',['home','lessons','program','words','grammar']],['Çalış',['practice','writing']],['Kendini değerlendir',['placement','exam','progress']],['Topluluk',['community']]];
-const defaultMobileShortcuts=['home','lessons','practice'];
+const defaultMobileShortcuts=['home','lessons','progress'];
 const mobileShortcutChoices=navItems.filter(([id])=>id!=='live');
 function mobileShortcuts(){
  const chosen=Array.isArray(state.mobileShortcuts)?state.mobileShortcuts:[];
@@ -669,6 +714,7 @@ function resetStudyScroll(){
 window.deutschaiResetStudyScroll=resetStudyScroll;
 window.addEventListener('pageshow',event=>{if(!event.persisted&&page==='home')requestAnimationFrame(resetStudyScroll)},{once:true});
 function setPage(p){
+  if(p==='profile'){toggleMobileMore(false);document.getElementById('da-account-action')?.click();return;}
   toggleMobileMore(false);
   if (p === 'community') { if(window.DeutschAI?.ready)window.DeutschAI.openCommunity();return; }
   if (p === 'live' && window.DeutschAI?.ready) { window.DeutschAI.openFelkan(); return; }
@@ -1376,9 +1422,15 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>window.deutschaiDesktop?.not
     return true;
   };
   function educationCard(){
-    const d=window.deutschaiNextEducation();if(!d?.nodeId)return '';
-    return '<section class="card mastery-card engine-next"><span class="badge">EDIT · KİŞİSEL EĞİTİM</span><h2>Bugünkü eğitimime başla</h2><p class="muted">'+esc(d.level)+' · '+esc(d.topic)+'</p><p>'+esc(d.reason)+'</p><button class="btn" onclick="window.deutschaiStartEducation()">Edit ile çalış →</button></section>';
+    const d=window.deutschaiNextEducation(), weekly=window.deutschaiWeeklyContext?.(),today=weekly?.days?.[weekly.todayIndex],tasks=Array.isArray(today?.tasks)?today.tasks:[],stats=studyTotals(),level=placement?.level||profile.level||state.level;
+    const hero='<section class="concept1-hero"><div class="concept1-hero-copy"><small>ALMANCA · '+esc(level)+'</small><h2>Bugünkü<br>eğitimime başla</h2><p>'+esc(d?.topic||'Kişisel Almanca çalışman')+'</p><button class="concept1-play" aria-label="Bugünkü eğitimime başla" onclick="'+(d?.nodeId?'window.deutschaiStartEducation()':'setPage(&quot;lessons&quot;)')+'">Başla <span>▶</span></button></div><div class="concept1-robot" aria-hidden="true"><div class="c1-robot-head"><i>● ●</i><b>ᴗ</b></div><div class="c1-robot-body">✦</div></div></section>';
+    const plan='<section class="concept1-section"><div class="concept1-section-head"><h2>Bugünkü planım</h2><button onclick="setPage(&quot;program&quot;)">Tümü ›</button></div><div class="concept1-list">'+(tasks.length?tasks.map((t,i)=>'<button onclick="window.deutschaiStartWeeklyTask('+weekly.todayIndex+','+i+')"><span class="concept1-icon">'+navIcon(t.route||'program')+'</span><span><b>'+esc(t.activity||t.title||t.topic||'Çalışma')+'</b><small>'+esc(t.topic||'')+' · '+esc(t.minutes||0)+' dk</small></span><i>'+ (t.done?'✓':'›')+'</i></button>').join(''):'<button onclick="setPage(&quot;program&quot;)"><span class="concept1-icon">'+navIcon('program')+'</span><span><b>Ders programım</b><small>Bugünün görevlerini görüntüle veya plan oluştur.</small></span><i>›</i></button>')+'</div></section>';
+    const quick='<section class="concept1-section"><div class="concept1-section-head"><h2>Hızlı işlemler</h2></div><div class="concept1-quick">'+[['live','Edit ile konuş'],['words','Tekrar et'],['practice','Hızlı egzersiz']].map(([id,label])=>'<button onclick="setPage(&quot;'+id+'&quot;)"><span>'+navIcon(id)+'</span><b>'+label+'</b></button>').join('')+'</div></section>';
+    const goal='<section class="concept1-section"><div class="concept1-section-head"><h2>Günlük hedef</h2><button onclick="setPage(&quot;progress&quot;)">İlerlemem ›</button></div><div class="concept1-goal"><strong id="today-count">'+stats.today+' / '+state.daily+' dk</strong><progress id="today-goal" max="'+Math.max(1,Number(state.daily)||20)+'" value="'+stats.today+'"></progress><small>'+stats.streak+' gün seri · '+stats.xp+' XP</small></div></section>';
+    const more='<section class="concept1-section"><div class="concept1-section-head"><h2>Çalışma alanları</h2></div><div class="concept1-list">'+[['lessons','Dersler'],['grammar','Gramer'],['writing','Yazma ve konuşma'],['placement','Seviye tespiti'],['exam','Deneme sınavı']].map(([id,label])=>'<button onclick="setPage(&quot;'+id+'&quot;)"><span class="concept1-icon">'+navIcon(id)+'</span><b>'+label+'</b><i>›</i></button>').join('')+'</div></section>';
+    return '<div class="concept1-home">'+hero+plan+quick+goal+more+'</div>';
   }
+  function concept1Home(){shell('Ana sayfa',educationCard());}
   function curriculumCard(){
     const nodes=window.DilCurriculum?.packs?.de||[],m=window.deutschaiMasterySummary(),map=new Map(m.topics.filter(t=>t.nodeId).map(t=>[t.nodeId,t])),level=placement?.level||profile.level||state.level;
     return '<section class="card mastery-card"><h2>Müfredat haritan</h2><p class="muted">Almanca '+esc(level)+' · başlangıç müfredatı. Yeterlilik yalnız gerçek cevaplarla işaretlenir.</p>'+nodes.filter(n=>n.level===level).map(n=>{const t=map.get(n.id);return '<div class="mastery-topic"><div><b>'+esc(n.topic)+'</b><small>'+esc(t?.status||'Henüz ölçülmedi')+' · '+n.requires.length+' ön koşul</small></div><strong>'+(t?t.accuracy+'%':'—')+'</strong></div>'}).join('')+'</section>';
@@ -1777,7 +1829,7 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>window.deutschaiDesktop?.not
   page = 'home';
   render = function () {
     applyTheme();
-    if (page === 'welcome') welcomePage(); else if (page === 'home') {home();document.querySelector('#view')?.insertAdjacentHTML('afterbegin',educationCard());}
+    if (page === 'welcome') welcomePage(); else if (page === 'home') {concept1Home();}
     else if (page === 'live') livePage();
     else if (page === 'placement') { if (liveActive || liveConnecting) liveRelease(); placementExamPage(); }
     else if (page === 'ai') { document.body.classList.remove('welcome-mode'); if (liveActive || liveConnecting) liveRelease(); teacherPage(); }
@@ -1797,7 +1849,7 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>window.deutschaiDesktop?.not
     profile = { ...profile, dailyMinutes };
     saveProfile();
     await ensureDailyPlan(true);
-    if (page === 'home') home();
+    if (page === 'home') concept1Home();
   };
   render();
 })();
