@@ -1148,9 +1148,9 @@ function finishExam(button){
 
 render();
 requestAnimationFrame(()=>requestAnimationFrame(()=>window.deutschaiDesktop?.notifyStartupReady?.()));
-</script><script>(() => {
-  const desk = window.deutschaiDesktop;
-  if (!desk) return;
+</script><script src="./gemini-web.js?v=edit-web-bridge-1"></script><script>(() => {
+  const desk = window.deutschaiDesktop || window.deutschaiWeb;
+  if (!desk) {console.error('Edit öğrenme bağlantısı yüklenemedi.');return;}
   const profileKey = 'deutschai-ai-profile-v1';
   const historyKey = 'deutschai-ai-history-v1';
   let profile = JSON.parse(window.deutschaiStore.getItem(profileKey) || '{"level":null,"dailyMinutes":30,"onboardingComplete":false,"goal":"Goethe-Zertifikat A2"}');
