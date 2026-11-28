@@ -668,14 +668,14 @@ body #da-auth-screen .da-profile-v2.da-profile-c1:has(#da-profile-form:not([hidd
 body #da-auth-screen .da-profile-v2 .da-profile-stat{background:#191c36!important}
 @media(min-width:1000px){body .app.study-app>.study-header{width:250px!important}body .app.study-app .main{margin-left:250px!important;width:calc(100% - 250px)!important;padding:26px!important}body .study-nav button{border-radius:12px!important;min-height:42px}}
 @media(max-width:999px){body .concept1-home{grid-template-columns:1fr;gap:13px}body .concept1-hero{min-height:180px;padding:20px;border-radius:18px}body .neon-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}body .neon-stats>div{padding:11px}body .concept1-quick button{min-height:85px}body .app.study-app>.study-header .study-nav{background:linear-gradient(145deg,#201a38,#1b1f39)!important;border:1px solid #4c3d6a!important;box-shadow:0 0 17px #8a50e526!important}body .app.study-app>.study-header .study-nav>button[data-page=live]{background:radial-gradient(circle at 35% 20%,#c18aff,#8242ee 70%)!important;color:#fff!important;border-radius:50%!important;width:56px!important;height:56px!important;margin:auto;box-shadow:0 0 18px #a873ff88!important}body #da-auth-screen .da-profile-v2.da-profile-c1{margin:55px 0 0 auto!important;width:min(390px,100%)!important;max-height:calc(100dvh - 80px)!important}body #da-auth-screen .da-profile-v2.da-profile-c1:has(#da-profile-form:not([hidden])){margin:auto 0 0!important;width:100%!important;max-height:82dvh!important;border-radius:24px 24px 16px 16px!important}}
-</style><style>@media(min-width:1000px){html body .app.study-app{display:grid!important;grid-template-columns:220px minmax(0,1fr)!important;gap:20px!important;padding:14px 22px 20px 14px!important}html body .app.study-app>.study-header{width:auto!important;grid-column:1!important;position:sticky!important;top:14px!important}html body .app.study-app .main#view{grid-column:2!important;margin-left:0!important;width:100%!important;padding:18px 0!important;max-width:none!important}body .study-header .study-tools{z-index:50!important}}</style><link rel="stylesheet" href="./hallolab-dashboard.css?v=4"></head><body><div class="scene-ribbons" aria-hidden="true"></div><div class="app study-app"><header class="study-header"><div class="study-head"><div class="study-brand"><div class="study-mark"><svg class="deutschai-book-mark" viewBox="0 0 48 48" aria-hidden="true" fill="none">
+</style><style>@media(min-width:1000px){html body .app.study-app{display:grid!important;grid-template-columns:220px minmax(0,1fr)!important;gap:20px!important;padding:14px 22px 20px 14px!important}html body .app.study-app>.study-header{width:auto!important;grid-column:1!important;position:sticky!important;top:14px!important}html body .app.study-app .main#view{grid-column:2!important;margin-left:0!important;width:100%!important;padding:18px 0!important;max-width:none!important}body .study-header .study-tools{z-index:50!important}}</style><link rel="stylesheet" href="./hallolab-dashboard.css?v=5"></head><body><div class="scene-ribbons" aria-hidden="true"></div><div class="app study-app"><header class="study-header"><div class="study-head"><div class="study-brand"><div class="study-mark"><svg class="deutschai-book-mark" viewBox="0 0 48 48" aria-hidden="true" fill="none">
   <path d="M12 11h13c8 0 14 5.5 14 13s-6 13-14 13H12z" stroke="#fcfaff" stroke-width="3.1" stroke-linejoin="round"/>
   <path d="M12 18c4-1 8.2.2 12 3.2 3.5-2.8 7.3-4.1 11-3.4M12 27c4-1 8.2.2 12 3.2 4.2-3.3 8.5-4.6 13-3.1M24 21.2v9" stroke="#ded0ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
   <path d="M14.5 41h5" stroke="#f28a9c" stroke-width="2.2" stroke-linecap="round"/>
   <path d="M23 41h5" stroke="#ffd28e" stroke-width="2.2" stroke-linecap="round"/>
 </svg></div><span class="study-brand-text">HalloLab<small>Almanca Öğrenme Platformu</small></span></div></div>
 <nav class="study-nav" id="nav" aria-label="Çalışma menüsü"></nav>
-<div class="study-tools"><div id="theme-picker"></div><div class="study-window" role="group" aria-label="Pencere kontrolleri" hidden>
+<div class="study-tools"><button type="button" class="hl-search-toggle" aria-label="Ders veya kelime ara" aria-controls="hl-dashboard-search" aria-expanded="false"><svg class="study-toolbar-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zm4 9.5 4 4"/></svg></button><div id="theme-picker"></div><div class="study-window" role="group" aria-label="Pencere kontrolleri" hidden>
 <button type="button" data-window="minimize" title="Simge durumuna küçült" aria-label="Simge durumuna küçült"><svg class="study-toolbar-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h12"/></svg></button>
 <button type="button" data-window="maximize" title="Pencereyi büyüt" aria-label="Pencereyi büyüt"><svg class="study-toolbar-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4h12v12H4z"/></svg></button>
 <button type="button" data-window="close" title="Pencereyi kapat" aria-label="Pencereyi kapat"><svg class="study-toolbar-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5 5 15"/></svg></button>
@@ -1468,9 +1468,9 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>window.deutschaiDesktop?.not
     const account=window.DeutschAI?.user;
     const firstName=String(account?.firstName||'').trim();
     const shortcuts=[['writing','Konuşma Pratiği','pink'],['words','Kelime Kartları','blue'],['practice','Alıştırmalar','green'],['community','Topluluk','purple'],['placement','Seviye Tespiti','gold']];
-    const shortcut=([id,label,color],visibility='')=>`<button type="button" class="hl-shortcut hl-${color}${visibility?' '+visibility:''}" onclick="setPage('${id}')"><span class="hl-icon">${navIcon(id==='live'?'ai':id)}</span><span>${label}</span></button>`;
+    const shortcut=([id,label,color],visibility='')=>`<button type="button" data-shortcut="${id}" class="hl-shortcut hl-${color}${visibility?' '+visibility:''}" onclick="setPage('${id}')"><span class="hl-icon">${navIcon(id==='live'?'ai':id)}</span><span>${label}</span></button>`;
     return `<div class="hl-dashboard">
-      <form class="hl-search" role="search">
+      <form class="hl-search" id="hl-dashboard-search" role="search">
         <label for="hl-search-input" class="hl-visually-hidden">Ders, konu veya kelime ara</label>
         <span aria-hidden="true">${navIcon('search')}</span><input id="hl-search-input" type="search" placeholder="Ders, konu veya kelime ara…" autocomplete="off" aria-controls="hl-search-results" aria-expanded="false" role="combobox" aria-autocomplete="list">
         <div class="hl-search-results" hidden><div id="hl-search-results" role="listbox" aria-label="Arama sonuçları"></div><div class="hl-search-preview" hidden></div></div><span class="hl-visually-hidden" aria-live="polite" id="hl-search-status"></span>
@@ -1483,10 +1483,14 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>window.deutschaiDesktop?.not
         <div class="hl-panel hl-metric"><span class="hl-icon hl-blue">${navIcon('program')}</span><strong>Günlük Hedef</strong><small id="today-count">${stats.today} / ${goal} dk</small><progress id="today-goal" max="${goal}" value="${stats.today}" aria-label="Günlük çalışma hedefi"></progress></div>
         <button type="button" class="hl-panel hl-metric" onclick="setPage('progress')"><span class="hl-icon hl-green">${navIcon('progress')}</span><strong>İlerleme</strong><small>${state.completed.length} ders tamamlandı</small></button>
       </div>
-      <section class="hl-panel hl-recommendation" aria-labelledby="hl-lesson-heading"><span class="hl-tag">Önerilen Dersin</span><div class="hl-lesson-row"><span class="hl-icon">${navIcon('lessons')}</span><div><h2 id="hl-lesson-heading">${esc(recommendation?.topic||nextLesson?.title||'Almanca dersleri')}</h2><p>${esc(recommendation?.level||nextLesson?.level||level)} · Almanca dersi</p></div><button type="button" class="hl-play" onclick="${esc(start)}" aria-label="Önerilen derse başla">▶</button></div></section>
+      <div class="hl-study">
       <section class="hl-links" aria-labelledby="hl-links-heading"><h2 id="hl-links-heading">Hızlı Erişim</h2><div class="hl-link-grid">${shortcut(['lessons','Dersler','purple'],'hl-mobile-only')}${shortcuts.map(entry=>shortcut(entry,entry[0]==='community'?'hl-desktop-only':'')).join('')}${shortcut(['live','Edit (Yapay Zekâ)','purple'],'hl-mobile-only')}</div></section>
+      <section class="hl-panel hl-recommendation" aria-labelledby="hl-lesson-heading"><span class="hl-tag">Önerilen Dersin</span><div class="hl-lesson-row"><span class="hl-icon">${navIcon('lessons')}</span><div><h2 id="hl-lesson-heading">${esc(recommendation?.topic||nextLesson?.title||'Almanca dersleri')}</h2><p>${esc(recommendation?.level||nextLesson?.level||level)} · Almanca dersi</p></div><button type="button" class="hl-play" onclick="${esc(start)}" aria-label="Önerilen derse başla">▶</button></div></section>
+      </div>
+      <div class="hl-extra">
       <section class="hl-panel hl-ai"><div><h2>Edit <span aria-hidden="true">✦</span></h2><p>Almanca öğrenme asistanın</p><blockquote>Bugün hangi konuda çalışmak istersin?</blockquote><button type="button" class="hl-primary" onclick="setPage('live')">${navIcon('mic')} Edit ile Konuş</button></div></section>
       <section class="hl-panel hl-tasks"><h2>${navIcon('placement')} Günlük Görevler</h2>${tasks.length?`<ul>${tasks.map((task,index)=>`<li><button type="button" onclick="window.deutschaiStartWeeklyTask(${weekly.todayIndex},${index})"><span>${esc(task.activity||task.title||task.topic||'Çalışma')}</span><span class="hl-task-state" data-done="${Boolean(task.done)}">${task.done?'✓':''}<span class="hl-visually-hidden">${task.done?'Tamamlandı':'Bekliyor'}</span></span></button></li>`).join('')}</ul>`:'<button type="button" class="hl-task-empty" onclick="setPage(\'program\')">Ders programını aç</button>'}</section>
+      </div>
     </div>`;
   }
   function concept1Home(){
@@ -1497,6 +1501,13 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>window.deutschaiDesktop?.not
     const options=form.querySelector('#hl-search-results');
     const preview=form.querySelector('.hl-search-preview');
     const status=form.querySelector('#hl-search-status');
+    const dashboard=form.closest('.hl-dashboard');
+    const searchToggle=document.querySelector('.hl-search-toggle');
+    const setSearchOpen=open=>{
+      dashboard.toggleAttribute('data-search-open',open);
+      searchToggle.setAttribute('aria-expanded',String(open));
+      if(open)input.focus();
+    };
     const fold=value=>String(value||'').normalize('NFD').replace(/\p{M}/gu,'').toLowerCase().replace(/ı/g,'i').replace(/ß/g,'ss');
     let matches=[],selected=-1;
     const highlight=index=>{
@@ -1536,10 +1547,23 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>window.deutschaiDesktop?.not
       highlight(-1);
       status.textContent=`${match.word.de}. ${match.word.tr}.`;
     };
+    searchToggle.setAttribute('aria-expanded','false');
+    searchToggle.onclick=()=>{
+      const open=!dashboard.hasAttribute('data-search-open');
+      setSearchOpen(open);
+      if(!open)close();
+    };
     input.addEventListener('input',show);
     input.addEventListener('focus',()=>{if(results.hidden)show();});
     input.addEventListener('keydown',event=>{
-      if(event.key==='Escape'){close();return;}
+      if(event.key==='Escape'){
+        close();
+        if(dashboard.hasAttribute('data-search-open')){
+          setSearchOpen(false);
+          searchToggle.focus();
+        }
+        return;
+      }
       if(!['ArrowDown','ArrowUp'].includes(event.key))return;
       if(results.hidden)show();
       if(!matches.length||!(!options.hidden&&options.querySelector('[role="option"]')))return;
@@ -1555,7 +1579,11 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>window.deutschaiDesktop?.not
       if(result)open(Number(result.dataset.result));
     });
     form.addEventListener('submit',event=>{event.preventDefault();if(!results.hidden&&(!options.hidden&&options.querySelector('[role="option"]')))open(Math.max(0,selected));});
-    form.addEventListener('focusout',event=>{if(!form.contains(event.relatedTarget))close();});
+    form.addEventListener('focusout',event=>{
+      if(form.contains(event.relatedTarget)||event.relatedTarget===searchToggle)return;
+      close();
+      if(dashboard.hasAttribute('data-search-open'))setSearchOpen(false);
+    });
   }
   function curriculumCard(){
     const nodes=window.DilCurriculum?.packs?.de||[],m=window.deutschaiMasterySummary(),map=new Map(m.topics.filter(t=>t.nodeId).map(t=>[t.nodeId,t])),level=placement?.level||profile.level||state.level;
