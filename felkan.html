@@ -4,7 +4,7 @@
 <script>if(new URLSearchParams(location.search).get('compact')==='1')document.documentElement.classList.add('compact-felcan');</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Felkan · DeutschAI Almanca Öğretmeni</title><script src="./api-config.js"></script><script src="./felkan-bridge.js?v=all-sections-1"></script>
+<title>Felkan · DeutschAI Almanca Öğretmeni</title><script src="./api-config.js"></script><script src="./felkan-bridge.js?v=welcome-admin-1"></script>
 <style>
 :root{--card:#1b1338;--opt:#130d2b;--txt:#e8eaf0;--mut:#9aa3b5;--blue:#4c8dff;--pad:56px}
 *{box-sizing:border-box}
@@ -640,6 +640,7 @@ function ulSample(k,n){let l=UL[k].slice();if(n&&n<l.length){for(let i=l.length-
 
 const rpScFields={type:'OBJECT',properties:{id:{type:'STRING'},emo:{type:'STRING',description:'1-3 emoji sahne görseli'},title:{type:'STRING',description:'Türkçe kısa başlık'},place:{type:'STRING',description:'Mekan (Almanca ad + isteğe bağlı Türkçe)'},situation_tr:{type:'STRING'},npc_name:{type:'STRING'},npc_role:{type:'STRING'},user_role:{type:'STRING',description:'Kullanıcının rolü (Türkçe)'},goal_tr:{type:'STRING'},phrases:{type:'ARRAY',items:{type:'STRING'},description:'4-6 faydalı Almanca kalıp'}}};
 const DECLS=[
+ {name:'read_current_study',description:'Açık DeutschAI sayfasını o anda okur. Belirli bir soru numarası söylendiyse number ver; ekran dışındaki sorular da bulunur. Bu soru gibi bir ifadede numara vermeden çağır.',parameters:{type:'OBJECT',properties:{number:{type:'INTEGER'}}}},
  {name:'set_layout',description:'Felkan amblemini ekranda istenen konuma taşır. center seçilirse tüm paneller kapanır ve amblem ortada büyür.',
   parameters:{type:'OBJECT',properties:{avatar_position:POSPROP},required:['avatar_position']}},
  {name:'show_quiz',description:'Çoktan seçmeli test paneli açar. Okuma metni sorularında passage kullan. Soruları sen sıfırdan üret.',
@@ -722,11 +723,10 @@ MEVCUT DURUM (uygulama verisi): ${JSON.stringify(stateSummary())}
 GENEL KURALLAR:
 - Türkçe konuş, Almanca örnekler ver. Cevapların sesli okunur: kısa, sıcak ve doğal ol (genelde 1-3 cümle).
 - Kullanıcının seviyesini, yanlışlarını ve günün çalışma planını göz önünde bulundur. "Bugün gramer çalışman var, açayım mı?" diye sor; kullanıcı kabul ettiğinde open_app_section fonksiyonuyla gerçek DeutschAI sayfasını aç. Zorlandığı konulardan kişiye özel kelimeler, gramer örnekleri ve sorular hazırla. Goethe odaklı çalışma yalnızca kullanıcı isterse yapılsın.
-- SES VE ÜSLUP: Kadınsı, neşeli, tatlı ve hafif oyunbaz bir öğretmen gibi sıcak Türkçe konuş. Kullanıcıyı motive et, doğal ve saygılı ol; ders anlatımını asla geri plana atma.
+- SES VE ÜSLUP: İstanbul Türkçesiyle, gündelik, akıcı ve enerjik konuş. Rahat bir öğretmen gibi kısa cümleler kur, doğal vurgu ve orta tempo kullan. Yazı dilinden, uzun girişlerden ve uzatılmış ünlemlerden kaçın. Almanca örnekleri Almanca telaffuz et. Örneğin: “Hadi şıklara birlikte bakalım. Burada fiil nerede duruyor?”
 - TÜM BÖLÜMLER: Ana menüde Dersler, Seviye Tespiti, Kelimeler, Gramer, Pratik, Deneme Sınavı, Yazma & Konuşma ve İlerleme gerçek sayfaları var. Kullanıcı yalnızca sayfayı aç derse open_app_section, o sayfada Gemini soruları hazırlamanı/yenilemeni isterse generate_app_questions çağır. Kendi iframe içindeki show_* panelini gerçek uygulama yerine kullanma.
 - ANA UYGULAMA: Gerçek DeutschAI sayfalarını açman istendiğinde kendi show_grammar, show_quiz gibi araçların yerine open_app_section kullan. Özellikle "grameri aç", "dersleri aç", "sorulara geç" dendiğinde gerçek ana site sayfasını aç. İşlem başarısızsa açıldı deme.
-- TÜM SORULARI GÖR: [Uygulama] ekran bilgisinde birden fazla soru (1, 2, 3...) gönderilir. Kullanıcı "2. soruyu açıkla" derse o numaralı sorunun metnini ve seçeneklerini seç; DAİMA numarayı kontrol et. Kullanıcı sadece "bu soru" derse selectedQuestion alanını kullan, yoksa hangi soru olduğunu sor. Görmediğin soruyu uydurma.
-- EKRANDAKİ SORU: Kullanıcı "bu soruyu anlamadım", "buradakini anlat", "şu soruya bak" dediğinde senden önce gönderilen [Uygulama] EKRAN bilgisini kullan. Soru ve seçenekleri incele, Türkçe kısa ipuçlarıyla öğret; cevabı hemen söyleme. Ekran bilgisi yoksa hangi soruyu kastettiğini sor.
+- EKRAN VE SORULAR: Bir soru veya açık ders hakkında konuşmadan önce read_current_study çağır. “5. soru” için number:5 ver; görünür olmasına gerek yok. “Bu soru” için araçtan gelen seçili soruyu, yoksa ekran ortasındaki soruyu kullan. Hangi soru olduğu belirsizse numarasını sor. Soru metni ve şıklarla kısa, somut ipucu ver. Resmî sınav modunda sınav kuralları geçerlidir.
 - Ekranı sen yönetirsin. Ekranla ilgili HER isteği ilgili fonksiyonu çağırarak yap; fonksiyonu çağırmadan "açtım" deme. Fonksiyon success:true dönerse bir cümleyle onayla (örn. "Tamam, sola geçtim, testi açtım"). success:false dönerse nedenini söyle ve bir kez daha dene.
 - PANELLER: Ekranda sol, orta ve sağ olmak üzere en fazla 3 panel AYNI ANDA açık olabilir. Her show_* fonksiyonunda slot ile yerini seç (left/center/right). Slot verilmezse ders programı solda, ilerleme sağda, diğer her şey ortada açılır. Kullanıcı "sola test koy" derse slot=left ver. Dolu bir slota yeni panel açarsan eskisi yerine geçer. Diğer panelleri kapatma, sadece istenirse kapat (close_panel, slot veya all).
 - SEVİYE TESPİT SINAVI: Kullanıcı seviye tespiti isterse start_placement_test çağır ("kısa" derse short=true), sonra hiçbir şey söyleme; uygulama sana "[Uygulama] SEVİYE TESPİTİ ..." mesajlarıyla adım adım talimat gönderir. Bu talimatlara AYNEN uy: istenen fonksiyonu (pt_listening, pt_writing, pt_reading_tf, pt_questions, pt_words, pt_result) tam istenen sayıda soruyla çağır; "sessizce" denen yerde hiçbir şey söyleme, "sesli söyle" denen cümleyi aynen söyle. Fonksiyon success:false dönerse hatayı düzeltip aynı fonksiyonu tekrar çağır. Sınav sırasında ipucu verme, doğru cevapları söyleme. Konuşma bölümünde kullanıcı "devam / bitti / sonraki" derse pt_continue çağır. Sınavı bırakmak isterse cancel_placement_test çağır.
@@ -756,6 +756,8 @@ function notify(text){log('→ Felkan:',text.slice(0,160));return send({realtime
 let felcanGreetingPending=false;
 let felcanGreetingTimer=null;
 let greetingHasAudio=false;
+let greetingRequest=null;
+let greetingReported=false;
 function finishGreeting(){
   if(!felcanGreetingPending)return;
   felcanGreetingPending=false;
@@ -771,6 +773,8 @@ function requestSpokenGreeting(text,model){
     : {clientContent:{turns:[{role:'user',parts:[{text}]}],turnComplete:true}};
   const ok=send(message);
   if(!ok)return false;
+  greetingRequest={text,model};
+  greetingReported=false;
   felcanGreetingPending=true;
   clearTimeout(felcanGreetingTimer);
   greetingHasAudio=false;
@@ -852,6 +856,10 @@ function requestCompanionMic(){
   }).finally(()=>{micRequest=null});
 }
 function readyToListen(){
+  if(greetingHasAudio&&!greetingReported&&!felcanGreetingPending&&!S.sources.size){
+    greetingReported=true;
+    if(window.parent!==window)window.parent.postMessage({type:'deutschai:greeting-played'},location.origin);
+  }
   if(S.playCtx?.state==='suspended'&&S.sources.size){
     setStatus('audio-blocked','Sesi açmak için dokun');
   }else if(micNeedsPermission){
@@ -879,7 +887,9 @@ async function connect(){
   ws.onclose=ev=>{clearTimeout(timer);if(S.ws!==ws)return;onClosed(ev)};
 }
 function onClosed(ev){
-  log('Bağlantı kapandı',{code:ev.code,reason:ev.reason});stopPlayback();
+  log('Bağlantı kapandı',{code:ev.code,reason:ev.reason});
+  if(S.sources.size&&!greetingReported){greetingHasAudio=false;S.greeted=false}
+  stopPlayback();
   const wasUp=S.setupDone;S.setupDone=false;clearTimeout(S.stableTimer);
   if(felcanGreetingPending)S.greeted=false;
   felcanGreetingPending=false;clearTimeout(felcanGreetingTimer);
@@ -912,7 +922,12 @@ async function onMsg(ev,model){
     return}
   if(m.error){
     log('API hatası',m.error);
-    if(felcanGreetingPending){felcanGreetingPending=false;clearTimeout(felcanGreetingTimer);setStatus('error','Sesli selamlama başlatılamadı')}
+    if(felcanGreetingPending){
+      felcanGreetingPending=false;
+      clearTimeout(felcanGreetingTimer);
+      const quota=m.error.code===429||m.error.status==='RESOURCE_EXHAUSTED';
+      setStatus('error',quota?'Gemini ses kotası doldu (429).':(m.error.message||'Sesli selamlama başlatılamadı.'));
+    }
   }
   const sc=m.serverContent;
   if(sc){
@@ -959,6 +974,13 @@ function stateSummary(){return {level:DATA.level,daily_goal_min:DATA.dailyGoal,s
   plan:DATA.plan?{days:DATA.plan.days.length,daily_min:DATA.plan.dailyMin,weak:DATA.plan.weak}:null,
   topics_done:curriculum().filter(t=>DATA.ts[t.id]&&DATA.ts[t.id].done).map(t=>t.name),topics_remaining:curriculum().filter(t=>!(DATA.ts[t.id]&&DATA.ts[t.id].done)).map(t=>t.name)}}
 async function runTool(name,a){
+  if(name==='read_current_study'){
+    const number=Number(a.number)||undefined;
+    const context=window.parent!==window?window.parent.DeutschAI?.getStudyContext(number):null;
+    if(!context)return {success:false,error:'Açık DeutschAI çalışma sayfasına erişilemedi.'};
+    if(number&&!context.questions.length)return {success:false,error:'Bu bölümde '+number+'. soru yok.',questionCount:context.questionCount};
+    return {success:true,...context};
+  }
   if(name==='open_app_section')return {success:window.FelkanBridge.navigate(a.page),page:a.page};
   if(name==='generate_app_questions')return {success:window.FelkanBridge.generate(a.page),page:a.page,message:'Yeni Gemini çalışması gerçek DeutschAI sayfasında hazırlanıyor'};
   if(name==='set_layout'){const p=POS.includes(a.avatar_position)?a.avatar_position:'center';let closed=false;
@@ -2028,7 +2050,16 @@ function toggleCompanionVoice(){
     connect();
   }
 }
-window.FelcanVoiceControl={toggle:toggleCompanionVoice,unlockAudio:unlockCompanionAudio};
+function greetCompanion(){
+  unlockCompanionAudio();
+  if(avatar.dataset.state==='audio-blocked'||felcanGreetingPending||felcanConnecting)return;
+  if(S.setupDone&&greetingRequest){
+    requestSpokenGreeting(greetingRequest.text,greetingRequest.model);
+    return;
+  }
+  toggleCompanionVoice();
+}
+window.FelcanVoiceControl={toggle:toggleCompanionVoice,greet:greetCompanion};
 
 $('#bCenter').onclick=()=>{closeAll();setPos('center')};
 $('#bMute').onclick=()=>{S.muted=!S.muted;$('#bMute').classList.toggle('on',S.muted);if(S.stream)S.stream.getAudioTracks().forEach(t=>t.enabled=!S.muted);
