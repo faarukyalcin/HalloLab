@@ -569,11 +569,16 @@ function ensureAudio(){
 function unlockCompanionAudio(){
   ensureAudio();
   if(S.micCtx?.state==='suspended')void S.micCtx.resume().catch(()=>{});
+  playFallbackGreeting();
 }
 function playPCM(b64,rate){
   ensureAudio();const u=b64ToBytes(b64);const n=Math.floor(u.length/2);if(!n)return;
   const dv=new DataView(u.buffer,u.byteOffset,u.byteLength),f=new Float32Array(n);
   for(let i=0;i<n;i++)f[i]=dv.getInt16(i*2,true)/32768;
+  if(felcanGreetingPending&&!greetingHasAudio){
+    if(!f.some(sample=>Math.abs(sample)>0.002))return;
+    greetingHasAudio=true;
+  }
   const buf=S.playCtx.createBuffer(1,n,rate||24000);buf.copyToChannel(f,0);
   const src=S.playCtx.createBufferSource();src.buffer=buf;src.connect(S.analyser);
   const t=Math.max(S.nextTime,S.playCtx.currentTime+0.03);src.start(t);S.nextTime=t+buf.duration;
@@ -751,6 +756,49 @@ function send(o){if(S.ws&&S.ws.readyState===1){S.ws.send(JSON.stringify(o));retu
 function notify(text){log('→ Felkan:',text.slice(0,160));return send({realtimeInput:{text}})}
 let felcanGreetingPending=false;
 let felcanGreetingTimer=null;
+let greetingHasAudio=false;
+let fallbackGreetingWaiting=false;
+let skipLateGreeting=false;
+function playFallbackGreeting(){
+  if(!fallbackGreetingWaiting||S.ttsBusy)return;
+  if(!window.speechSynthesis||!window.SpeechSynthesisUtterance){
+    fallbackGreetingWaiting=false;
+    if(S.setupDone)readyToListen();
+    return;
+  }
+  const greeting=new SpeechSynthesisUtterance('Merhaba '+cfg.name+'! Ben Felcan. Almanca çalışmaya hazır mısın?');
+  greeting.lang='tr-TR';
+  const voice=speechSynthesis.getVoices().find(item=>item.lang.toLowerCase().startsWith('tr'));
+  if(voice)greeting.voice=voice;
+  S.ttsBusy=true;
+  greeting.onstart=()=>{
+    fallbackGreetingWaiting=false;
+    setSpeaking(true);
+  };
+  greeting.onend=()=>{
+    S.ttsBusy=false;
+    setSpeaking(false);
+  };
+  greeting.onerror=event=>{
+    S.ttsBusy=false;
+    if(event.error==='not-allowed'){
+      setStatus('audio-blocked','Selamı duymak için dokun');
+    }else{
+      fallbackGreetingWaiting=false;
+      if(S.setupDone)readyToListen();
+    }
+  };
+  speechSynthesis.speak(greeting);
+}
+function finishGreeting(){
+  if(!felcanGreetingPending)return;
+  felcanGreetingPending=false;
+  clearTimeout(felcanGreetingTimer);
+  if(!greetingHasAudio){
+    fallbackGreetingWaiting=true;
+    playFallbackGreeting();
+  }else if(!S.speaking)readyToListen();
+}
 function requestSpokenGreeting(text,model){
   // Gemini 3.1 accepts live text through realtimeInput.
   const message=model.startsWith('gemini-3.1-')
@@ -760,13 +808,15 @@ function requestSpokenGreeting(text,model){
   if(!ok)return false;
   felcanGreetingPending=true;
   clearTimeout(felcanGreetingTimer);
+  greetingHasAudio=false;
+  skipLateGreeting=false;
   felcanGreetingTimer=setTimeout(()=>{
-    felcanGreetingPending=false;
-    if(S.setupDone&&!S.speaking){
-      if(micNeedsPermission||S.sources.size)readyToListen();
-      else setStatus('listening','Selam yanıtı gecikti. Konuşabilirsin.');
+    if(greetingHasAudio)finishGreeting();
+    else{
+      skipLateGreeting=true;
+      finishGreeting();
     }
-  },14000);
+  },6500);
   setStatus('connecting','Felcan seni karşılıyor…');
   return true;
 }
@@ -908,13 +958,14 @@ async function onMsg(ev,model){
   }
   const sc=m.serverContent;
   if(sc){
-    if((sc.turnComplete||sc.interrupted)&&felcanGreetingPending){
-      felcanGreetingPending=false;clearTimeout(felcanGreetingTimer);
-      if(!S.speaking)readyToListen();
-    }
     if(sc.interrupted){stopPlayback()}
+    if(sc.inputTranscription?.text)skipLateGreeting=false;
     const parts=sc.modelTurn&&sc.modelTurn.parts||[];
-    for(const p of parts){const d=p.inlineData;if(d&&d.data){const mt=/rate=(\d+)/.exec(d.mimeType||'');playPCM(d.data,mt?+mt[1]:24000)}}
+    if(!skipLateGreeting)for(const p of parts){const d=p.inlineData;if(d&&d.data){const mt=/rate=(\d+)/.exec(d.mimeType||'');playPCM(d.data,mt?+mt[1]:24000)}}
+    if(sc.turnComplete||sc.interrupted){
+      skipLateGreeting=false;
+      finishGreeting();
+    }
     if(sc.inputTranscription&&sc.inputTranscription.text){S.capIn+=sc.inputTranscription.text;showCaption()}
     if(sc.outputTranscription&&sc.outputTranscription.text){S.capOut+=sc.outputTranscription.text;showCaption()}
     if(PT.on&&PT.cap){
