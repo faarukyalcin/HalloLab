@@ -870,6 +870,7 @@ function describeFelcanScreen(context){
    'Aktif yüzey: '+String(context.surface||''),
    'Güncel öğrenme bilgisi: '+JSON.stringify(context.learning||{}).slice(0,3500),
    context.studyText?'Ders içeriği: '+String(context.studyText).slice(0,3600):'',
+   context.currentWord?'Aktif kelime kartı: '+JSON.stringify(context.currentWord).slice(0,1000):'',
    context.lessonDetails?'Aktif ders adımı '+(context.lessonDetails.stage+1)+': '+String(context.lessonDetails.text||'').slice(0,3200):'',
    'Sayfada '+(context.questionCount||questions.length)+' soru var.',
    context.selectedQuestion?'Öğrencinin seçtiği soru: '+context.selectedQuestion+'. soru':'',
@@ -887,13 +888,14 @@ function activationPrompt(context,intent='auto'){
   if(!lesson?.text&&!context?.studyText)return base+'Ders henüz hazır değilse bunu söyle, konu uydurma.';
   return base+'Öğrenci bu ekrandaki dersi seninle çalışmak istiyor. Genel selamlaşma veya hedef sorma yapma. Ekrandaki gerçek konu ve aktif adımla hemen başla. '+(lesson?.stage>=2?'Görünen soruyu birlikte çözmek için yönlendir, cevabı hemen verme.':'Konuyu basit Türkçe ile anlat, Almanca örnek ver ve kısa bir anlama sorusu sor.')+' Ekranda olmayan konu uydurma.\n'+describeFelcanScreen(context);
  }
+ if(page==='words'&&context?.currentWord)return base+'Öğrencinin açık olan kelime kartıyla hemen çalış. Almanca kelimeyi doğru telaffuz et, artikeli ve anlamını açıkla, örnek cümleyi söyle, sonra öğrenciye kısa bir hatırlama sorusu sor. Başka kart uydurma.\n'+describeFelcanScreen(context);
  if(['words','practice','writing'].includes(page))return base+'Doğrudan ekrandaki '+(page==='words'?'kelimelerle telaffuz ve örnek çalışmasına':page==='writing'?'yazma veya konuşma görevine':'görünen alıştırmaya')+' başla; yanıtı hemen söyleme.\n'+describeFelcanScreen(context);
  if(page==='program'||page==='progress')return base+'Mevcut '+(page==='program'?'çalışma planını':'öğrenme ilerlemesini')+' kısa ve gerçek verilere göre açıkla; ardından bir sonraki adımı öner.\n'+describeFelcanScreen(context);
  return base+'Kısa doğal selam ver, nasıl yardımcı olabileceğini sor. Özel hesap ve yönetim bilgilerini isteme.';
 }
 function activateVoice(context,intent='auto'){
  felcanScreen=context||felcanScreen;activationIntent=intent;
- const key=JSON.stringify([felcanScreen?.surface,felcanScreen?.lessonDetails,felcanScreen?.title,felcanScreen?.selectedQuestion,felcanScreen?.questions?.[0]?.prompt]);
+ const key=JSON.stringify([felcanScreen?.surface,felcanScreen?.lessonDetails,felcanScreen?.title,felcanScreen?.selectedQuestion,felcanScreen?.currentWord?.index,felcanScreen?.currentWord?.de,felcanScreen?.questions?.[0]?.prompt]);
  const active=S.setupDone&&S.ws?.readyState===1;
  if(active&&intent!=='lesson'&&key===activationKey){toggleCompanionVoice();return;}
  activationKey=key;activationQueued=true;S.greeted=false;unlockCompanionAudio();
