@@ -283,6 +283,7 @@ body #da-auth-screen .da-profile-v2.da-profile-c1 #da-profile-form { gap: 8px; }
 }
 
 @media (min-width: 1000px) and (min-height: 700px) {
+  .hl-dashboard { height: calc(100svh - 36px); min-height: min-content; }
   html body .app.study-app:has(.hl-dashboard) > .study-header { align-self: stretch; }
   .study-app:has(.hl-dashboard) #nav { gap: clamp(1px, .7svh - 4px, 6px); }
   .study-app:has(.hl-dashboard) #nav > button { min-height: clamp(36px, 4.75svh, 60px); }
