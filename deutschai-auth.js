@@ -372,7 +372,7 @@
     e.innerHTML='<div class="da-card da-admin-card"><div class="da-admin-top"><div class="da-admin-heading"><span class="da-admin-emblem" aria-hidden="true">✦</span><div><small>YÖNETİM MERKEZİ</small><h1>Yönetici Paneli</h1><p>Hesaplar, roller ve Gemini yönetimi</p></div></div><button type="button" id="da-admin-close" aria-label="Kapat">✕</button></div>'
       +'<div class="da-admin-stat-grid"><div><b id="da-users-count">—</b><small>Toplam kayıtlı hesap</small></div><div><b id="da-admins-count">—</b><small>Yöneticiler</small></div><div><b id="da-members-count">—</b><small>Öğrenciler</small></div></div>'
       +'<section class="da-admin-section"><h2>Hesap yönetimi</h2><div class="da-admin-toolbar"><label for="da-user-search">Hesap ara</label><input id="da-user-search" type="search" placeholder="Ad, kullanıcı adı veya e-posta"><button type="button" id="da-reload-users">Yenile</button></div><p id="da-admin-account-status" role="status"></p><div class="da-admin-users" id="da-admin-users" aria-live="polite">Üyeler yükleniyor…</div></section>'
-      +'<section class="da-admin-section"><h2>Gemini API anahtarı</h2><p>Ortak anahtarı yöneticiler değiştirebilir. Mevcut anahtar tarayıcıya geri gönderilmez.</p><form id="da-admin-form"><label>Yeni Gemini API anahtarı<input name="apiKey" type="password" autocomplete="off" required></label><p class="da-error" role="alert"></p><button type="submit">Anahtarı Kaydet</button></form></section></div>';
+      +'<section class="da-admin-section"><h2>Gemini API anahtarı</h2><p>Ortak anahtarı yöneticiler değiştirebilir. Mevcut anahtar tarayıcıya geri gönderilmez.</p><form id="da-admin-form"><label>Yeni Gemini API anahtarı<input name="apiKey" type="password" autocomplete="off" required></label><p id="da-key-status" role="status">Anahtar durumu sorgulanıyor…</p><p class="da-error" role="alert"></p><button type="submit">Yeni anahtarı kaydet / değiştir</button> <button type="button" id="da-key-clear">Girişi temizle</button> <button type="button" id="da-key-delete" class="da-admin-danger">Kayıtlı anahtarı sil</button></form></section></div>';
     const list=e.querySelector('#da-admin-users');
     const search=e.querySelector('#da-user-search');
     const accountStatus=e.querySelector('#da-admin-account-status');
@@ -503,12 +503,23 @@
       }catch(error){list.textContent='Liste alınamadı: '+error.message+' — Backend güncellemesinin yayımlandığından emin ol.'}
     };
     e.querySelector('#da-reload-users').onclick=load;
-    e.querySelector('form').onsubmit=async ev=>{
-      ev.preventDefault();
-      const status=e.querySelector('.da-error');
-      try{await request('/admin/gemini-key',{method:'PUT',body:JSON.stringify(Object.fromEntries(new FormData(ev.currentTarget)))});status.textContent='Anahtar güvenli olarak kaydedildi';ev.currentTarget.reset()}
-      catch(error){status.textContent=error.message}
+    const keyForm=e.querySelector('#da-admin-form'),keyInput=keyForm.elements.apiKey,keyStatus=e.querySelector('#da-key-status'),keyError=keyForm.querySelector('.da-error'),keyDelete=e.querySelector('#da-key-delete');
+    const keyRefresh=async()=>{try{const s=await request('/admin/status');keyStatus.textContent=s.geminiConfigured?(s.geminiReadable===false?'Anahtar kayıtlı ancak şifresi çözülemiyor. Yeni anahtar gir veya sil.':'Anahtar kayıtlı (erişim doğrulanmadı).'):'Kayıtlı API anahtarı yok.';keyDelete.disabled=!s.geminiConfigured;}catch(err){keyStatus.textContent='Anahtar durumu alınamadı: '+err.message;keyDelete.disabled=false;}};
+    let keyBusy=false;
+    const keyAction=async(method)=>{
+      if(keyBusy)return;
+      const value=keyInput.value.trim();
+      if(method==='PUT'&&(value.length<20||value.length>200||/\s/.test(value))){keyError.textContent='Geçerli bir API anahtarı gir.';return;}
+      if(method==='DELETE'&&!window.confirm('Ortak Gemini anahtarı silinsin mi? Yeni anahtar kaydedilene kadar AI özellikleri çalışmaz. Öğrenci verileri korunur.'))return;
+      keyBusy=true;keyError.textContent='';keyForm.querySelectorAll('button').forEach(b=>b.disabled=true);
+      try{await request('/admin/gemini-key',{method,...(method==='PUT'?{body:JSON.stringify({apiKey:value})}:{})});keyForm.reset();keyError.textContent=method==='PUT'?'Yeni anahtar güvenli olarak kaydedildi.':'Kayıtlı anahtar silindi.';}
+      catch(err){keyError.textContent=err.message+(err.status===404&&method==='DELETE'?' — Backend güncellemesi henüz yayımlanmamış.':'');}
+      finally{keyBusy=false;keyForm.querySelectorAll('button').forEach(b=>b.disabled=false);await keyRefresh();}
     };
+    keyForm.onsubmit=ev=>{ev.preventDefault();void keyAction('PUT')};
+    e.querySelector('#da-key-clear').onclick=()=>{keyInput.value='';keyError.textContent='Giriş alanı temizlendi. Kayıtlı anahtar değişmedi.';keyInput.focus()};
+    keyDelete.onclick=()=>void keyAction('DELETE');
+    void keyRefresh();
     load();
   }
   function claimAdmin() {
