@@ -555,30 +555,10 @@ body #mobile-more-menu .mobile-more-sheet,body .study-popup,body .study-appearan
 body #da-auth-screen :is(.da-profile-card,.da-admin-card){background:linear-gradient(145deg,color-mix(in srgb,var(--accent-soft) 12%,var(--paper)),var(--paper))!important;color:var(--ink)!important;border-color:var(--line)!important}
 body #da-auth-screen :is(.da-profile-card,.da-admin-card) :is(input,select,textarea,button){background:color-mix(in srgb,var(--paper) 85%,var(--mint))!important;color:var(--ink)!important;border-color:var(--line)!important}
 body #da-auth-screen :is(.da-profile-card,.da-admin-card) :is(p,label,small){color:var(--muted)!important}
-</style><style id="calm-theme-1">
-body{--accent:#52756d;--accent-deep:#36574f;--accent-soft:#a7c7ba}
-body.theme-violet,body.theme-violet-dark{--accent:#82749c;--accent-deep:#645479;--accent-soft:#c4b8d5}
-body.theme-ocean,body.theme-ocean-dark{--accent:#527da1;--accent-deep:#345a7b;--accent-soft:#adc9df}
-body.theme-rose,body.theme-rose-dark{--accent:#a56f7e;--accent-deep:#824c5c;--accent-soft:#dfb5c0}
-body.theme-sunset,body.theme-sunset-dark{--accent:#9b795a;--accent-deep:#795a3e;--accent-soft:#dac4ab}
-body:not(:is(.theme-dark,.theme-ocean-dark,.theme-violet-dark,.theme-rose-dark,.theme-sunset-dark)){--bg:#f3f5f4;--paper:#ffffff;--ink:#24302d;--muted:#596764;--line:#dce3df;--mint:color-mix(in srgb,var(--accent) 8%,white);--green:var(--accent-deep);background:var(--bg)!important}
-body:is(.theme-dark,.theme-ocean-dark,.theme-violet-dark,.theme-rose-dark,.theme-sunset-dark){--bg:#171c1d;--paper:#242b2c;--ink:#eef2f0;--muted:#b1bfba;--line:#3b4745;--mint:color-mix(in srgb,var(--accent) 13%,var(--paper));--green:var(--accent-soft);background:var(--bg)!important}
-body .scene-ribbons{display:none!important}
-body .app.study-app{--lg-edge:var(--line);--lg-surface:var(--paper);--lg-inset:color-mix(in srgb,var(--paper) 92%,var(--bg));--lg-shadow:0 4px 18px #00000009;background:transparent!important}
-body .app.study-app>.study-header,body .app.study-app>.study-header .study-nav,body #mobile-more-menu .mobile-more-sheet,body .study-popup,body #da-account-action,body #da-auth-screen :is(.da-profile-card,.da-admin-card){background:var(--paper)!important;border-color:var(--line)!important;box-shadow:0 4px 18px #00000012!important}
-body .app.study-app .main .study-next{background-image:linear-gradient(90deg,#304e49ee,#304e4977),var(--hero-asset)!important}
-body .app.study-app .main :is(.card,.placement-card,.stat,.adaptive-question,.mastery-card){background:var(--paper)!important;border-color:var(--line)!important;box-shadow:0 3px 14px #00000008!important}
-body .app.study-app .main .btn:not(.ghost){background:var(--accent-deep)!important;border-color:transparent!important;box-shadow:none!important;color:white!important}
-body #da-auth-screen :is(.da-profile-card,.da-admin-card) button{box-shadow:none!important}
-body #da-auth-screen .da-profile-v2 .da-profile-menu button{background:transparent!important}
-body #da-auth-screen .da-admin-v2 .da-admin-tabs button[aria-pressed=true]{background:var(--accent-deep)!important;color:white!important}
-body #da-auth-screen .da-profile-v2 #da-logout{color:#c65d72!important}
-body #da-felcan-float{background:var(--paper)!important;border-color:var(--line)!important;box-shadow:0 5px 18px #0002!important}
-body #placement-writing,body #placement-open-answer{display:block!important;visibility:visible!important;opacity:1!important;width:100%!important;min-height:180px;box-sizing:border-box;padding:14px;border:1px solid var(--line)!important;border-radius:14px;background:var(--bg)!important;color:var(--ink)!important;font:16px/1.6 system-ui;resize:vertical;margin:8px 0}
+</style><style id="placement-input-fix">body #placement-writing,body #placement-open-answer{display:block!important;visibility:visible!important;opacity:1!important;width:100%!important;min-height:180px;box-sizing:border-box;padding:14px;border:1px solid var(--line)!important;border-radius:14px;background:var(--bg)!important;color:var(--ink)!important;font:16px/1.6 system-ui;resize:vertical;margin:8px 0}
 body #placement-writing:focus,body #placement-open-answer:focus{outline:2px solid var(--accent);outline-offset:2px}
 .placement-writing-label{display:block;font-weight:650;margin-top:15px;color:var(--ink)}
-#placement-word-count{display:block;color:var(--muted);margin:6px 0 14px}
-</style><script src="./api-config.js"></script><script src="./deutschai-auth.js?v=profile-level-1"></script></head><body><div class="scene-ribbons" aria-hidden="true"></div><div class="app study-app"><header class="study-header"><div class="study-head"><div class="study-brand"><div class="study-mark"><svg class="deutschai-book-mark" viewBox="0 0 48 48" aria-hidden="true" fill="none">
+#placement-word-count{display:block;color:var(--muted);margin:6px 0 14px}</style><script src="./api-config.js"></script><script src="./deutschai-auth.js?v=profile-level-1"></script></head><body><div class="scene-ribbons" aria-hidden="true"></div><div class="app study-app"><header class="study-header"><div class="study-head"><div class="study-brand"><div class="study-mark"><svg class="deutschai-book-mark" viewBox="0 0 48 48" aria-hidden="true" fill="none">
   <path d="M12 11h13c8 0 14 5.5 14 13s-6 13-14 13H12z" stroke="#fcfaff" stroke-width="3.1" stroke-linejoin="round"/>
   <path d="M12 18c4-1 8.2.2 12 3.2 3.5-2.8 7.3-4.1 11-3.4M12 27c4-1 8.2.2 12 3.2 4.2-3.3 8.5-4.6 13-3.1M24 21.2v9" stroke="#ded0ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
   <path d="M14.5 41h5" stroke="#f28a9c" stroke-width="2.2" stroke-linecap="round"/>
@@ -608,7 +588,7 @@ if (legacyProfile && !window.DeutschAI?.user) {
   sessionStorage.removeItem('deutschai-active-account');
 }
 const KEY = KEY_PREFIX;
-const defaults={completed:[],learned:{},attempts:[],minutes:0,level:'A1',daily:20,wrongWords:[],notes:{},theme:'light',themeVersion:1,grammarDone:{}};
+const defaults={completed:[],learned:{},attempts:[],minutes:0,level:'A1',daily:20,wrongWords:[],notes:{},theme:'dark',themeVersion:1,grammarDone:{}};
 let state={...defaults,...JSON.parse(window.deutschaiStore.getItem(KEY)||'{}')};
 if(!state.themeVersion){if(state.theme==='light')state.theme='dark';else if(['ocean','violet','rose','sunset'].includes(state.theme))state.theme+='-dark';state.themeVersion=1;window.deutschaiStore.setItem(KEY,JSON.stringify(state))}
 function save(){window.deutschaiStore.setItem(KEY,JSON.stringify(state))}
@@ -718,7 +698,7 @@ function renderNav() {
   }
 
   const wasOpen = picker.querySelector('details')?.open;
-  const colors = [['light','Doğal','#52756d'],['ocean','Mavi','#527da1'],['violet','Lavanta','#82749c'],['rose','Gül','#a56f7e'],['sunset','Kum','#9b795a']];
+  const colors = [['light','Yeşil','#167461'],['ocean','Mavi','#3978c5'],['violet','Mor','#7957c8'],['rose','Pembe','#c05f7a'],['sunset','Turuncu','#c47a24']];
   picker.innerHTML = `<details class="study-disclosure study-appearance" ${wasOpen ? 'open' : ''}>
     <summary aria-label="Görünüm" title="Görünüm">${toolbarIcon('M10 5v-2m0 14v-2m5-5h2M3 10h2m9-4 1.5-1.5m-11 11L6 14m8 0 1.5 1.5m-11-11L6 6 M13 10a3 3 0 1 0-6 0 3 3 0 0 0 6 0Z')}</summary>
     <div class="study-popup">
@@ -782,7 +762,6 @@ function shell(title,body,eyebrow='DilAtölyesi · Almanca'){
   }
   previousViewKey=viewKey;
 }
-if(!state.calmThemeVersion){state.theme=window.matchMedia?.('(prefers-color-scheme: dark)').matches?'dark':'light';state.calmThemeVersion=1;save();}
 function baseTheme(name=state.theme){return name==='dark'?'light':name.replace(/-dark$/,'')}
 function isDarkTheme(name=state.theme){return name==='dark'||name.endsWith('-dark')}
 function setTheme(name){if(!['light','dark','ocean','ocean-dark','violet','violet-dark','rose','rose-dark','sunset','sunset-dark'].includes(name))return;const dark=isDarkTheme(),base=baseTheme(name);state.theme=dark?(base==='light'?'dark':base+'-dark'):base;save();render()}
