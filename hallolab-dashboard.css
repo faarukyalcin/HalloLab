@@ -492,7 +492,7 @@ body .study-app #view > :is(.top, .card, #adaptive-ai-root, .placement-exam, .le
 }
 
 /* Phone dashboard chrome and cards. */
-.hl-phone-copy, .study-tools .hl-phone-updates, .study-app .study-header #nav > .hl-phone-profile { display: none; }
+.hl-phone-copy, .study-tools .hl-phone-updates { display: none; }
 
 @media (max-width: 719px) {
   html body .app.study-app > .study-header {
@@ -619,7 +619,7 @@ body .study-app #view > :is(.top, .card, #adaptive-ai-root, .placement-exam, .le
     background: linear-gradient(150deg,#231c3a,#1a1d35 58%) !important;
   }
   html body .app.study-app > .study-header #nav > button { display: none !important; }
-  html body .app.study-app > .study-header #nav > :is([data-page="home"],[data-page="lessons"],[data-page="live"],[data-page="progress"],.hl-phone-profile) {
+  html body .app.study-app > .study-header #nav > :is([data-page="home"],[data-page="lessons"],[data-page="live"],[data-page="progress"],.mobile-more-trigger) {
     display: flex !important; flex-direction: column; align-items: center; justify-content: center;
     width: 100% !important; min-width: 0; text-align: center; white-space: normal;
     font-size: .71rem !important;
@@ -628,7 +628,8 @@ body .study-app #view > :is(.top, .card, #adaptive-ai-root, .placement-exam, .le
   html body .app.study-app > .study-header #nav > [data-page="lessons"] { order: 2 !important; }
   html body .app.study-app > .study-header #nav > [data-page="live"] { order: 3 !important; }
   html body .app.study-app > .study-header #nav > [data-page="progress"] { order: 4 !important; }
-  html body .app.study-app > .study-header #nav > .hl-phone-profile { order: 5 !important; }
+  html body .app.study-app > .study-header #nav > .mobile-more-trigger { order: 5 !important; }
+  html body .app.study-app > .study-header #nav > .mobile-more-trigger[aria-expanded="true"] { color: #d780ff !important; }
   html body .app.study-app > .study-header #nav .study-route-label { font-size: .71rem !important; }
   html body .app.study-app > .study-header #nav > button:not([data-page="live"]) {
     background: transparent !important; border-color: transparent !important; box-shadow: none !important;
