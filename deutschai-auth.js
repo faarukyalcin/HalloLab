@@ -447,6 +447,34 @@
       } catch(err) {e.querySelector('.da-error').textContent=err.message;b.disabled=false;}
     };
   }
+  async function community() {
+    const e=overlay();
+    e.innerHTML='<div class="da-card da-profile-card da-community-card"><div class="da-profile-actions" style="justify-content:space-between;margin:0"><h2 style="margin:0">Öğrenci topluluğu</h2><button type="button" id="da-community-close">✕</button></div><p>Birlikte öğren, seviyeleri keşfet ve başarıları kutla.</p><p>Profilini paylaşmak için Profilim bölümündeki topluluk ayarını açabilirsin.</p><div id="da-community-list" aria-live="polite">Öğrenciler yükleniyor…</div><button type="button" id="da-community-more" hidden>Weitere · Daha fazla</button></div>';
+    const list=e.querySelector('#da-community-list'),more=e.querySelector('#da-community-more');
+    e.querySelector('#da-community-close').onclick=()=>e.hidden=true;
+    let offset=0;
+    async function load(){
+      more.disabled=true;
+      try{
+        const data=await request('/community?offset='+offset);
+        if(!list.isConnected)return;
+        if(offset===0)list.replaceChildren();
+        for(const m of data.members||[]){
+          const card=document.createElement('article');card.className='da-community-member da-profile-level';
+          const avatar=document.createElement('span');avatar.className='da-profile-avatar';
+          const name=m.displayName||m.username;
+          if(typeof m.photo==='string'&&m.photo.length<60000&&/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(m.photo)){const img=document.createElement('img');img.src=m.photo;img.alt='';avatar.append(img)}else avatar.textContent=String(name||'?').slice(0,2).toLocaleUpperCase('tr');
+          const body=document.createElement('div');body.style.minWidth='0';const title=document.createElement('strong');title.textContent=name;const meta=document.createElement('small');meta.textContent='@'+m.username+(m.visible?' · '+(m.level||'Seviye belirlenmedi'):' · Gizli profil');body.append(title,meta);
+          if(m.visible){const info=document.createElement('small');info.textContent=String(m.lessons||0)+' tamamlanan ders';body.append(info);const badges=document.createElement('div');badges.className='da-community-badges';for(const badge of m.badges||[]){const chip=document.createElement('span');chip.textContent='🏅 '+badge;badges.append(chip)}body.append(badges)}
+          card.append(avatar,body);list.append(card);
+        }
+        if(!list.childElementCount)list.textContent='Henüz öğrenci yok.';
+        offset=data.nextOffset;more.hidden=offset==null;
+      }catch(err){if(list.isConnected)list.textContent='Topluluk yüklenemedi: '+err.message}
+      finally{more.disabled=false}
+    }
+    more.onclick=load;await load();
+  }
   function account() {
     if (!auth?.user || document.getElementById('da-account-action')) return;
     const key='deutschai-personal-profile-v1';
@@ -473,6 +501,7 @@
       .da-profile-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:10px 0}.da-profile-stat{text-align:center}.da-profile-stat b{display:block;font-size:20px}.da-profile-stat small{font-size:11px}
       #da-auth-screen .da-profile-card button{color:var(--ink,#fff);background:linear-gradient(145deg,color-mix(in srgb,var(--green,#b59aff) 25%,var(--paper,#252347)),color-mix(in srgb,var(--green,#b59aff) 10%,var(--paper,#252347)));border-color:color-mix(in srgb,var(--green,#b59aff) 38%,var(--line,#ffffff44));box-shadow:inset 0 1px 0 #ffffff28}
       #da-auth-screen .da-profile-card input,#da-auth-screen .da-profile-card textarea,#da-auth-screen .da-profile-card select{width:100%;box-sizing:border-box;background:var(--paper,#252347);color:var(--ink,#fff);border:1px solid var(--line,#ffffff44);border-radius:10px;padding:10px;font:inherit}
+      .da-community-card{width:min(540px,100%)!important}.da-community-member{display:flex;gap:12px;align-items:flex-start;margin:10px 0;overflow-wrap:anywhere}.da-community-member .da-profile-avatar{width:48px;height:48px}.da-community-member small{display:block;margin:4px 0}.da-community-badges{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}.da-community-badges span{font-size:11px;padding:5px 8px;border-radius:999px;border:1px solid var(--line,#ffffff33);background:color-mix(in srgb,var(--green,#b59aff) 12%,transparent)}
       .da-profile-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.da-profile-card form{display:grid;gap:10px}.da-profile-card [hidden]{display:none!important}
     `;document.head.append(style);
     function avatar(photo,name){const s=document.createElement('span');s.className='da-profile-avatar';if(validPhoto(photo)){const img=document.createElement('img');img.src=photo;img.alt='';s.append(img)}else{s.textContent=(name||'?').trim().slice(0,2).toLocaleUpperCase('tr')}return s}
@@ -482,13 +511,15 @@
       const e=overlay(),p=read(key),learning=read('deutschai-ai-profile-v1'),placement=read('deutschai-ai-placement-v1'),progress=read('deutschai-online-v1');
       const level=levels.includes(placement.level)?placement.level:levels.includes(learning.level)?learning.level:'Belirlenmedi';
       const fullName=[auth.user.firstName,auth.user.lastName].filter(Boolean).join(' ');
-      e.innerHTML='<div class="da-card da-profile-card"><div class="da-profile-actions" style="justify-content:space-between;margin:0"><strong>PROFİLİM</strong><button type="button" id="da-close" aria-label="Kapat">✕</button></div><div class="da-profile-head"><span id="da-profile-photo"></span><div><h2 id="da-profile-name"></h2><small id="da-profile-handle"></small></div></div><div class="da-profile-level"><small class="da-profile-muted">Almanca seviyen</small><h2 style="margin:5px 0">'+safe(level)+'</h2><small class="da-profile-muted">'+(levels.includes(placement.level)?'Seviye tespit sınavı sonucu':level==='Belirlenmedi'?'Seviye tespit sınavını tamamla':'Mevcut çalışma seviyesi')+'</small></div><div class="da-profile-stats"><div class="da-profile-stat"><b>'+safe(Array.isArray(progress.completed)?progress.completed.length:0)+'</b><small>Ders</small></div><div class="da-profile-stat"><b>'+safe(Number(progress.xp)||0)+'</b><small>XP</small></div><div class="da-profile-stat"><b>'+safe(Number(learning.dailyMinutes)||Number(progress.daily)||0)+'</b><small>Günlük dk.</small></div></div><p id="da-profile-bio" class="da-profile-muted"></p><button type="button" id="da-profile-edit">Profili düzenle</button><form id="da-profile-form" hidden><label>Profil fotoğrafı<input type="file" accept="image/*" id="da-profile-file"></label><button type="button" id="da-profile-remove">Fotoğrafı kaldır</button><label>Görünen ad<input name="displayName" maxlength="60"></label><label>Şehir<input name="city" maxlength="60"></label><label>Doğum tarihi (isteğe bağlı)<input name="birthday" type="date"></label><label>Hakkımda<textarea name="bio" maxlength="240" rows="3"></textarea></label><label>Hedef seviye<select name="goal"><option value="">Seçiniz</option>'+levels.map(x=>'<option>'+x+'</option>').join('')+'</select></label><button type="submit">Değişiklikleri kaydet</button></form><p id="da-profile-status" role="status" class="da-profile-muted"></p><div class="da-profile-actions">'+(auth.user.role==='admin'?'<button id="da-admin">Admin Paneli</button>':'<button id="da-claim-admin">İlk Yönetici Kurulumu</button>')+'<button id="da-logout">Çıkış Yap</button></div></div>';
+      e.innerHTML='<div class="da-card da-profile-card"><div class="da-profile-actions" style="justify-content:space-between;margin:0"><strong>PROFİLİM</strong><button type="button" id="da-close" aria-label="Kapat">✕</button></div><div class="da-profile-head"><span id="da-profile-photo"></span><div><h2 id="da-profile-name"></h2><small id="da-profile-handle"></small></div></div><div class="da-profile-level"><small class="da-profile-muted">Almanca seviyen</small><h2 style="margin:5px 0">'+safe(level)+'</h2><small class="da-profile-muted">'+(levels.includes(placement.level)?'Seviye tespit sınavı sonucu':level==='Belirlenmedi'?'Seviye tespit sınavını tamamla':'Mevcut çalışma seviyesi')+'</small></div><div class="da-profile-stats"><div class="da-profile-stat"><b>'+safe(Array.isArray(progress.completed)?progress.completed.length:0)+'</b><small>Ders</small></div><div class="da-profile-stat"><b>'+safe(Number(progress.xp)||0)+'</b><small>XP</small></div><div class="da-profile-stat"><b>'+safe(Number(learning.dailyMinutes)||Number(progress.daily)||0)+'</b><small>Günlük dk.</small></div></div><p id="da-profile-bio" class="da-profile-muted"></p><button type="button" id="da-profile-edit">Profili düzenle</button> <button type="button" id="da-community-open">Öğrenci topluluğu</button><form id="da-profile-form" hidden><label>Profil fotoğrafı<input type="file" accept="image/*" id="da-profile-file"></label><button type="button" id="da-profile-remove">Fotoğrafı kaldır</button><label>Görünen ad<input name="displayName" maxlength="60"></label><label>Şehir<input name="city" maxlength="60"></label><label>Doğum tarihi (isteğe bağlı)<input name="birthday" type="date"></label><label>Hakkımda<textarea name="bio" maxlength="240" rows="3"></textarea></label><label>Hedef seviye<select name="goal"><option value="">Seçiniz</option>'+levels.map(x=>'<option>'+x+'</option>').join('')+'</select></label><label style="display:flex;align-items:center;gap:8px"><input style="width:auto" type="checkbox" name="communityVisible"> Fotoğrafımı, görünen adımı, seviyemi ve rozetlerimi diğer öğrencilere göster</label><button type="submit">Değişiklikleri kaydet</button></form><p id="da-profile-status" role="status" class="da-profile-muted"></p><div class="da-profile-actions">'+(auth.user.role==='admin'?'<button id="da-admin">Admin Paneli</button>':'<button id="da-claim-admin">İlk Yönetici Kurulumu</button>')+'<button id="da-logout">Çıkış Yap</button></div></div>';
       const q=s=>e.querySelector(s),form=q('#da-profile-form'),status=q('#da-profile-status');
       let photo=validPhoto(p.photo)?p.photo:'',busy=false;
       const paint=()=>q('#da-profile-photo').replaceChildren(avatar(photo,fullName));
       paint();q('#da-profile-name').textContent=p.displayName||fullName;q('#da-profile-handle').textContent='@'+auth.user.username+' · '+(auth.user.role==='admin'?'Yönetici':'Öğrenci');
       q('#da-profile-bio').textContent=[p.city,p.bio,p.goal?'Hedef: '+p.goal:''].filter(Boolean).join(' · ');
       for(const field of ['displayName','city','birthday','bio','goal'])form.elements[field].value=p[field]||'';
+      form.elements.communityVisible.checked=p.communityVisible===true;
+      q('#da-community-open').onclick=community;
       q('#da-profile-edit').onclick=()=>{form.hidden=!form.hidden;q('#da-profile-edit').textContent=form.hidden?'Profili düzenle':'Düzenlemeyi kapat'};
       q('#da-profile-remove').onclick=()=>{photo='';q('#da-profile-file').value='';paint()};
       q('#da-profile-file').onchange=async ev=>{
@@ -499,7 +530,7 @@
       };
       form.onsubmit=async ev=>{
         ev.preventDefault();if(busy)return;
-        const data=Object.fromEntries(new FormData(form));const value={displayName:data.displayName.trim().slice(0,60),city:data.city.trim().slice(0,60),birthday:data.birthday,bio:data.bio.trim().slice(0,240),goal:levels.includes(data.goal)?data.goal:'',photo};
+        const data=Object.fromEntries(new FormData(form));const value={displayName:data.displayName.trim().slice(0,60),city:data.city.trim().slice(0,60),birthday:data.birthday,bio:data.bio.trim().slice(0,240),goal:levels.includes(data.goal)?data.goal:'',photo,communityVisible:form.elements.communityVisible.checked};
         const raw=JSON.stringify(value),submit=form.querySelector('[type=submit]');submit.disabled=true;
         try{await request('/state',{method:'PUT',body:JSON.stringify({bucket:bucket(key),data:{raw}})});put(prefix()+key,raw);refresh();b.click();e.querySelector('#da-profile-status').textContent='Profil kaydedildi.'}catch(err){status.textContent='Profil kaydedilemedi: '+err.message;submit.disabled=false}
       };
@@ -653,7 +684,7 @@
     nav?.addEventListener('focusin',warmMobileVoice);
   }
   window.deutschaiStore=store;
-  window.DeutschAI={api:request,store,get user(){return auth?.user||null;},get ready(){return !!origin && !!auth;},logout,showAdmin:admin,openFelkan:felkan,getStudyContext:number=>auth?felcanScreenContext(number):null};
+  window.DeutschAI={api:request,store,openCommunity:community,get user(){return auth?.user||null;},get ready(){return !!origin && !!auth;},logout,showAdmin:admin,openFelkan:felkan,getStudyContext:number=>auth?felcanScreenContext(number):null};
   window.addEventListener('message',event=>{
     const frame=felcanFrame();
     if(event.origin!==location.origin||!frame||event.source!==frame.contentWindow)return;
