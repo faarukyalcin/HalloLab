@@ -507,7 +507,7 @@ body .app.study-app .main .glass-shortcuts > button { display:grid; justify-item
   .home-section-grid button { gap:6px; padding-inline:7px; font-size:13px; }
   .home-section-arrow { display:none; }
 }
-</style><link rel="stylesheet" href="./mobile-liquid-glass.css?v=study-menu-glass-2"><script src="./api-config.js"></script><script src="./deutschai-auth.js?v=admin-glass-4"></script></head><body><div class="scene-ribbons" aria-hidden="true"></div><div class="app study-app"><header class="study-header"><div class="study-head"><div class="study-brand"><div class="study-mark"><svg class="deutschai-book-mark" viewBox="0 0 48 48" aria-hidden="true" fill="none">
+</style><link rel="stylesheet" href="./mobile-liquid-glass.css?v=custom-dock-1"><script src="./api-config.js"></script><script src="./deutschai-auth.js?v=admin-glass-4"></script></head><body><div class="scene-ribbons" aria-hidden="true"></div><div class="app study-app"><header class="study-header"><div class="study-head"><div class="study-brand"><div class="study-mark"><svg class="deutschai-book-mark" viewBox="0 0 48 48" aria-hidden="true" fill="none">
   <path d="M12 11h13c8 0 14 5.5 14 13s-6 13-14 13H12z" stroke="#fcfaff" stroke-width="3.1" stroke-linejoin="round"/>
   <path d="M12 18c4-1 8.2.2 12 3.2 3.5-2.8 7.3-4.1 11-3.4M12 27c4-1 8.2.2 12 3.2 4.2-3.3 8.5-4.6 13-3.1M24 21.2v9" stroke="#ded0ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
   <path d="M14.5 41h5" stroke="#f28a9c" stroke-width="2.2" stroke-linecap="round"/>
@@ -543,7 +543,29 @@ if(!state.themeVersion){if(state.theme==='light')state.theme='dark';else if(['oc
 function save(){window.deutschaiStore.setItem(KEY,JSON.stringify(state))}
 const navItems=[['home','⌂','Ana sayfa'],['lessons','▤','Dersler'],['program','▦','Ders programı'],['placement','◈','Seviye tespiti'],['words','Aa','Kelime kartları'],['grammar','≋','Gramer'],['practice','✓','Alıştırmalar'],['exam','◷','Deneme sınavı'],['writing','✎','Yazma & konuşma'],['live','◉','Edit'],['progress','↗','İlerleme'],['community','♧','Öğrenci topluluğu']];
 const navGroups=[['Öğren',['home','lessons','program','words','grammar']],['Çalış',['practice','writing']],['Kendini değerlendir',['placement','exam','progress']],['Topluluk',['community']]];
-const primaryMobile=['home','lessons','live','practice'];
+const defaultMobileShortcuts=['home','lessons','practice'];
+const mobileShortcutChoices=navItems.filter(([id])=>id!=='live');
+function mobileShortcuts(){
+ const chosen=Array.isArray(state.mobileShortcuts)?state.mobileShortcuts:[];
+ const valid=[...new Set(chosen.filter(id=>mobileShortcutChoices.some(([key])=>key===id)))].slice(0,3);
+ for(const id of defaultMobileShortcuts)if(valid.length<3&&!valid.includes(id))valid.push(id);
+ return valid;
+}
+let primaryMobile=[];
+function editMobileShortcuts(){
+ const sheet=document.querySelector('#mobile-more-menu .mobile-more-sheet');if(!sheet)return;
+ const editor=sheet.querySelector('.mobile-shortcut-editor');if(!editor)return;
+ editor.hidden=!editor.hidden;
+ if(editor.hidden)return;
+ const draft=mobileShortcuts();
+ const draw=()=>{
+  editor.innerHTML='<p>Üç kısayolunu seç. Edit ve Menü sabit kalır.</p><div class="mobile-shortcut-preview">'+[draft[0],draft[1],'live',draft[2],'menu'].map(id=>'<span>'+navIcon(id)+'<small>'+escapeHtml(id==='menu'?'Menü':navItems.find(x=>x[0]===id)?.[2]||'')+'</small></span>').join('')+'</div><div class="mobile-shortcut-fields">'+draft.map((id,i)=>'<label>'+[1,2,4][i]+'. konum<select data-slot="'+i+'">'+mobileShortcutChoices.map(([key,,name])=>'<option value="'+key+'"'+(key===id?' selected':'')+'>'+escapeHtml(name)+'</option>').join('')+'</select></label>').join('')+'</div><div class="mobile-shortcut-actions"><button type="button" data-reset>Varsayılana dön</button><button type="button" data-save>Kısayolları kaydet</button></div>';
+  editor.querySelectorAll('select').forEach(select=>select.onchange=()=>{const i=Number(select.dataset.slot),next=select.value,other=draft.indexOf(next);if(other>=0&&other!==i)draft[other]=draft[i];draft[i]=next;draw();editor.querySelector('[data-slot="'+i+'"]')?.focus()});
+  editor.querySelector('[data-reset]').onclick=()=>{draft.splice(0,3,...defaultMobileShortcuts);draw()};
+  editor.querySelector('[data-save]').onclick=()=>{state.mobileShortcuts=[...draft];save();document.querySelector('#nav').dataset.renderKey='';renderNav();toggleMobileMore(true)};
+ };
+ draw();
+}
 function navIcon(id){const paths={community:'M16 11a4 4 0 1 0-8 0m-5 9v-2a6 6 0 0 1 6-6h6a6 6 0 0 1 6 6v2M12 3a4 4 0 1 0 0 8',program:'M5 5h14v15H5zm0 4h14M8 3v4m8-4v4m-7 6h2m3 0h2m-7 3h2m3 0h2',menu:'M4 6h16M4 12h16M4 18h16',placement:'M12 3 20 8v8l-8 5-8-5V8zm-3 9 2 2 4-5',home:'M3.5 10.5 12 3.5l8.5 7v9.2a1.3 1.3 0 0 1-1.3 1.3h-5v-6h-4.4v6h-5a1.3 1.3 0 0 1-1.3-1.3z',lessons:'M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22zm0 0V22m4-15h8m-8 4h8',words:'M8 4h12v15H8zm-3 3H4v14h12v-2m-5-11h6m-6 4h6',grammar:'M5 6h14M8 3v6m8-6v6M7 13h10m-8 4h6m-4 4h2',practice:'M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17zm-4 8.5 2.5 2.5 5-5',exam:'M7 3.5h8l4 4V21H5V3.5zm8 0V8h4m-9 5h6m-6 4h6',writing:'m14 5 5 5M4 20l4.2-.9L20 7.3 16.7 4 4.9 15.8z',live:'M4 10v4m4-7v10m4-13v16m4-11v6m4-8v10',ai:'m12 3 2.1 6.2L20 12l-5.9 2.1L12 21l-2.1-6.9L4 12l5.9-2.8z',progress:'M4 20V5m0 15h17M8 15l3-4 3 2 5-7'};return `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[id]||paths.home}"/></svg>`}
 let page='home',filter='Tümü',wordIndex=0,wordBack=false,wordFilter='Tümü',wordMode='kart';
 function escapeHtml(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -576,7 +598,8 @@ function renderNav() {
   const picker = document.querySelector('#theme-picker');
   const focused = document.activeElement;
   const active = page === 'welcome' ? 'home' : ['lesson','lesson-end'].includes(page) ? 'lessons' : page;
-  const navKey=active+'|'+state.theme;
+  const shortcuts=mobileShortcuts();primaryMobile=[shortcuts[0],shortcuts[1],'live',shortcuts[2]];
+  const navKey=active+'|'+state.theme+'|'+shortcuts.join(',');
   if(nav.dataset.renderKey===navKey)return;
   nav.dataset.renderKey=navKey;
   const route = ([id, , name]) => {
@@ -593,9 +616,10 @@ function renderNav() {
     document.body.appendChild(mobileMore);
   }
   mobileMore.classList.remove('open');
-  mobileMore.innerHTML = `<button type="button" class="mobile-more-dismiss" onclick="toggleMobileMore(false)" aria-label="Menüyü kapat"></button><div class="mobile-more-sheet" role="dialog" aria-label="Çalışma menüsü"><div class="mobile-more-grabber" aria-hidden="true"></div><div class="mobile-more-heading"><div class="mobile-more-title"><strong>Çalışma menüsü</strong><small>Öğrenme yolculuğunu keşfet</small></div><button type="button" onclick="toggleMobileMore(false)" aria-label="Kapat">✕</button></div>${navGroups.map(([heading,ids])=>`<section class="mobile-more-group"><h3>${heading}</h3><div class="mobile-more-links">${ids.filter(id=>!primaryMobile.includes(id)).map(routeById).join('')}</div></section>`).join('')}</div>`;
+  mobileMore.innerHTML = `<button type="button" class="mobile-more-dismiss" onclick="toggleMobileMore(false)" aria-label="Menüyü kapat"></button><div class="mobile-more-sheet" role="dialog" aria-label="Çalışma menüsü"><div class="mobile-more-grabber" aria-hidden="true"></div><div class="mobile-more-heading"><div class="mobile-more-title"><strong>Çalışma menüsü</strong><small>Öğrenme yolculuğunu keşfet</small></div><button type="button" onclick="toggleMobileMore(false)" aria-label="Kapat">✕</button></div><button type="button" class="mobile-shortcut-edit" onclick="editMobileShortcuts()">⚙ Alt menüyü düzenle</button><div class="mobile-shortcut-editor" hidden></div>${navGroups.map(([heading,ids])=>`<section class="mobile-more-group"><h3>${heading}</h3><div class="mobile-more-links">${ids.filter(id=>!primaryMobile.includes(id)).map(routeById).join('')}</div></section>`).join('')}</div>`;
   nav.querySelectorAll('[data-page]').forEach(button => {
     if(!primaryMobile.includes(button.dataset.page))button.classList.add('mobile-secondary-route');
+    else button.style.setProperty('--dock-order',String(primaryMobile.indexOf(button.dataset.page)+1));
   });
   if(!primaryMobile.includes(active))nav.querySelector('.mobile-more-trigger')?.setAttribute('data-current','');
   const felcanTab=nav.querySelector('[data-page="live"]');
